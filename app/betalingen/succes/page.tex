@@ -1,0 +1,18 @@
+"use client";
+
+import Link from "next/link";
+
+export default function BetalingSucces() {
+  return (
+    <main style={{ padding: "40px", textAlign: "center" }}>
+      <h1>Betaling gelukt</h1>
+
+      <p>Je betaling is succesvol ontvangen.</p>
+      <p>Je ShineGo-boeking is bevestigd.</p>
+
+      <Link href="/">
+        Terug naar ShineGo
+      </Link>
+    </main>
+  );
+}
