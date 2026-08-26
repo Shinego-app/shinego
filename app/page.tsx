@@ -24,7 +24,7 @@ export default function Home() {
               href="#professional"
               className="text-gray-700 hover:text-blue-600"
             >
-              Voor professionals
+              Voor glazenwassers
             </a>
           </nav>
 
@@ -59,17 +59,18 @@ export default function Home() {
                 href="/boeken"
                 className="rounded-xl bg-blue-600 px-7 py-4 text-center text-lg font-semibold text-white hover:bg-blue-700"
               >
-                Boek een klus
+                Boek een 
+              
               </a>
 
               <button className="rounded-xl border border-gray-300 bg-white px-7 py-4 text-lg font-semibold text-gray-800 hover:bg-gray-50">
-                Word professional
+                Word glazenwasser 
               </button>
             </div>
 
             <div className="mt-8 flex flex-wrap gap-6 text-sm text-gray-600">
               <span>✓ Vooraf vaste prijs</span>
-              <span>✓ Betrouwbare professionals</span>
+              <span>✓ Betrouwbare glazenwassers</span>
               <span>✓ Veilig betalen</span>
             </div>
           </div>
@@ -141,12 +142,12 @@ export default function Home() {
       <section id="diensten" className="mx-auto max-w-7xl px-6 py-20">
         <div className="text-center">
           <h2 className="text-4xl font-bold text-gray-900">
-            Eén platform voor jouw klussen
+            Glazenwasser eenvoudig geregeld 
           </h2>
 
           <p className="mx-auto mt-4 max-w-2xl text-lg text-gray-600">
-            ShineGo maakt het boeken van een vakman net zo eenvoudig als het
-            bestellen van een taxi.
+            ShineGo maakt het boeken van een glazenwasser snel,duidelijk
+            en eenvoudig.
           </p>
         </div>
 
@@ -159,8 +160,8 @@ export default function Home() {
             </h3>
 
             <p className="mt-3 leading-relaxed text-gray-600">
-              Geen eindeloze offertes. Vul de klusgegevens in en zie vooraf
-              wat de klus kost.
+              Geen eindeloze offertes. Vul de gegevens in en zie direct 
+              wat de glasbewassing kost.
             </p>
           </div>
 
@@ -181,11 +182,11 @@ export default function Home() {
             <div className="text-4xl">✅</div>
 
             <h3 className="mt-5 text-xl font-bold text-gray-900">
-              Gecontroleerde professionals
+              Gecontroleerde glazenwassers 
             </h3>
 
             <p className="mt-3 leading-relaxed text-gray-600">
-              Professionals worden gecontroleerd voordat ze opdrachten via
+              Glazenwassers worden gecontroleerd voordat ze opdrachten via
               ShineGo kunnen uitvoeren.
             </p>
           </div>
@@ -208,7 +209,7 @@ export default function Home() {
               </div>
 
               <h3 className="mt-5 text-xl font-bold">
-                Kies je klus
+                Kies je glasbewassing
               </h3>
 
               <p className="mt-2 text-gray-600">
@@ -240,7 +241,7 @@ export default function Home() {
               </h3>
 
               <p className="mt-2 text-gray-600">
-                Een beschikbare professional kan jouw opdracht uitvoeren.
+                Een beschikbare glazenwasser kan jouw opdracht uitvoeren.
               </p>
             </div>
           </div>
@@ -252,20 +253,20 @@ export default function Home() {
         <div className="rounded-3xl bg-gray-900 px-8 py-14 text-white md:px-14">
           <div className="max-w-3xl">
             <p className="font-semibold text-blue-400">
-              Voor zelfstandige professionals
+              Voor zelfstandige glazenwassers 
             </p>
 
-            <h2 className="mt-3 text-4xl font-bold">
-              Meer opdrachten. Geen betaalde leads.
+            <h2 className="mt-3 text-4xl font-bol">
+              Meer opdrachten. Meer omzet. jij bepaalt.
             </h2>
 
             <p className="mt-5 text-lg leading-relaxed text-gray-300">
-              Ontvang echte opdrachten in jouw regio. Bekijk de klus, verdien
-              aan uitgevoerd werk en beheer je planning vanuit één plek.
+              Vul je agenda met nieuwe glasbewassingsopdrachten in jouw regio.
+              kies zelf welke opdrachten je aanneemt en bepaal wanner je werkt. Aanmelden bij ShineGO is gratis.
             </p>
 
             <button className="mt-8 rounded-xl bg-white px-7 py-4 font-semibold text-gray-900 hover:bg-gray-100">
-              Aanmelden als professional
+              Gratis aanmelden glazenwasser 
             </button>
           </div>
         </div>
