@@ -24,8 +24,8 @@ const session = await stripe.checkout.sessions.create({
       },
     ],
    metadata: { bookingId: String(bookingId) }, 
-    success_url: "http://localhost:3000?betaling/succes",
-    cancel_url: "http://localhost:3000?betaling=geannuleerd",
+    success_url: "https://www.shinego.nl?betaling/succes",
+    cancel_url: "https://www.shinego.nl?betaling=geannuleerd",
   });
 
   return Response.json({ url: session.url });
