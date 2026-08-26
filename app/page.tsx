@@ -39,17 +39,17 @@ export default function Home() {
         <div className="mx-auto grid max-w-7xl gap-12 px-6 py-20 md:grid-cols-2 md:items-center">
           <div>
             <div className="mb-4 inline-block rounded-full bg-blue-100 px-4 py-2 text-sm font-semibold text-blue-700">
-              Snel geregeld. Vooraf een duidelijke prijs.
+              Schone ramen, snel en duidelijke geregeld.
             </div>
 
             <h1 className="text-5xl font-bold leading-tight text-gray-900 md:text-6xl">
-              Een vakman regelen
+              Een glazenwasser regelen 
               <span className="text-blue-600"> zonder gedoe.</span>
             </h1>
 
             <p className="mt-6 max-w-xl text-xl leading-relaxed text-gray-600">
-              Boek eenvoudig een betrouwbare professional voor jouw klus.
-              Kies je dienst, ontvang direct een prijs en plan wanneer het jou
+              Boek eenvoudig een betrouwbare glazenwasser. kies wat je wilt 
+              laten reinigen, ontvang direct een duidelijke prijs en plan wanneer het jou
               uitkomt.
             </p>
 
@@ -77,61 +77,61 @@ export default function Home() {
           {/* Boekingskaart */}
           <div className="rounded-3xl border border-gray-200 bg-white p-7 shadow-xl">
             <h2 className="text-2xl font-bold text-gray-900">
-              Wat wil je laten doen?
+              Wat wil je laten reinigen?
             </h2>
 
             <p className="mt-2 text-gray-500">
-              Kies een dienst om direct te beginnen.
+              Kies de glasbewassing die bij je past.
             </p>
 
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <button className="rounded-2xl border border-gray-200 p-5 text-left transition hover:border-blue-500 hover:bg-blue-50">
+              <a href="/boeken/glazenwassen" className="rounded-2xl border border-gray-200 p-5 text-left transition hover:border-blue-500 hover:bg-blue-50">
+                <div className="text-3xl">✨</div>
+
+                <div className="mt-3 font-semibold text-gray-900">
+                  Ramen buiten wassen 
+                </div>
+
+                <div className="mt-1 text-sm text-gray-500">
+                  Buitenzijde van ramen 
+                </div>
+              </a>
+
+              <a href="/boeken/glazenwassen" className="rounded-2xl border border-gray-200 p-5 text-left transition hover:border-blue-500 hover:bg-blue-50">
+                <div className="text-3xl">🧼</div>
+
+                <div className="mt-3 font-semibold text-gray-900">
+                  Ramen binnen wassen
+                </div>
+
+                <div className="mt-1 text-sm text-gray-500">
+                  Binnenzijde van ramen 
+                </div>
+              </a>
+
+              <a href="/boeken/glazenwassen" className="rounded-2xl border border-gray-200 p-5 text-left transition hover:border-blue-500 hover:bg-blue-50">
                 <div className="text-3xl">🪟</div>
 
                 <div className="mt-3 font-semibold text-gray-900">
-                  Glazenwassen
+                  Telewash
                 </div>
 
                 <div className="mt-1 text-sm text-gray-500">
-                  Ramen buitenzijde
+                  Voor ramen op hoogte 
                 </div>
-              </button>
+              </a> 
 
-              <button className="rounded-2xl border border-gray-200 p-5 text-left transition hover:border-blue-500 hover:bg-blue-50">
-                <div className="text-3xl">🎨</div>
+              <a href="/boeken/glazenwassen" className="rounded-2xl border border-gray-200 p-5 text-left transition hover:border-blue-500 hover:bg-blue-50">
+                <div className="text-3xl">🏢</div>
 
                 <div className="mt-3 font-semibold text-gray-900">
-                  Schilderwerk
+                  Winkel / bedrijfspand 
                 </div>
 
                 <div className="mt-1 text-sm text-gray-500">
-                  Binnen en buiten
+                  Glasbewassing voor bedrijven 
                 </div>
-              </button>
-
-              <button className="rounded-2xl border border-gray-200 p-5 text-left transition hover:border-blue-500 hover:bg-blue-50">
-                <div className="text-3xl">🧱</div>
-
-                <div className="mt-3 font-semibold text-gray-900">
-                  Stucwerk
-                </div>
-
-                <div className="mt-1 text-sm text-gray-500">
-                  Per vierkante meter
-                </div>
-              </button>
-
-              <button className="rounded-2xl border border-gray-200 p-5 text-left transition hover:border-blue-500 hover:bg-blue-50">
-                <div className="text-3xl">🏠</div>
-
-                <div className="mt-3 font-semibold text-gray-900">
-                  Vloeren
-                </div>
-
-                <div className="mt-1 text-sm text-gray-500">
-                  Leggen en afwerken
-                </div>
-              </button>
+              </a>
             </div>
           </div>
         </div>
