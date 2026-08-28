@@ -28,9 +28,12 @@ export default function Home() {
             </a>
           </nav>
 
-          <button className="rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-700">
-            Inloggen
-          </button>
+          <a
+  href="/professional/login"
+  className="rounded-xl bg-blue-600 px-5 py-3 font-semibold text-white"
+>
+  Inloggen
+</a>
         </div>
       </header>
 
