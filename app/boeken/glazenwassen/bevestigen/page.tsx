@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { boekingOpslaan } from "../../../../lib/boekingopslaan";
 
 type GlazenwassenGegevens = {
@@ -8,6 +9,8 @@ type GlazenwassenGegevens = {
   verdiepingen: string[];
   ramen: number;
   telescoop: boolean;
+  type: string;
+  frequentie: string;
 };
 
 type GlazenwassenDetails = {
@@ -23,6 +26,8 @@ type Prijs = {
   verdiepingToeslag: number;
   bereikToeslag: number;
   kozijnenToeslag: number;
+  kortingPercentage: number;
+  kortingBedrag: number;
   totaal: number;
 };
 
@@ -42,6 +47,7 @@ type KlantGegevens = {
 };
 
 export default function BevestigenPage() {
+  const router = useRouter();
   const [klus, setKlus] =
     useState<GlazenwassenGegevens | null>(null);
 
@@ -105,7 +111,10 @@ export default function BevestigenPage() {
       );
       return;
     }
-
+   if (!klant.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(klant.email.trim())) {
+  setFout("Vul een geldig e-mailadres in.");
+  return;
+}
     setBezig(true);
     setFout("");
 
@@ -128,7 +137,8 @@ export default function BevestigenPage() {
         telescoop: klus.telescoop,
         verdiepingen: klus.verdiepingen,
         aantal_ramen: klus.ramen,
-
+        glasbewassing_type: klus.type,
+        frequentie: klus.frequentie,
         bereikbaar: details.bereikbaar,
         kozijnen: details.kozijnen,
         
@@ -139,7 +149,8 @@ export default function BevestigenPage() {
         verdieping_toeslag: prijs.verdiepingToeslag,
         bereik_toeslag: prijs.bereikToeslag,
         kozijnen_toeslag: prijs.kozijnenToeslag,
-
+        korting_percentage: prijs.kortingPercentage,
+        korting_bedrag: prijs.kortingBedrag,
         totaalprijs: prijs.totaal,
         gewenste_datum: klant.gewensteDatum,
         gewenste_tijd: klant.gewensteTijd,
@@ -249,14 +260,16 @@ return;if (nieuweBoeking?.[0]?.id) {
             className="text-2xl font-bold text-blue-600"
           >
             ShineGo
-          </a>
-
-          <a
-            href="/boeken/glazenwassen/gegevens"
-            className="font-medium text-gray-600 hover:text-blue-600"
-          >
-            ← Terug
-          </a>
+            </a>
+          <button
+  type="button"
+  onClick={() => router.back()}
+  className="font-medium text-gray-600 hover:text-gray-900"
+>
+  ← Terug
+</button>
+            
+          
         </div>
       </header>
 
@@ -290,7 +303,7 @@ return;if (nieuweBoeking?.[0]?.id) {
                     Naam
                   </span>
 
-                  <strong className="text-right">
+                  <strong className="text-right text-gray-900">
                     {klant.voornaam} {klant.achternaam}
                   </strong>
                 </div>
@@ -300,7 +313,7 @@ return;if (nieuweBoeking?.[0]?.id) {
                     E-mail
                   </span>
 
-                  <strong className="text-right">
+                  <strong className="text-right text-gray-900">
                     {klant.email}
                   </strong>
                 </div>
@@ -310,7 +323,7 @@ return;if (nieuweBoeking?.[0]?.id) {
                     Telefoon
                   </span>
 
-                  <strong className="text-right">
+                  <strong className="text-right text-gray-900">
                     {klant.telefoon}
                   </strong>
                 </div>
@@ -320,7 +333,7 @@ return;if (nieuweBoeking?.[0]?.id) {
                     Adres
                   </span>
 
-                  <strong className="text-right">
+                  <strong className="text-right text-gray-900">
                     {klant.straat} {klant.huisnummer}
                     {klant.toevoeging
                       ? ` ${klant.toevoeging}`
@@ -343,7 +356,7 @@ return;if (nieuweBoeking?.[0]?.id) {
                     Dienst
                   </span>
 
-                  <strong>Glazenwassen</strong>
+                  <strong className="text-gray-900">Glazenwassen</strong>
                 </div>
 
                 <div className="flex justify-between">
@@ -351,15 +364,46 @@ return;if (nieuweBoeking?.[0]?.id) {
                     Woningtype
                   </span>
 
-                  <strong>{klus.woningtype}</strong>
-                </div>
+                  <strong className="text-gray-900">{klus.woningtype}</strong>
+                  </div>
+                  <div className="flex justify-between">
+  <span className="text-gray-500">
+    Soort glasbewassing
+  </span>
+
+  <strong className="text-gray-900">
+    {klus.type === "binnen"
+      ? "Ramen binnen wassen"
+      : klus.type === "telewash"
+        ? "Telewash"
+        : klus.type === "bedrijf"
+          ? "Winkel / bedrijfspand"
+          : "Ramen buiten wassen"}
+  </strong>
+</div>
+<div className="flex justify-between">
+  <span className="text-gray-500">
+    Frequentie
+  </span>
+
+  <strong className="text-gray-900">
+    {klus.frequentie === "4weken"
+      ? "Elke 4 weken"
+      : klus.frequentie === "8weken"
+        ? "Elke 8 weken"
+        : klus.frequentie === "12weken"
+          ? "Elke 12 weken"
+          : "Eenmalig"}
+  </strong>
+</div>
+              
 
                 <div className="flex justify-between">
                   <span className="text-gray-500">
                     Verdiepingen
                   </span>
 
-                  <strong>{klus.verdiepingen}</strong>
+                  <strong className="text-gray-900">{klus.verdiepingen}</strong>
                 </div>
 
                 <div className="flex justify-between">
@@ -367,7 +411,7 @@ return;if (nieuweBoeking?.[0]?.id) {
                     Aantal ramen
                   </span>
 
-                  <strong>{klus.ramen}</strong>
+                  <strong className="text-gray-900">{klus.ramen}</strong>
                 </div>
 
                 <div className="flex justify-between">
@@ -375,7 +419,7 @@ return;if (nieuweBoeking?.[0]?.id) {
                     Bereikbaarheid
                   </span>
 
-                  <strong>
+                  <strong className="text-gray-900">
                     {details.bereikbaar === "ja"
                       ? "Goed bereikbaar"
                       : "Moeilijk bereikbaar"}
@@ -385,17 +429,17 @@ return;if (nieuweBoeking?.[0]?.id) {
                 <span className="text-gray-500">
                    Gewenste datum
                   </span>
-                  <strong>{klant.gewensteDatum}</strong>
+                  <strong className="text-gray-900">{klant.gewensteDatum}</strong>
                 </div>
                 <div className="flex justify-between">
                 <span className="text-gray-500">
                 Gewenste tijd
                 </span>
-              <strong>{klant.gewensteTijd}</strong>
+              <strong className="text-gray-900">{klant.gewensteTijd}</strong>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-500">Moet je thuis zijn?</span>
-              <strong>{klant.thuisNodig === "ja" ? "ja" : klant.thuisNodig === "nee" ? "Nee" : "-"}</strong>
+              <strong className="text-gray-900">{klant.thuisNodig === "ja" ? "ja" : klant.thuisNodig === "nee" ? "Nee" : "-"}</strong>
             </div>
             </div>
             </div>
@@ -407,9 +451,25 @@ return;if (nieuweBoeking?.[0]?.id) {
                   </p>
 
                   <p className="mt-1 font-semibold">
-                    Glazenwassen buitenzijde
+                   {klus.type === "binnen"
+  ? "Ramen binnen wassen"
+  : klus.type === "telewash"
+    ? "Telewash"
+    : klus.type === "bedrijf"
+      ? "Winkel / bedrijfspand"
+      : "Ramen buiten wassen"}
                   </p>
                 </div>
+                {prijs.kortingPercentage > 0 && (
+  <div className="mb-3 flex justify-between text-sm">
+    <span className="text-blue-100">
+      Abonnementskorting ({Math.round(prijs.kortingPercentage * 100)}%)
+    </span>
+    <span className="font-semibold text-green-300">
+      - €{prijs.kortingBedrag.toFixed(2).replace(".", ",")}
+    </span>
+  </div>
+)}
 
                 <div className="text-4xl font-bold">
                   €

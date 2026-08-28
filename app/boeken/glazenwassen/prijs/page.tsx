@@ -7,6 +7,8 @@ type Gegevens = {
   verdiepingen: string[];
   ramen: number;
   telescoop: boolean;
+  type: string;
+  frequentie: string;
 };
 
 type Details = {
@@ -45,14 +47,35 @@ export default function PrijsPage() {
         verdiepingToeslag: 0,
         bereikToeslag: 0,
         kozijnenToeslag: 0,
+        kortingPercentage: 0,
+        kortingBedrag: 0,
         totaal: 0,
       };
     }
 
-    const basisprijs = 20;
+    const basisprijs =
+  gegevens.type === "binnen"
+    ? 25
+    : gegevens.type === "telewash" || gegevens.type === "bedrijf"
+      ? 30
+      : 20;
 
-    const ramenPrijs = gegevens.ramen * 2;
+    const prijsPerRaam =
+  gegevens.type === "binnen" ||
+  gegevens.type === "telewash" ||
+  gegevens.type === "bedrijf"
+    ? 3
+    : 2.5;
 
+const ramenPrijs = gegevens.ramen * prijsPerRaam;
+const kortingPercentage =
+  gegevens.frequentie === "4weken"
+    ? 0.12
+    : gegevens.frequentie === "8weken"
+      ? 0.10
+      : gegevens.frequentie === "12weken"
+        ? 0.07
+        : 0;
     let verdiepingToeslag = 0;
 
     if (gegevens.verdiepingen.includes("2")) {
@@ -69,19 +92,24 @@ export default function PrijsPage() {
     const kozijnenToeslag =
       details.kozijnen ? 10 : 0;
 
-    const totaal =
-      basisprijs +
-      ramenPrijs +
-      verdiepingToeslag +
-      bereikToeslag +
-      kozijnenToeslag;
+    const subtotaal =
+  basisprijs +
+  ramenPrijs +
+  verdiepingToeslag +
+  bereikToeslag +
+  kozijnenToeslag;
 
+const kortingBedrag = subtotaal * kortingPercentage;
+
+const totaal = subtotaal - kortingBedrag;
     return {
       basisprijs,
       ramenPrijs,
       verdiepingToeslag,
       bereikToeslag,
       kozijnenToeslag,
+      kortingPercentage,
+      kortingBedrag,
       totaal,
     };
   }, [gegevens, details]);
@@ -251,6 +279,17 @@ export default function PrijsPage() {
               )}
 
               <div className="flex justify-between pt-3 text-xl">
+                {prijs.kortingPercentage > 0 && (
+  <div className="flex justify-between border-b border-gray-100 pb-4">
+    <span className="text-gray-600">
+      Abonnementskorting ({Math.round(prijs.kortingPercentage * 100)}%)
+    </span>
+
+    <span className="font-semibold text-green-600">
+      - €{prijs.kortingBedrag.toFixed(2).replace(".", ",")}
+    </span>
+  </div>
+)}
                 <span className="font-bold text-gray-900">
                   Totaal
                 </span>
@@ -279,6 +318,21 @@ export default function PrijsPage() {
                 {gegevens.woningtype}
               </strong>
             </div>
+            <div className="flex justify-between">
+  <span className="text-gray-500">
+    Frequentie
+  </span>
+
+  <strong className="text-gray-900">
+    {gegevens.frequentie === "4weken"
+      ? "Elke 4 weken"
+      : gegevens.frequentie === "8weken"
+        ? "Elke 8 weken"
+        : gegevens.frequentie === "12weken"
+          ? "Elke 12 weken"
+          : "Eenmalig"}
+  </strong>
+</div>
           <div className="flex justify-between"><span className="text-gray-500">Telescoop</span><strong className="text-gray-900">{gegevens.telescoop ?"ja" : "nee"}</strong></div>
 
             <div className="flex justify-between">

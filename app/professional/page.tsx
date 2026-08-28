@@ -10,6 +10,7 @@ export default function ProfessionalPage() {
   const [voornaam, setVoornaam] = useState("");
   const [achternaam, setAchternaam] = useState("");
   const [email, setEmail] = useState("");
+  const [wachtwoord, setWachtwoord] = useState("");
   const [telefoon, setTelefoon] = useState("");
   const [postcode, setPostcode] = useState("");
   const [woonplaats, setWoonplaats] = useState("");
@@ -51,6 +52,17 @@ export default function ProfessionalPage() {
     }
 
     setBezig(true);
+    const { data: authData, error: authError } = await supabase.auth.signUp({
+  email: email.trim().toLowerCase(),
+  password: wachtwoord,
+});
+
+if (authError || !authData.user) {
+   console.error("Supabase auth signUp error:", authError, authData); 
+  setBezig(false);
+  setMelding(authError?.message || "Account kon niet worden aangemaakt.");
+  return;
+}
 
     const { error } = await supabase.from("professionals").insert([
       {
@@ -58,6 +70,7 @@ export default function ProfessionalPage() {
         voornaam: voornaam.trim(),
         achternaam: achternaam.trim(),
         email: email.trim().toLowerCase(),
+        user_id: authData.user.id,
         telefoon: telefoon.trim(),
         postcode: postcode.trim().toUpperCase(),
         woonplaats: woonplaats.trim(),
@@ -77,7 +90,12 @@ export default function ProfessionalPage() {
       },
     ]);
 
- 
+if (error) {
+    
+  setBezig(false);
+  setMelding(error.message || "Professional kon niet worden opgeslagen.");
+  return;
+}
   const stripeResponse = await fetch("/api/stripe-connect", {
   method: "POST",
   headers: {
@@ -304,6 +322,21 @@ return;
                     className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
                   />
                 </div>
+                <div>
+  <label className="mb-2 block font-medium">
+    Wachtwoord
+  </label>
+
+  <input
+    type="password"
+    value={wachtwoord}
+    onChange={(e) => setWachtwoord(e.target.value)}
+    placeholder="Minimaal 8 tekens"
+    minLength={8}
+    required
+    className="w-full rounded-xl border"
+  />
+</div>
 
                 <div>
                   <label className="mb-2 block font-medium text-gray-800">

@@ -86,7 +86,7 @@ export default function Home() {
             </p>
 
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <a href="/boeken/glazenwassen" className="rounded-2xl border border-gray-200 p-5 text-left transition hover:border-blue-500 hover:bg-blue-50">
+              <a href="/boeken/glazenwassen?type=buiten" className="rounded-2xl border border-gray-200 p-5 text-left transition hover:border-blue-500 hover:bg-blue-50">
                 <div className="text-3xl">✨</div>
 
                 <div className="mt-3 font-semibold text-gray-900">
@@ -98,7 +98,7 @@ export default function Home() {
                 </div>
               </a>
 
-              <a href="/boeken/glazenwassen" className="rounded-2xl border border-gray-200 p-5 text-left transition hover:border-blue-500 hover:bg-blue-50">
+              <a href="/boeken/glazenwassen?type=binnen" className="rounded-2xl border border-gray-200 p-5 text-left transition hover:border-blue-500 hover:bg-blue-50">
                 <div className="text-3xl">🧼</div>
 
                 <div className="mt-3 font-semibold text-gray-900">
@@ -110,7 +110,7 @@ export default function Home() {
                 </div>
               </a>
 
-              <a href="/boeken/glazenwassen" className="rounded-2xl border border-gray-200 p-5 text-left transition hover:border-blue-500 hover:bg-blue-50">
+              <a href="/boeken/glazenwassen?type=telewash" className="rounded-2xl border border-gray-200 p-5 text-left transition hover:border-blue-500 hover:bg-blue-50">
                 <div className="text-3xl">🪟</div>
 
                 <div className="mt-3 font-semibold text-gray-900">
@@ -122,7 +122,7 @@ export default function Home() {
                 </div>
               </a> 
 
-              <a href="/boeken/glazenwassen" className="rounded-2xl border border-gray-200 p-5 text-left transition hover:border-blue-500 hover:bg-blue-50">
+              <a href="/boeken/glazenwassen?type=bedrijf" className="rounded-2xl border border-gray-200 p-5 text-left transition hover:border-blue-500 hover:bg-blue-50">
                 <div className="text-3xl">🏢</div>
 
                 <div className="mt-3 font-semibold text-gray-900">

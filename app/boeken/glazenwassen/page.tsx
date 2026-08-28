@@ -1,13 +1,19 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect,useState } from "react";
 
 export default function GlazenwassenPage() {
   const [woningtype, setWoningtype] = useState("");
   const [verdiepingen, setVerdiepingen] = useState<string[]>([]);
   const [ramen, setRamen] = useState(0);
   const [telescoop, setTelescoop] = useState(false);
-
+  const [type, setType] = useState("");
+  const [frequentie, setFrequentie] = useState("eenmalig");
+  useEffect(() => {
+  const params = new URLSearchParams(window.location.search);
+  const gekozenType = params.get("type") || "";
+  setType(gekozenType);
+}, []);
   const woningtypes = [
     {
       id: "tussenwoning",
@@ -50,7 +56,9 @@ export default function GlazenwassenPage() {
       woningtype,
       verdiepingen,
       ramen,
-      telescoop
+      telescoop,
+      type,
+      frequentie,
     };
     
   
@@ -59,7 +67,7 @@ export default function GlazenwassenPage() {
       JSON.stringify(gegevens)
     );
 
-    window.location.href = "/boeken/glazenwassen/details";
+    window.location.href = `/boeken/glazenwassen/details?type=${type}`
   }
 
   return (
@@ -287,6 +295,40 @@ export default function GlazenwassenPage() {
         </div>
 
         {/* ONDERKANT */}
+       <div className="mt-8">
+  <h2 className="text-xl font-bold text-gray-900">
+    Hoe vaak wil je de ramen laten wassen?
+  </h2>
+
+  <p className="mt-2 text-sm text-gray-600">
+    Kies eenmalig of profiteer van korting bij periodieke glasbewassing.
+  </p>
+
+  <div className="mt-4 grid gap-3 sm:grid-cols-2">
+    {[
+      { id: "eenmalig", label: "Eenmalig", korting: "" },
+      { id: "4weken", label: "Elke 4 weken", korting: "12% korting" },
+      { id: "8weken", label: "Elke 8 weken", korting: "10% korting" },
+      { id: "12weken", label: "Elke 12 weken", korting: "7% korting" },
+    ].map((optie) => (
+      <button
+        key={optie.id}
+        type="button"
+        onClick={() => setFrequentie(optie.id)}
+        className={`rounded-xl border p-4 text-left transition ${
+          frequentie === optie.id
+            ? "border-blue-600 bg-blue-50"
+            : "border-gray-200 bg-white hover:border-blue-300"
+        }`}
+      >
+        <div className="font-semibold text-gray-900">{optie.label}</div>
+        {optie.korting && (
+          <div className="mt-1 text-sm text-green-600">{optie.korting}</div>
+        )}
+      </button>
+    ))}
+  </div>
+</div>
         <div className="mt-10 flex items-center justify-between border-t border-gray-200 pt-8">
           <a
             href="/boeken"

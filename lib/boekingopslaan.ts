@@ -17,7 +17,8 @@ export type NieuweBoeking = {
   woningtype?: string;
   verdiepingen?: string[];
   aantal_ramen?: number;
-
+  glasbewassing_type?: string;
+  frequentie?: string;
   bereikbaar?: string;
   kozijnen?: boolean;
   opmerking?: string;
@@ -27,7 +28,9 @@ export type NieuweBoeking = {
   verdieping_toeslag?: number;
   bereik_toeslag?: number;
   kozijnen_toeslag?: number;
- telescoop: boolean;
+  korting_percentage?: number;
+  korting_bedrag?: number;
+  telescoop: boolean;
   totaalprijs: number;
 
   gewenste_datum?: string;
@@ -58,7 +61,8 @@ export async function boekingOpslaan(boeking: NieuweBoeking) {
         verdiepingen: boeking.verdiepingen ?? null,
         aantal_ramen: boeking.aantal_ramen ?? null,
         telescoop: boeking.telescoop,
-
+        glasbewassing_type: boeking.glasbewassing_type || null,
+        frequentie: boeking.frequentie || null,
         bereikbaar: boeking.bereikbaar || null,
         kozijnen: boeking.kozijnen ?? false,
         opmerking: boeking.opmerking || null,
@@ -68,7 +72,8 @@ export async function boekingOpslaan(boeking: NieuweBoeking) {
         verdieping_toeslag: boeking.verdieping_toeslag ?? 0,
         bereik_toeslag: boeking.bereik_toeslag ?? 0,
         kozijnen_toeslag: boeking.kozijnen_toeslag ?? 0,
-
+       korting_percentage: boeking.korting_percentage ?? 0,
+       korting_bedrag: boeking.korting_bedrag ?? 0,
         totaalprijs: boeking.totaalprijs,
 
         status: "nieuw",

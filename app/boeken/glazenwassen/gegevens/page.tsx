@@ -32,6 +32,32 @@ export default function GegevensPage() {
       setPrijs(JSON.parse(opgeslagenPrijs));
     }
   }, []);
+  useEffect(() => {
+  async function haalAdresOp() {
+    if (postcode.trim().length < 6 || huisnummer.trim() === "") return;
+
+    try {
+      const zoekterm = `${postcode} ${huisnummer}`;
+      const response = await fetch(
+        `https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?q=${encodeURIComponent(
+          zoekterm
+        )}&fq=type:adres`
+      );
+
+      const data = await response.json();
+      const adres = data.response?.docs?.[0];
+
+      if (adres) {
+        setStraat(adres.straatnaam || "");
+        setPlaats(adres.woonplaatsnaam || "");
+      }
+    } catch (error) {
+      console.error("Adres ophalen mislukt:", error);
+    }
+  }
+
+  haalAdresOp();
+}, [postcode, huisnummer]);
 
   const kanVerder =
     voornaam.trim() !== "" &&
@@ -45,6 +71,7 @@ export default function GegevensPage() {
     gewensteDatum !== "" &&
     gewensteTijd !=="" &&
     thuisNodig !== "";
+    
     function gaVerder() {
     if (!kanVerder) return;
 
@@ -295,7 +322,7 @@ export default function GegevensPage() {
           <div>|
           <label className="mb-2 block text-sm font-semibold text-gray-700">Moet je thuis zijn?</label>
           <select value={thuisNodig} onChange={(e) => setThuisNodig(e.target.value)}>
-            
+
           ClassName="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none"
           
           

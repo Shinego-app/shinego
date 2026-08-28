@@ -7,6 +7,8 @@ type Gegevens = {
   verdiepingen: string[];
   ramen: number;
   telescoop: boolean;
+  type: string;
+  frequentie: string;
 };
 
 export default function DetailsPage() {
