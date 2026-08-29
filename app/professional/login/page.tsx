@@ -14,15 +14,18 @@ export default function ProfessionalLoginPage() {
 
   async function inloggen(e: React.FormEvent) {
     e.preventDefault();
+   
     setBezig(true);
     setMelding("");
 
     const { error } = await supabase.auth.signInWithPassword({
-      email: email.trim(),
+      email: email.trim().toLowerCase(),
       password: wachtwoord,
     });
+    
 
     if (error) {
+       console.error("Supabase login error:", error); 
       setMelding("E-mailadres of wachtwoord is niet correct.");
       setBezig(false);
       return;

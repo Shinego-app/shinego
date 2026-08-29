@@ -91,6 +91,7 @@ if (authError || !authData.user) {
     ]);
 
 if (error) {
+    console.error("Supabase professionals insert error:", error);
     
   setBezig(false);
   setMelding(error.message || "Professional kon niet worden opgeslagen.");
