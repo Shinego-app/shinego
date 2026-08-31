@@ -51,7 +51,7 @@ export default function OpdrachtPage() {
         .update({ status: "onderweg" })
         .eq("id", opdrachtId)
 .eq("professional_id", opdracht.professional_id);
-        if (!error) setOpdracht({ ...opdracht, status: "bezig" });
+        if (!error) setOpdracht({ ...opdracht, status: "onderweg" });
 }
     if (laden) {
         return (
