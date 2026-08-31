@@ -85,7 +85,7 @@ async function afrondOpdracht() {
             <p>Bereikbaarheid: {opdracht.bereikbaarheid || "Niet opgegeven"}</p>
             <p>Verdiepingen: {opdracht.verdiepingen?.join(", ") || "Niet opgegeven"}</p>
             <p>Jouw vergoeding: €{opdracht.professional_bedrag || "0,00"}</p>
-            {opdracht.status !== "onderweg" && <button type="button" onClick={startOpdracht}>Opdracht starten</button>}
+            {opdracht.status === "toegewezen" && <button type="button" onClick={startOpdracht}>Opdracht starten</button>}
             {opdracht.status === "onderweg" && <button type="button" onClick={afrondOpdracht}>Opdracht afronden</button>}
             
             
