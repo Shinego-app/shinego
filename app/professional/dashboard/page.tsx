@@ -28,12 +28,12 @@ export default function ProfessionalDashboardPage() {
 
     setProfessional(data);
     if (data) {
-  const { data: boekingenData } = await supabase
+  const { data: boekingenData, error: boekingenError } = await supabase
     .from("boekingen")
     .select("*")
     .eq("professional_id", data.id)
     .order("created_at", { ascending: false });
-
+    console.error("BOEKINGEN ERROR:", boekingenError);
   setOpdrachten(boekingenData || []);
 }
     setLaden(false);
