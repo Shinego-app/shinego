@@ -56,6 +56,14 @@ if (laden) {
       <p>Datum: {opdracht?.gewenste_datum || "Nog niet gepland"}</p>
       <p>Tijd: {opdracht?.gewenste_tijd || "Nog niet gepland"}</p>
       <p>Status: {opdracht?.status || "Onbekend"}</p>
+      <p>Adres: {opdracht.straat} {opdracht.huisnummer}</p>
+      <p>Plaats: {opdracht.plaats}</p>
+      <p>Telefoon: {opdracht.telefoon}</p>
+      <p>Woningtype: {opdracht.woningtype || "Niet opgegeven"}</p>
+      <p>Aantal ramen: {opdracht.aantal_ramen || "Niet opgegeven"}</p>
+      <p>Bereikbaarheid: {opdracht.bereikbaarheid || "Niet opgegeven"}</p>
+      <p>Verdiepingen: {opdracht.verdiepingen?.join(", ") || "Niet opgegeven"}</p>
+      <p>Jouw vergoeding: €{opdracht.professional_bedrag || "0,00"}</p>
     </main>
   );
 }
