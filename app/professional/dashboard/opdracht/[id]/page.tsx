@@ -50,7 +50,7 @@ if (laden) {
   );
 }
   return (
-    <main style={{ padding: "24px", maxWidth: "700px", margin: "0 auto" }}>
+    <main style={{ padding: "24px", maxWidth: "700px", margin: "0 auto", backgroundColor: "#ffffff", minHeight: "100vh", color: "#111111" }}>
       <h1>Opdracht</h1>
       <p>Klant: {opdracht?.voornaam} {opdracht?.achternaam}</p>
       <p>Datum: {opdracht?.gewenste_datum || "Nog niet gepland"}</p>
