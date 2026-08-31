@@ -62,9 +62,9 @@ async function startStripeConnect() {
   const stripeData = await stripeResponse.json();
 
   if (!stripeResponse.ok || !stripeData.url) {
-    console.error("Stripe Connect fout:", stripeData);
-    return;
-  }
+  alert(stripeData.error || "Stripe Connect fout");
+  return;
+}
 
   window.location.href = stripeData.url;
 }
@@ -125,7 +125,7 @@ async function startStripeConnect() {
       <section style={{ marginTop: "32px" }}>
         <h2>Verdiensten</h2>
         <button
-  onClick={() => alert("KNOP WERKT")}
+  onClick={startStripeConnect}
 >
   Uitbetalingen instellen
 </button>
