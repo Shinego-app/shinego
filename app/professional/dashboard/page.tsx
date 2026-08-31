@@ -125,7 +125,7 @@ async function startStripeConnect() {
       <section style={{ marginTop: "32px" }}>
         <h2>Verdiensten</h2>
         <button
-  onClick={startStripeConnect}
+  onClick={() => alert("KNOP WERKT")}
 >
   Uitbetalingen instellen
 </button>
