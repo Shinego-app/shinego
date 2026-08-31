@@ -43,7 +43,31 @@ export default function ProfessionalDashboardPage() {
 
   laadProfessional();
 }, []);
+async function startStripeConnect() {
+  if (!professional?.email) {
+    console.error("Professional heeft geen e-mailadres.");
+    return;
+  }
 
+  const stripeResponse = await fetch("/api/stripe-connect", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      email: professional.email.trim().toLowerCase(),
+    }),
+  });
+
+  const stripeData = await stripeResponse.json();
+
+  if (!stripeResponse.ok || !stripeData.url) {
+    console.error("Stripe Connect fout:", stripeData);
+    return;
+  }
+
+  window.location.href = stripeData.url;
+}
   if (laden) {
     return <main style={{ padding: "24px" }}>Dashboard laden...</main>;
   }
@@ -101,7 +125,7 @@ export default function ProfessionalDashboardPage() {
       <section style={{ marginTop: "32px" }}>
         <h2>Verdiensten</h2>
         <button
-  onClick={() => window.location.href = "/professional"}
+  onClick={startStripeConnect}
 >
   Uitbetalingen instellen
 </button>
