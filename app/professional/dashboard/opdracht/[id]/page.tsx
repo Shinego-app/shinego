@@ -45,9 +45,10 @@ export default function OpdrachtPage() {
         laadOpdracht();
     }, [opdrachtId]);
     async function startOpdracht() {
+        
         const { error } = await supabase
         .from("boekingen")
-        .update({ status: "bezig" })
+        .update({ status: "onderweg" })
         .eq("id", opdrachtId)
 .eq("professional_id", opdracht.professional_id);
         if (!error) setOpdracht({ ...opdracht, status: "bezig" });
@@ -76,6 +77,9 @@ export default function OpdrachtPage() {
             <p>Verdiepingen: {opdracht.verdiepingen?.join(", ") || "Niet opgegeven"}</p>
             <p>Jouw vergoeding: €{opdracht.professional_bedrag || "0,00"}</p>
             <button onClick={startOpdracht}>Opdracht starten</button>
+            
+            
+            
         </main>
     );
 }
