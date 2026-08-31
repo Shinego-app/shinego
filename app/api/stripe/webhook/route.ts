@@ -43,6 +43,18 @@ if (event.type === "checkout.session.completed") {
       .eq("id", bookingId);
   }
 }
+if (event.type === "account.updated") {
+  const account = event.data.object as Stripe.Account;
+
+  const { error: updateError } = await supabaseAdmin
+    .from("professionals")
+    .update({ uitbetalingen_actief: account.payouts_enabled })
+    .eq("stripe_account_id", account.id);
+
+  if (updateError) {
+    throw updateError;
+  }
+}
     return NextResponse.json({ received: true });
   } catch (error) {
     console.error("Stripe webhook fout:", error);
