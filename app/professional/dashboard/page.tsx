@@ -72,6 +72,7 @@ export default function ProfessionalDashboardPage() {
           padding: "16px",
           border: "1px solid #ddd",
           borderRadius: "12px",
+          cursor: "pointer",
         }}
       >
         <strong>
