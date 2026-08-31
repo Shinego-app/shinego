@@ -119,12 +119,17 @@ if (!accountLinkResponse.ok) {
       account_id: account.id,
       url: accountLink.url,
     });
-  } catch (error) {
-    console.error("Stripe Connect fout:", error);
+} catch (error) {
+  console.error("Stripe Connect fout:", error);
 
-    return NextResponse.json(
-      { error: "Stripe Connect kon niet worden gestart." },
-      { status: 500 }
-    );
-  }
+  const message =
+    error instanceof Error
+      ? error.message
+      : "Stripe Connect kon niet worden gestart.";
+
+  return NextResponse.json(
+    { error: message },
+    { status: 500 }
+  );
+}
 }
