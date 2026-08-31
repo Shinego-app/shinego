@@ -11,10 +11,29 @@ const [opdracht, setOpdracht] = useState<any>(null);
 const [laden, setLaden] = useState(true);
 useEffect(() => {
   async function laadOpdracht() {
+    const {
+  data: { user },
+} = await supabase.auth.getUser();
+
+if (!user) {
+  setLaden(false);
+  return;
+}
+const { data: professional } = await supabase
+  .from("professionals")
+  .select("id")
+  .eq("user_id", user.id)
+  .single();
+
+if (!professional) {
+  setLaden(false);
+  return;
+}
     const { data } = await supabase
       .from("boekingen")
       .select("*")
       .eq("id", opdrachtId)
+      .eq("professional_id", professional.id)
       .single();
 
     setOpdracht(data);
