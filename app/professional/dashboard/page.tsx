@@ -100,7 +100,11 @@ export default function ProfessionalDashboardPage() {
 
       <section style={{ marginTop: "32px" }}>
         <h2>Verdiensten</h2>
-        <p>Nog geen uitbetalingen geladen.</p>
+        <button
+  onClick={() => window.location.href = "/professional"}
+>
+  Uitbetalingen instellen
+</button>
       </section>
     </main>
   );
