@@ -79,12 +79,31 @@ if (updateError) {
 
     const origin = new URL(request.url).origin;
 
-    const accountLink = await stripe.accountLinks.create({
-      account: account.id,
-      refresh_url: `${origin}/professional`,
-      return_url: `${origin}/professional`,
+    const accountLinkResponse = await fetch("https://api.stripe.com/v2/core/account_links", {
+  method: "POST",
+  headers: {
+    Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
+    "Content-Type": "application/json",
+    "Stripe-Version": "2026-07-29.preview",
+  },
+  body: JSON.stringify({
+    account: account.id,
+    use_case: {
       type: "account_onboarding",
-    });
+      account_onboarding: {
+        configurations: ["recipient"],
+        refresh_url: `${origin}/professional`,
+        return_url: `${origin}/professional`,
+      },
+    },
+  }),
+});
+
+const accountLink = await accountLinkResponse.json();
+
+if (!accountLinkResponse.ok) {
+  throw new Error(accountLink?.error?.message || "Stripe onboarding-link kon niet worden gemaakt.");
+}
 
     return NextResponse.json({
       account_id: account.id,
