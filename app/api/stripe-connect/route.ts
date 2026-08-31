@@ -17,7 +17,7 @@ if (!email) {
 
 const { data: professional, error: professionalError } = await supabaseAdmin
   .from("professionals")
-  .select("id")
+  .select("id, stripe_account_id")
   .eq("email", email.trim().toLowerCase())
   .single();
 
@@ -30,53 +30,63 @@ if (professionalError || !professional) {
 
 const professional_id = professional.id;
 
- const accountResponse = await fetch("https://api.stripe.com/v2/core/accounts", {
-  method: "POST",
-  headers: {
-    Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
-    "Content-Type": "application/json",
-    "Stripe-Version": "2026-07-29.preview",
-  },
-  body: JSON.stringify({
-    contact_email: email,
-    dashboard: "express",
-    identity: {
-      country: "nl",
+let account: any;
+
+if (professional.stripe_account_id) {
+  account = {
+    id: professional.stripe_account_id,
+  };
+} else {
+  const accountResponse = await fetch("https://api.stripe.com/v2/core/accounts", {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
+      "Content-Type": "application/json",
+      "Stripe-Version": "2026-07-29.preview",
     },
-    defaults: {
-      responsibilities: {
-        fees_collector: "application",
-        losses_collector: "application",
+    body: JSON.stringify({
+      contact_email: email,
+      dashboard: "express",
+      identity: {
+        country: "nl",
       },
-    },
-    configuration: {
-      recipient: {
-        capabilities: {
-          stripe_balance: {
-            stripe_transfers: {
-              requested: true,
+      defaults: {
+        responsibilities: {
+          fees_collector: "application",
+          losses_collector: "application",
+        },
+      },
+      configuration: {
+        recipient: {
+          capabilities: {
+            stripe_balance: {
+              stripe_transfers: {
+                requested: true,
+              },
             },
           },
         },
       },
-    },
-  }),
-});
+    }),
+  });
 
-const account = await accountResponse.json();
+  account = await accountResponse.json();
 
-if (!accountResponse.ok) {
-  throw new Error(account?.error?.message || "Stripe account kon niet worden aangemaakt.");
-}   
-    const { error: updateError } = await supabaseAdmin
-  .from("professionals")
-  .update({ stripe_account_id: account.id })
-  .eq("id", professional_id);
+  if (!accountResponse.ok) {
+    throw new Error(
+      account?.error?.message || "Stripe account kon niet worden gemaakt."
+    );
+  }
 
-if (updateError) {
-  throw updateError;
+  const { error: updateError } = await supabaseAdmin
+    .from("professionals")
+    .update({ stripe_account_id: account.id })
+    .eq("id", professional_id);
+
+  if (updateError) {
+    throw updateError;
+  }
 }
-
     const origin = new URL(request.url).origin;
 
     const accountLinkResponse = await fetch("https://api.stripe.com/v2/core/account_links", {
