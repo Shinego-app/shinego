@@ -27,6 +27,7 @@ export default function ProfessionalDashboardPage() {
       .single();
 
     setProfessional(data);
+    console.log("PROFESSIONAL ID:", data?.id);
     if (data) {
   const { data: boekingenData, error: boekingenError } = await supabase
     .from("boekingen")
