@@ -76,7 +76,7 @@ export default function OpdrachtPage() {
             <p>Bereikbaarheid: {opdracht.bereikbaarheid || "Niet opgegeven"}</p>
             <p>Verdiepingen: {opdracht.verdiepingen?.join(", ") || "Niet opgegeven"}</p>
             <p>Jouw vergoeding: €{opdracht.professional_bedrag || "0,00"}</p>
-            <button onClick={startOpdracht}>Opdracht starten</button>
+            <button type="button" onClick={startOpdracht}>Opdracht starten</button>
             
             
             
