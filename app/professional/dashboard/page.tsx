@@ -35,6 +35,7 @@ export default function ProfessionalDashboardPage() {
     .eq("professional_id", data.id)
     .order("created_at", { ascending: false });
     console.error("BOEKINGEN ERROR:", boekingenError);
+    console.log("BOEKINGEN DATA:", boekingenData);
   setOpdrachten(boekingenData || []);
 }
     setLaden(false);
