@@ -1,10 +1,12 @@
 "use client";
+import { useRouter } from "next/navigation";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 
 export default function OpdrachtPage() {
+    const router = useRouter();
     const params = useParams();
 const opdrachtId = params.id as string;
 const [opdracht, setOpdracht] = useState<any>(null);
@@ -51,6 +53,7 @@ if (laden) {
 }
   return (
     <main style={{ padding: "24px", backgroundColor: "#ffffff", minHeight: "100vh", color: "#111111" }}>
+        <button onClick={() => router.push("/professional/dashboard")}>← Terug naar dashboard</button>
       <h1>Opdracht</h1>
       <p>Klant: {opdracht?.voornaam} {opdracht?.achternaam}</p>
       <p>Datum: {opdracht?.gewenste_datum || "Nog niet gepland"}</p>
