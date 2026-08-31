@@ -53,6 +53,15 @@ export default function OpdrachtPage() {
 .eq("professional_id", opdracht.professional_id);
         if (!error) setOpdracht({ ...opdracht, status: "onderweg" });
 }
+async function afrondOpdracht() {
+  const { error } = await supabase
+    .from("boekingen")
+    .update({ status: "afgerond" })
+    .eq("id", opdrachtId)
+    .eq("professional_id", opdracht.professional_id);
+
+  if (!error) setOpdracht({ ...opdracht, status: "afgerond" });
+}
     if (laden) {
         return (
             <main style={{ padding: "24px" }}>
@@ -77,6 +86,7 @@ export default function OpdrachtPage() {
             <p>Verdiepingen: {opdracht.verdiepingen?.join(", ") || "Niet opgegeven"}</p>
             <p>Jouw vergoeding: €{opdracht.professional_bedrag || "0,00"}</p>
             {opdracht.status !== "onderweg" && <button type="button" onClick={startOpdracht}>Opdracht starten</button>}
+            {opdracht.status === "onderweg" && <button type="button" onClick={afrondOpdracht}>Opdracht afronden</button>}
             
             
             
