@@ -60,8 +60,30 @@ async function afrondOpdracht() {
     .eq("id", opdrachtId)
     .eq("professional_id", opdracht.professional_id);
 
-  if (!error) setOpdracht({ ...opdracht, status: "afgerond" });
+  if (error) {
+    console.error("Afronden mislukt:", error);
+    return;
+  }
+
+  const payoutResponse = await fetch("/api/stripe-payout", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      booking_id: opdrachtId,
+    }),
+  });
+const payoutData = await payoutResponse.json();
+
+if (!payoutResponse.ok) {
+  console.error("Uitbetaling mislukt:", payoutData);
+  return;
 }
+
+setOpdracht({ ...opdracht, status: "afgerond" });
+}
+ 
     if (laden) {
         return (
             <main style={{ padding: "24px" }}>
