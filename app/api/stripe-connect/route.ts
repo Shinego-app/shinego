@@ -4,9 +4,11 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(request: Request) {
+
   try {
     const body = await request.json();
-    const { email } = body;
+  const { email, professional_id: requestedProfessionalId } = body;
+    
 
 if (!email) {
   return NextResponse.json(
@@ -18,7 +20,7 @@ if (!email) {
 const { data: professional, error: professionalError } = await supabaseAdmin
   .from("professionals")
   .select("id, stripe_account_id")
-  .eq("email", email.trim().toLowerCase())
+  .eq("id", requestedProfessionalId)
   .single();
 
 if (professionalError || !professional) {

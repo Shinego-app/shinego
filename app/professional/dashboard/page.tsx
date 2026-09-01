@@ -55,8 +55,9 @@ async function startStripeConnect() {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      email: professional.email.trim().toLowerCase(),
-    }),
+  email: professional.email.trim().toLowerCase(),
+  professional_id: professional.id,
+}),
   });
 
   const stripeData = await stripeResponse.json();
