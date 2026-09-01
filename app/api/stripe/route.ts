@@ -5,7 +5,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 export async function POST(request: Request) {
 
   const { amount, email,bookingId } = await request.json();
-
+console.log("STRIPE MODE:", process.env.STRIPE_SECRET_KEY?.startsWith("sk_live_") ? "LIVE" : "TEST");
 console.log("Stripe ontvangt:", { amount, email });
 
 const session = await stripe.checkout.sessions.create({
