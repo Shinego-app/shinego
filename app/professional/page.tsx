@@ -52,9 +52,27 @@ export default function ProfessionalPage() {
     }
 
     setBezig(true);
-  const { data: authData, error: authError } = await supabase.auth.signUp({
+ const { data: authData, error: authError } = await supabase.auth.signUp({
   email: email.trim().toLowerCase(),
   password: wachtwoord,
+  options: {
+    data: {
+     account_type: "professional",   
+      bedrijfsnaam: bedrijfsnaam.trim(),
+      voornaam: voornaam.trim(),
+      achternaam: achternaam.trim(),
+      telefoon: telefoon.trim(),
+      postcode: postcode.trim().toUpperCase(),
+      woonplaats: woonplaats.trim(),
+      straat: straat.trim(),
+      huisnummer: huisnummer.trim(),
+      toevoeging: toevoeging.trim() || null,
+      kvk_nummer: kvkNummer.trim(),
+      btw_nummer: btwNummer.trim(),
+      diensten: ["glazenwasser"],
+      werkgebied_km: Number(werkgebiedKm),
+    },
+  },
 });
 
 if (authError || !authData.user) {
@@ -63,40 +81,8 @@ if (authError || !authData.user) {
   setMelding(authError?.message || "Account kon niet worden aangemaakt.");
   return;
 }
-console.log("SIGNUP SESSION:", authData.session, "USER:", authData.user.id);
-    const { error } = await supabase.from("professionals").insert([
-      {
-        bedrijfsnaam: bedrijfsnaam.trim(),
-        voornaam: voornaam.trim(),
-        achternaam: achternaam.trim(),
-        email: email.trim().toLowerCase(),
-        user_id: authData.user.id,
-        telefoon: telefoon.trim(),
-        postcode: postcode.trim().toUpperCase(),
-        woonplaats: woonplaats.trim(),
-        straat: straat.trim(),
-        huisnummer: huisnummer.trim(),
-        toevoeging: toevoeging.trim() || null,
 
-         kvk_nummer: kvkNummer.trim(),
-         btw_nummer: btwNummer.trim(),
-
-        diensten: ["glazenwassen"],
-
-        werkgebied_km: Number(werkgebiedKm),
-
-        actief: false,
-        geverifieerd: false,
-      },
-    ]);
-
-if (error) {
-    console.error("Supabase professionals insert error:", error);
     
-  setBezig(false);
-  setMelding(error.message || "Professional kon niet worden opgeslagen.");
-  return;
-}
   const stripeResponse = await fetch("/api/stripe-connect", {
   method: "POST",
   headers: {
@@ -122,11 +108,7 @@ return;
 
     setBezig(false);
 
-    if (error) {
-      console.error("Supabase fout:", error);
-      setMelding(`Aanmelden mislukt: ${error?.message ?? "Onbekende fout"}`);
-      return;
-    }
+  
 
     setSucces(true);
     setMelding(
