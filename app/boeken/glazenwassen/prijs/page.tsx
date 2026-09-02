@@ -6,6 +6,7 @@ type Gegevens = {
   woningtype: string;
   verdiepingen: string[];
   ramen: number;
+  glasOppervlak: string;
   telescoop: boolean;
   type: string;
   frequentie: string;
@@ -52,13 +53,42 @@ export default function PrijsPage() {
         totaal: 0,
       };
     }
-
-    const basisprijs =
-  gegevens.type === "binnen"
+ const bedrijfsPrijs =
+  gegevens.glasOppervlak === "0-15"
+    ? gegevens.telescoop
+      ? 65
+      : 39
+    : gegevens.glasOppervlak === "16-30"
+    ? gegevens.telescoop
+      ? 85
+      : 55
+    : gegevens.glasOppervlak === "31-50"
+    ? gegevens.telescoop
+      ? 125
+      : 75
+    : gegevens.glasOppervlak === "51-100"
+    ? gegevens.telescoop
+      ? 225
+      : 150
+    : gegevens.glasOppervlak === "101-200"
+    ? gegevens.telescoop
+      ? 400
+      : 275
+    : gegevens.glasOppervlak === "201-500"
+    ? gegevens.telescoop
+      ? 850
+      : 600
+    : gegevens.glasOppervlak === "500+"
+? -1
+: 0;
+   const basisprijs =
+  gegevens.type === "bedrijf"
+    ? bedrijfsPrijs
+    : gegevens.type === "binnen"
     ? 25
-    : gegevens.type === "telewash" || gegevens.type === "bedrijf"
-      ? 30
-      : 20;
+    : gegevens.type === "telewash"
+    ? 30
+    : 20;
 
     const prijsPerRaam =
   gegevens.type === "binnen" ||
@@ -67,7 +97,11 @@ export default function PrijsPage() {
     ? 3
     : 2.5;
 
-const ramenPrijs = gegevens.ramen * prijsPerRaam;
+const ramenPrijs = gegevens.type === "bedrijf" ? 0 : gegevens.ramen * prijsPerRaam;
+const totaalVoorKorting =
+  gegevens.woningtype === "bedrijfspand"
+    ? bedrijfsPrijs
+    : basisprijs + ramenPrijs;
 const kortingPercentage =
   gegevens.frequentie === "4weken"
     ? 0.12
@@ -83,7 +117,7 @@ const kortingPercentage =
     }
 
     if (gegevens.verdiepingen.includes("3")) {
-      verdiepingToeslag += 15;
+      verdiepingToeslag += 21.5;
     }
 
     const bereikToeslag =
@@ -93,8 +127,7 @@ const kortingPercentage =
       details.kozijnen ? 10 : 0;
 
     const subtotaal =
-  basisprijs +
-  ramenPrijs +
+  totaalVoorKorting +
   verdiepingToeslag +
   bereikToeslag +
   kozijnenToeslag;
@@ -103,6 +136,7 @@ const kortingBedrag = subtotaal * kortingPercentage;
 
 const totaal = subtotaal - kortingBedrag;
     return {
+      bedrijfsPrijs,
       basisprijs,
       ramenPrijs,
       verdiepingToeslag,
@@ -214,22 +248,34 @@ const totaal = subtotaal - kortingBedrag;
 
             <div className="mt-6 space-y-4">
               <div className="flex justify-between border-b border-gray-100 pb-4">
-                <span className="text-gray-600">
-                  Basisprijs
-                </span>
+               <span className="text-gray-600">
+  {gegevens.woningtype === "bedrijfspand" ? "Zakelijke glasprijs" : "Basisprijs"}
+</span>
+
+<span className="font-semibold text-gray-900">
+  {gegevens.woningtype === "bedrijfspand" && gegevens.glasOppervlak === "500+"
+    ? "Offerte op maat"
+    : `€${(
+        gegevens.woningtype === "bedrijfspand"
+          ? (prijs.bedrijfsPrijs ?? 0)
+          : prijs.basisprijs
+      )
+        .toFixed(2)
+        .replace(".", ",")}`}
+</span>
+</div>
+
+<div className="flex justify-between border-b border-gray-100 pb-4">
+  <span className="text-gray-600">
+    {gegevens.woningtype === "bedrijfspand"
+      ? gegevens.glasOppervlak
+      : `${gegevens.ramen} ramen`}
+  </span>
+
+               
 
                 <span className="font-semibold text-gray-900">
-                  €{prijs.basisprijs.toFixed(2).replace(".", ",")}
-                </span>
-              </div>
-
-              <div className="flex justify-between border-b border-gray-100 pb-4">
-                <span className="text-gray-600">
-                  {gegevens.ramen} ramen
-                </span>
-
-                <span className="font-semibold text-gray-900">
-                  €{prijs.ramenPrijs.toFixed(2).replace(".", ",")}
+                  {gegevens.woningtype !== "bedrijfspand" && `€${prijs.ramenPrijs.toFixed(2).replace(".", ",")}`}
                 </span>
               </div>
 
@@ -347,11 +393,11 @@ const totaal = subtotaal - kortingBedrag;
 
             <div className="flex justify-between">
               <span className="text-gray-500">
-                Aantal ramen
+               {gegevens.woningtype === "bedrijfspand" ? "Glasoppervlak" : "Aantal ramen"} 
               </span>
 
               <strong className="text-gray-900">
-                {gegevens.ramen}
+                {gegevens.woningtype === "bedrijfspand" ? `${gegevens.glasOppervlak} m²` : gegevens.ramen}
               </strong>
             </div>
 

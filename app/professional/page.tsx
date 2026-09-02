@@ -446,8 +446,8 @@ return;
                       Glazenwassen
                     </div>
 
-                    <div className="text-sm text-gray-600">
-                      Buitenramen van woningen
+                    <div className="text-sm font-bold text-gray-900">
+                      Telewash
                     </div>
                   </div>
                 </div>

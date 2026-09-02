@@ -6,6 +6,7 @@ export default function GlazenwassenPage() {
   const [woningtype, setWoningtype] = useState("");
   const [verdiepingen, setVerdiepingen] = useState<string[]>([]);
   const [ramen, setRamen] = useState(0);
+  const [glasOppervlak, setGlasOppervlak] = useState("");
   const [telescoop, setTelescoop] = useState(false);
   const [type, setType] = useState("");
   const [frequentie, setFrequentie] = useState("eenmalig");
@@ -45,9 +46,9 @@ export default function GlazenwassenPage() {
   ];
 
   const kanVerder =
-    woningtype !== "" &&
-    ( woningtype === "appartement" || verdiepingen.length > 0) &&
-    ramen > 0;
+  woningtype !== "" &&
+  (woningtype === "appartement" || verdiepingen.length > 0) &&
+  (woningtype === "bedrijfspand" ? glasOppervlak !== "" && glasOppervlak !== "500+" : ramen > 0);
 
   function gaVerder() {
     if (!kanVerder) return;
@@ -56,6 +57,7 @@ export default function GlazenwassenPage() {
       woningtype,
       verdiepingen,
       ramen,
+      glasOppervlak,
       telescoop,
       type,
       frequentie,
@@ -211,7 +213,9 @@ export default function GlazenwassenPage() {
           </div>
         </div>
         )}
+        
         {/* RAMEN */}
+        {woningtype !== "bedrijfspand" && (
         <div className="mt-6 rounded-3xl border border-gray-200 bg-white p-7">
           <h2 className="text-xl font-bold text-gray-900">
             3. Hoeveel ramen moeten worden gewassen?
@@ -254,7 +258,43 @@ export default function GlazenwassenPage() {
             </button>
           </div>
         </div>
+        )}
+        {woningtype === "bedrijfspand" && (
+  <div className="mt-6 rounded-3xl border border-gray-200 bg-white p-7">
+    <h2 className="text-xl font-bold text-gray-900">
+      3. Hoeveel m² glas moet worden gewassen?
+    </h2>
 
+    <p className="mt-2 text-gray-500">
+      Kies het geschatte totale glasoppervlak van het winkel- of bedrijfspand.
+    </p>
+
+    <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-2">
+    {[
+  ["0-15", "Tot 15 m²"],
+  ["16-30", "16 - 30 m²"],
+  ["31-50", "31 - 50 m²"],
+  ["51-100", "51 - 100 m²"],
+  ["101-200", "101 - 200 m²"],
+  ["201-500", "201 - 500 m²"],
+  ["500+", "Meer dan 500 m²"],
+].map(([waarde, label]) => (
+        <button
+          key={waarde}
+          type="button"
+          onClick={() => setGlasOppervlak(waarde)}
+          className={`rounded-2xl border p-4 text-left font-semibold ${
+            glasOppervlak === waarde
+              ? "border-blue-600 bg-blue-50 text-blue-700"
+              : "border-gray-200 bg-white text-gray-900"
+          }`}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  </div>
+)}
         {/* SAMENVATTING */}
         <div className="mt-6 rounded-2xl bg-blue-50 p-6">
           <h3 className="font-bold text-blue-900">
@@ -263,6 +303,11 @@ export default function GlazenwassenPage() {
 
           <div className="mt-3 space-y-2 text-sm text-blue-900">
             <div className="flex justify-between">
+      {glasOppervlak === "500+" && (
+  <p className="mt-3 text-sm font-medium text-blue-700">
+    Meer dan 500 m²? Vraag een offerte aan. Wij nemen contact met je op.
+  </p>
+)}        
               <span>Dienst</span>
               <strong>Glazenwassen buitenzijde</strong>
             </div>
@@ -288,9 +333,11 @@ export default function GlazenwassenPage() {
             </div>
 
             <div className="flex justify-between">
-              <span>Aantal ramen</span>
-              <strong>{ramen}</strong>
-            </div>
+  <span>{woningtype === "bedrijfspand" ? "Glasoppervlak" : "Aantal ramen"}</span>
+  <strong>
+    {woningtype === "bedrijfspand" ? `${glasOppervlak} m²` : ramen}
+  </strong>
+</div>
           </div>
         </div>
 
