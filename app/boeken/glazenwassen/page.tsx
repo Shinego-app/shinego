@@ -172,7 +172,7 @@ export default function GlazenwassenPage() {
         {/* TELESCOOP */}
         {woningtype !== "" && (
         <div className="mt-6 rounded-3xl border border-gray-200 bg-white-7">
-        <h2 className="text-xl font-bold text-gray-900">
+        <h2 className="px-6 text-xl font-bold text-gray-900">
          bereikbaarheid van het glas 
          </h2>
          <button type="button" onClick={()=> setTelescoop( !telescoop)} className={`mt-4 rounded-xl border-2 p-5 font-bold ${telescoop ?"border-blue-600 bg-blue50 text-blue-700" :"border-gray-200 bg-white text-gray-900"}`}>Telescoop nodig</button>
@@ -185,7 +185,7 @@ export default function GlazenwassenPage() {
             2. Hoeveel verdiepingen?
           </h2>
 
-          <div className="mt-6 grid grid-cols-3 gap-4">
+          <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-3">
             {["1", "2", "3"].map((aantal) => (
               <button
                 key={aantal}

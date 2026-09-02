@@ -74,15 +74,16 @@ async function startStripeConnect() {
   }
 
   return (
-    <main style={{ padding: "24px", maxWidth: "900px", margin: "0 auto" }}>
-      <h1>
+    <main className="min-h-screen bg-gray-50 px-4 py-8 sm:px-6">
+     <div className="mx-auto w-full max-w-5xl"> 
+   <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">   
   {professional?.bedrijfsnaam
     ? `Welkom, ${professional.bedrijfsnaam}`
     : "Mijn ShineGo"}
 </h1>
-      <p>Beheer hier je opdrachten, planning en verdiensten.</p>
+      <p className="mt-2 text-gray-600">Beheer hier je opdrachten, planning en verdiensten.</p>
 
-      <section style={{ marginTop: "32px" }}>
+    <section className="mt-8 rounded-2xl bg-white p-5 shadow-sm sm:p-6">
   <h2>Mijn opdrachten</h2>
 
   {opdrachten.length === 0 ? (
@@ -92,13 +93,7 @@ async function startStripeConnect() {
       <div
         key={opdracht.id}
         onClick={() => router.push(`/professional/dashboard/opdracht/${opdracht.id}`)}
-        style={{
-          marginTop: "16px",
-          padding: "16px",
-          border: "1px solid #ddd",
-          borderRadius: "12px",
-          cursor: "pointer",
-        }}
+        className="mt-4 cursor-pointer rounded-xl border border-gray-200 bg-white p-4 transition hover:border-blue-300 hover:shadow-sm"
       >
         <strong>
           {opdracht.voornaam} {opdracht.achternaam}
@@ -113,24 +108,28 @@ async function startStripeConnect() {
         </p>
 
         <p>Status: {opdracht.status}</p>
+        <p>Jouw vergoeding: {opdracht.professional_bedrag != null ? `€${Number(opdracht.professional_bedrag).toFixed(2).replace(".", ",")}` : "Nog niet berekend"}</p>
       </div>
     ))
   )}
 </section>
 
-      <section style={{ marginTop: "32px" }}>
-        <h2>Mijn planning</h2>
-        <p>Nog geen afspraken geladen.</p>
+      <section className="mt-8 rounded-2xl bg-white p-5 shadow-sm sm:p-6">
+        <h2 className="text-xl font-bold text-gray-900">Mijn planning</h2>
+        <p className="mt-2 text-gray-600">Nog geen afspraken gepland.</p>
       </section>
 
-      <section style={{ marginTop: "32px" }}>
-        <h2>Verdiensten</h2>
+     <section className="mt-8 rounded-2xl bg-white p-5 shadow-sm sm:p-6"> 
+        <h2 className="text-xl font-bold text-gray-900">Verdiensten</h2>
+        <p className="mt-2 text-gray-600">Beheer hier je uitbetalingen via Stripe.</p>
         <button
+        className="mt-4 w-full rounded-xl bg-blue-600 px-4 py-3 font-semibold text-white hover:bg-blue-700 disabled:opacity-50 sm:w-auto"
   onClick={startStripeConnect}
 >
   Uitbetalingen instellen
 </button>
       </section>
+      </div>
     </main>
   );
 }

@@ -65,10 +65,11 @@ export default function Home() {
                 Boek een 
               
               </a>
-
+              <a href="/professional">
               <button className="rounded-xl border border-gray-300 bg-white px-7 py-4 text-lg font-semibold text-gray-800 hover:bg-gray-50">
                 Word glazenwasser 
               </button>
+              </a>
             </div>
 
             <div className="mt-8 flex flex-wrap gap-6 text-sm text-gray-600">
@@ -267,10 +268,11 @@ export default function Home() {
               Vul je agenda met nieuwe glasbewassingsopdrachten in jouw regio.
               kies zelf welke opdrachten je aanneemt en bepaal wanner je werkt. Aanmelden bij ShineGO is gratis.
             </p>
-
+            <a href="/professional">
             <button className="mt-8 rounded-xl bg-white px-7 py-4 font-semibold text-gray-900 hover:bg-gray-100">
               Gratis aanmelden glazenwasser 
             </button>
+            </a>
           </div>
         </div>
       </section>

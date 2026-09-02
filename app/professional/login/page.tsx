@@ -35,8 +35,9 @@ export default function ProfessionalLoginPage() {
   }
 
   return (
-    <main style={{ padding: "24px", maxWidth: "450px", margin: "40px auto" }}>
-      <h1>Inloggen als glazenwasser</h1>
+    <main className="min-h-screen bg-gray-50 px-6 py-12 flex items-start justify-center">
+       <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg">
+      <h1 className="mb-6 text-2xl font-bold text-gray-900">Inloggen als glazenwasser</h1>
 
       <form onSubmit={inloggen}>
         <div style={{ marginTop: "24px" }}>
@@ -46,7 +47,7 @@ export default function ProfessionalLoginPage() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            style={{ width: "100%", padding: "12px", marginTop: "6px" }}
+     className="mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"       
           />
         </div>
 
@@ -57,7 +58,7 @@ export default function ProfessionalLoginPage() {
             value={wachtwoord}
             onChange={(e) => setWachtwoord(e.target.value)}
             required
-            style={{ width: "100%", padding: "12px", marginTop: "6px" }}
+   className="mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"         
           />
         </div>
 
@@ -68,11 +69,12 @@ export default function ProfessionalLoginPage() {
         <button
           type="submit"
           disabled={bezig}
-          style={{ width: "100%", padding: "14px", marginTop: "24px" }}
+    className="w-full rounded-xl bg-blue-600 px-4 py-3 font-semibold text-white hover:bg-blue-700 disabled:opacity-50"
         >
           {bezig ? "Inloggen..." : "Inloggen"}
         </button>
       </form>
+      </div>
     </main>
   );
 }

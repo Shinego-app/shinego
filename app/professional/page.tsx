@@ -148,9 +148,9 @@ return;
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <main className="min-h-screen overflow-x-hidden bg-gray-50">
       <header className="border-b bg-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-5">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-5 sm:px-6">
           <a
             href="/"
             className="text-2xl font-bold text-blue-600"
@@ -167,11 +167,11 @@ return;
         </div>
       </header>
 
-      <section className="mx-auto max-w-3xl px-6 py-12">
+      <section className="mx-auto w-full max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
         <div className="mb-10 text-center">
           <div className="mb-4 text-5xl">🧼</div>
 
-          <h1 className="text-4xl font-bold text-gray-900">
+          <h1 className="text-3xl font-bold text-gray-900 sm:text-4xl">
             Word ShineGo Professional
           </h1>
 
@@ -215,7 +215,7 @@ return;
 
         <form
           onSubmit={aanmelden}
-          className="rounded-3xl border border-gray-200 bg-white p-7 shadow-sm sm:p-9"
+          className="w-full rounded-3xl border border-gray-200 bg-white p-5 shadow-sm sm:p-9"
         >
           <h2 className="text-2xl font-bold text-gray-900">
             Aanmelden als professional
