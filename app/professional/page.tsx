@@ -52,7 +52,7 @@ export default function ProfessionalPage() {
     }
 
     setBezig(true);
-    const { data: authData, error: authError } = await supabase.auth.signUp({
+  const { data: authData, error: authError } = await supabase.auth.signUp({
   email: email.trim().toLowerCase(),
   password: wachtwoord,
 });
@@ -63,7 +63,7 @@ if (authError || !authData.user) {
   setMelding(authError?.message || "Account kon niet worden aangemaakt.");
   return;
 }
-
+console.log("SIGNUP SESSION:", authData.session, "USER:", authData.user.id);
     const { error } = await supabase.from("professionals").insert([
       {
         bedrijfsnaam: bedrijfsnaam.trim(),
