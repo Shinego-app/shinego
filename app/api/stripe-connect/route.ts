@@ -17,11 +17,21 @@ if (!email) {
   );
 }
 
-const { data: professional, error: professionalError } = await supabaseAdmin
+let professionalQuery = supabaseAdmin
   .from("professionals")
-  .select("id, stripe_account_id")
-  .eq("id", requestedProfessionalId)
-  .single();
+  .select("id, stripe_account_id");
+
+if (requestedProfessionalId) {
+  professionalQuery = professionalQuery.eq("id", requestedProfessionalId);
+} else {
+  professionalQuery = professionalQuery.eq(
+    "email",
+    email.trim().toLowerCase()
+  );
+}
+
+const { data: professional, error: professionalError } =
+  await professionalQuery.single();
 
 if (professionalError || !professional) {
   return NextResponse.json(
