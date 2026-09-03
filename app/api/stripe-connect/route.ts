@@ -69,16 +69,23 @@ if (professional.stripe_account_id) {
         },
       },
       configuration: {
-        recipient: {
-          capabilities: {
-            stripe_balance: {
-              stripe_transfers: {
-                requested: true,
-              },
-            },
-          },
+  merchant: {
+    capabilities: {
+      card_payments: {
+        requested: true,
+      },
+    },
+  },
+  recipient: {
+    capabilities: {
+      stripe_balance: {
+        stripe_transfers: {
+          requested: true,
         },
       },
+    },
+  },
+},
     }),
   });
 
