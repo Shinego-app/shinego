@@ -83,27 +83,11 @@ if (authError || !authData.user) {
 }
 
     
-  const stripeResponse = await fetch("/api/stripe-connect", {
-  method: "POST",
-  headers: {
-    "Content-Type": "application/json",
-  },
-  body: JSON.stringify({
-    
-    email: email.trim().toLowerCase(),
-  }),
-});
+  
+  
 
-const stripeData = await stripeResponse.json();
 
-if (!stripeResponse.ok || !stripeData.url) {
-  setBezig(false);
-  setMelding(stripeData.error || "Stripe Connect kon niet worden gestart.");
-  return;
-}
 
-window.location.href = stripeData.url;
-return;
 
 
     setBezig(false);

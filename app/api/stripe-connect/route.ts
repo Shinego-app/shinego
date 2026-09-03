@@ -19,7 +19,7 @@ if (!email) {
 
 let professionalQuery = supabaseAdmin
   .from("professionals")
-  .select("id, stripe_account_id");
+  .select("id, stripe_account_id, bedrijfsnaam, voornaam, achternaam, telefoon, postcode, woonplaats, straat, huisnummer, toevoeging, kvk_nummer, btw_nummer");
 
 if (requestedProfessionalId) {
   professionalQuery = professionalQuery.eq("id", requestedProfessionalId);
@@ -58,6 +58,8 @@ if (professional.stripe_account_id) {
     },
     body: JSON.stringify({
       contact_email: email,
+     display_name: professional.bedrijfsnaam,
+     contact_phone: professional.telefoon,
       dashboard: "express",
       identity: {
         country: "nl",

@@ -118,7 +118,9 @@ const transfer = await stripe.transfers.create({
       .update({
         uitbetaald: true,
         uitbetaald_bedrag: Number(booking.professional_bedrag),
+        stripe_transfer_id: transfer.id,
       })
+      
       .eq("id", booking.id);
 
     if (updateError) {

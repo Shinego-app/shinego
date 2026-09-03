@@ -8,7 +8,10 @@ export default function ProfessionalDashboardPage() {
   const [laden, setLaden] = useState(true);
   const [professional, setProfessional] = useState<any>(null);
   const [opdrachten, setOpdrachten] = useState<any[]>([]);
-
+ async function uitloggen() {
+  await supabase.auth.signOut();
+  router.push("/professional/login");
+}
   useEffect(() => {
   async function laadProfessional() {
     const {
@@ -34,7 +37,7 @@ export default function ProfessionalDashboardPage() {
     .select("*")
     .eq("professional_id", data.id)
     .order("created_at", { ascending: false });
-    console.error("BOEKINGEN ERROR:", boekingenError);
+    
     console.log("BOEKINGEN DATA:", boekingenData);
   setOpdrachten(boekingenData || []);
 }
@@ -82,6 +85,12 @@ async function startStripeConnect() {
     : "Mijn ShineGo"}
 </h1>
       <p className="mt-2 text-gray-600">Beheer hier je opdrachten, planning en verdiensten.</p>
+   <button
+  onClick={uitloggen}
+  className="mt-4 rounded-xl border border-gray-300 bg-white px-4 py-2 font-semibold text-gray-900"
+>
+  Uitloggen
+</button>   
 
     <section className="mt-8 rounded-2xl bg-white p-5 shadow-sm sm:p-6">
   <h2>Mijn opdrachten</h2>
