@@ -120,7 +120,7 @@ if (professional.stripe_account_id) {
     use_case: {
       type: "account_onboarding",
       account_onboarding: {
-        configurations: ["recipient"],
+      configurations: ["merchant", "recipient"],  
         refresh_url: `${origin}/professional`,
         return_url: `${origin}/professional`,
       },
