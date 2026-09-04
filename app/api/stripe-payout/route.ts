@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { supabaseAdmin } from "../../../lib/supabaseAdmin";
-
+import { maakFactuurnummer } from "@/lib/factuur";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(request: Request) {
@@ -119,6 +119,8 @@ const transfer = await stripe.transfers.create({
         uitbetaald: true,
         uitbetaald_bedrag: Number(booking.professional_bedrag),
         stripe_transfer_id: transfer.id,
+        factuurnummer: booking.factuurnummer ?? maakFactuurnummer(booking.id),
+        
       })
       
       .eq("id", booking.id);
