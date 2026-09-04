@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { maakFactuurnummer } from "@/lib/factuur";
+import { Resend } from "resend";
+const resend = new Resend(process.env.RESEND_API_KEY!);
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(request: Request) {

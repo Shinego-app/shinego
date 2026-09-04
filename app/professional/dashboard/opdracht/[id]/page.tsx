@@ -62,19 +62,25 @@ export default function OpdrachtPage() {
   }
 
   async function afrondOpdracht() {
-    const { error } = await supabase
-      .from("boekingen")
-      .update({ status: "afgerond" })
-      .eq("id", opdrachtId)
-      .eq("professional_id", opdracht.professional_id);
+  const response = await fetch("/api/opdracht-afronden", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      booking_id: opdrachtId,
+    }),
+  });
 
-    if (error) {
-      console.error("Afronden mislukt:", error);
-      return;
-    }
+  const resultaat = await response.json();
 
-    setOpdracht({ ...opdracht, status: "afgerond" });
+  if (!response.ok) {
+    console.error("Afronden mislukt:", resultaat);
+    return;
   }
+
+  setOpdracht({ ...opdracht, status: "afgerond" });
+}
 
   if (laden) {
     return (
