@@ -28,6 +28,12 @@ export async function POST(request: Request) {
         { status: 404 }
       );
     }
+    if (booking.status !== "afgerond") {
+  return NextResponse.json(
+    { error: "Boeking is nog niet afgerond." },
+    { status: 400 }
+  );
+}
 
     if (!booking.professional_id) {
       return NextResponse.json(
