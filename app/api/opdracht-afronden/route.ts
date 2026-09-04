@@ -78,7 +78,7 @@ export async function POST(req: NextRequest) {
   klantHuisnummer: booking.huisnummer,
   klantToevoeging: booking.toevoeging,
   klantPostcode: booking.postcode,
-  klantPlaats: booking.woonplaats,
+  klantPlaats: booking.plaats,
   professionalBedrijfsnaam: professional.bedrijfsnaam,
   professionalKvK: professional.kvk_nummer,
   professionalBtwNummer: professional.btw_nummer,
