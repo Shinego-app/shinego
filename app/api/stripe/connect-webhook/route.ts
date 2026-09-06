@@ -25,10 +25,15 @@ if (eventType === "v2.core.account[configuration.recipient].capability_status_up
   const accountId = account.id;
   const payoutsActive = account.configuration?.recipient?.capabilities?.stripe_balance?.stripe_transfers?.status === "active"; 
   console.log("CONNECT RECIPIENT:", JSON.stringify(account.configuration?.recipient));
-await supabaseAdmin
+ const { error } = await supabaseAdmin
   .from("professionals")
   .update({ uitbetalingen_actief: payoutsActive })
   .eq("stripe_account_id", accountId);
+  if (error) {
+  console.error("CONNECT SUPABASE ERROR:", error);
+  return NextResponse.json({ error: error.message }, { status: 500 });
+}
+  
 }
 return NextResponse.json({ received: true });
 }
