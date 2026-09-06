@@ -23,6 +23,7 @@ const eventType = event.type;
 if (eventType === "v2.core.account[configuration.recipient].capability_status_updated") {
   const account = await event.fetchRelatedObject();
   const accountId = account.id;
+  console.log("CONNECT ACCOUNT ID:", accountId);
   const payoutsActive = account.configuration?.recipient?.capabilities?.stripe_balance?.stripe_transfers?.status === "active"; 
   console.log("CONNECT RECIPIENT:", JSON.stringify(account.configuration?.recipient));
  const { error } = await supabaseAdmin
