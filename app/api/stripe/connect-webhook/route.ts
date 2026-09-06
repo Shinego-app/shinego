@@ -34,8 +34,14 @@ if (eventType === "v2.core.account[configuration.recipient].capability_status_up
   console.error("CONNECT SUPABASE ERROR:", error);
   return NextResponse.json({ error: error.message }, { status: 500 });
 }
-  
+ return NextResponse.json({
+  received: true,
+  accountId,
+  payoutStatus: account.configuration?.recipient?.capabilities?.stripe_balance?.payouts?.status,
+});
 }
+
 return NextResponse.json({ received: true });
-}
+} 
+
   
