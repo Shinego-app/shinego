@@ -24,7 +24,7 @@ if (eventType === "v2.core.account[configuration.recipient].capability_status_up
   const account = await event.fetchRelatedObject();
   const accountId = account.id;
   const payoutsActive = account.configuration?.recipient?.capabilities?.stripe_balance?.stripe_transfers?.status === "active"; 
-  console.log("CONNECT PAYOUT STATUS:", account.configuration?.recipient?.capabilities?.stripe_balance?.stripe_transfers?.status);
+  console.log("CONNECT RECIPIENT:", JSON.stringify(account.configuration?.recipient));
 await supabaseAdmin
   .from("professionals")
   .update({ uitbetalingen_actief: payoutsActive })
