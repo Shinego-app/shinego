@@ -34,6 +34,15 @@ export async function POST(request: Request) {
     if (professional.stripe_account_id) {
       account = { id: professional.stripe_account_id };
     } else {
+      const adresRegel = [
+        professional.straat,
+        professional.huisnummer,
+        professional.toevoeging,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .trim();
+
       const accountResponse = await fetch("https://api.stripe.com/v2/core/accounts", {
         method: "POST",
         headers: {
@@ -42,11 +51,25 @@ export async function POST(request: Request) {
           "Stripe-Version": "2026-07-29.preview",
         },
         body: JSON.stringify({
-          contact_email: email,
+          contact_email: email.trim().toLowerCase(),
           display_name: professional.bedrijfsnaam,
           contact_phone: professional.telefoon,
           dashboard: "express",
-          identity: { country: "nl" },
+          identity: {
+            country: "nl",
+            entity_type: "company",
+            business_details: {
+              doing_business_as: professional.bedrijfsnaam,
+              phone: professional.telefoon,
+              product_description: "Glazenwassen via ShineGo",
+              address: {
+                country: "nl",
+                line1: adresRegel,
+                postal_code: professional.postcode?.trim().toUpperCase(),
+                city: professional.woonplaats?.trim(),
+              },
+            },
+          },
           defaults: {
             responsibilities: {
               fees_collector: "application",
