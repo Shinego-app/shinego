@@ -3,141 +3,120 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+
 export default function ProfessionalDashboardPage() {
- const router = useRouter();   
+  const router = useRouter();
   const [laden, setLaden] = useState(true);
   const [professional, setProfessional] = useState<any>(null);
   const [opdrachten, setOpdrachten] = useState<any[]>([]);
- async function uitloggen() {
-  await supabase.auth.signOut();
-  router.push("/professional/login");
-}
-  useEffect(() => {
-  async function laadProfessional() {
-    const {
-      data: { user },
-    } = await supabase.auth.getUser();
 
-    if (!user) {
+  async function uitloggen() {
+    await supabase.auth.signOut();
+    router.push("/professional/login");
+  }
+
+  useEffect(() => {
+    async function laadProfessional() {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setLaden(false);
+        return;
+      }
+
+      let { data } = await supabase
+        .from("professionals")
+        .select("*")
+        .eq("user_id", user.id)
+        .single();
+
+      if (data && new URLSearchParams(window.location.search).get("stripe") === "return") {
+        const { data: sessionData } = await supabase.auth.getSession();
+        const token = sessionData.session?.access_token;
+        if (token) {
+          const response = await fetch("/api/stripe-connect/status", {
+            method: "POST",
+            headers: { Authorization: `Bearer ${token}` },
+          });
+          if (response.ok) {
+            const status = await response.json();
+            data = { ...data, uitbetalingen_actief: status.uitbetalingen_actief };
+          }
+        }
+        window.history.replaceState({}, "", "/professional/dashboard");
+      }
+
+      setProfessional(data);
+
+      if (data) {
+        const { data: boekingenData } = await supabase
+          .from("boekingen")
+          .select("*")
+          .eq("professional_id", data.id)
+          .order("created_at", { ascending: false });
+        setOpdrachten(boekingenData || []);
+      }
       setLaden(false);
-      return;
     }
 
-    const { data } = await supabase
-      .from("professionals")
-      .select("*")
-      .eq("user_id", user.id)
-      .single();
+    laadProfessional();
+  }, []);
 
-    setProfessional(data);
-    console.log("PROFESSIONAL ID:", data?.id);
-    if (data) {
-  const { data: boekingenData, error: boekingenError } = await supabase
-    .from("boekingen")
-    .select("*")
-    .eq("professional_id", data.id)
-    .order("created_at", { ascending: false });
-    
-    console.log("BOEKINGEN DATA:", boekingenData);
-  setOpdrachten(boekingenData || []);
-}
-    setLaden(false);
+  async function startStripeConnect() {
+    if (!professional?.email) return;
+    const stripeResponse = await fetch("/api/stripe-connect", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        email: professional.email.trim().toLowerCase(),
+        professional_id: professional.id,
+      }),
+    });
+    const stripeData = await stripeResponse.json();
+    if (!stripeResponse.ok || !stripeData.url) {
+      alert(stripeData.error || "Stripe Connect fout");
+      return;
+    }
+    window.location.href = stripeData.url;
   }
 
-  laadProfessional();
-}, []);
-async function startStripeConnect() {
-  if (!professional?.email) {
-    console.error("Professional heeft geen e-mailadres.");
-    return;
-  }
-
-  const stripeResponse = await fetch("/api/stripe-connect", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-  email: professional.email.trim().toLowerCase(),
-  professional_id: professional.id,
-}),
-  });
-
-  const stripeData = await stripeResponse.json();
-
-  if (!stripeResponse.ok || !stripeData.url) {
-  alert(stripeData.error || "Stripe Connect fout");
-  return;
-}
-
-  window.location.href = stripeData.url;
-}
-  if (laden) {
-    return <main style={{ padding: "24px" }}>Dashboard laden...</main>;
-  }
+  if (laden) return <main style={{ padding: "24px" }}>Dashboard laden...</main>;
 
   return (
     <main className="min-h-screen bg-gray-50 px-4 py-8 sm:px-6">
-     <div className="mx-auto w-full max-w-5xl"> 
-   <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">   
-  {professional?.bedrijfsnaam
-    ? `Welkom, ${professional.bedrijfsnaam}`
-    : "Mijn ShineGo"}
-</h1>
-      <p className="mt-2 text-gray-600">Beheer hier je opdrachten, planning en verdiensten.</p>
-   <button
-  onClick={uitloggen}
-  className="mt-4 rounded-xl border border-gray-300 bg-white px-4 py-2 font-semibold text-gray-900"
->
-  Uitloggen
-</button>   
+      <div className="mx-auto w-full max-w-5xl">
+        <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+          {professional?.bedrijfsnaam ? `Welkom, ${professional.bedrijfsnaam}` : "Mijn ShineGo"}
+        </h1>
+        <p className="mt-2 text-gray-600">Beheer hier je opdrachten, planning en verdiensten.</p>
+        <button onClick={uitloggen} className="mt-4 rounded-xl border border-gray-300 bg-white px-4 py-2 font-semibold text-gray-900">Uitloggen</button>
 
-    <section className="mt-8 rounded-2xl bg-white p-5 shadow-sm sm:p-6">
-  <h2>Mijn opdrachten</h2>
+        <section className="mt-8 rounded-2xl bg-white p-5 shadow-sm sm:p-6">
+          <h2>Mijn opdrachten</h2>
+          {opdrachten.length === 0 ? <p>Je hebt momenteel geen opdrachten.</p> : opdrachten.map((opdracht) => (
+            <div key={opdracht.id} onClick={() => router.push(`/professional/dashboard/opdracht/${opdracht.id}`)} className="mt-4 cursor-pointer rounded-xl border border-gray-200 bg-white p-4 transition hover:border-blue-300 hover:shadow-sm">
+              <strong>{opdracht.voornaam} {opdracht.achternaam}</strong>
+              <p>Datum: {opdracht.gewenste_datum || "Nog niet gepland"}</p>
+              <p>Tijd: {opdracht.gewenste_tijd || "Nog niet gepland"}</p>
+              <p>Status: {opdracht.status}</p>
+              <p>Jouw vergoeding: {opdracht.professional_bedrag != null ? `€${Number(opdracht.professional_bedrag).toFixed(2).replace(".", ",")}` : "Nog niet berekend"}</p>
+            </div>
+          ))}
+        </section>
 
-  {opdrachten.length === 0 ? (
-    <p>Je hebt momenteel geen opdrachten.</p>
-  ) : (
-    opdrachten.map((opdracht) => (
-      <div
-        key={opdracht.id}
-        onClick={() => router.push(`/professional/dashboard/opdracht/${opdracht.id}`)}
-        className="mt-4 cursor-pointer rounded-xl border border-gray-200 bg-white p-4 transition hover:border-blue-300 hover:shadow-sm"
-      >
-        <strong>
-          {opdracht.voornaam} {opdracht.achternaam}
-        </strong>
+        <section className="mt-8 rounded-2xl bg-white p-5 shadow-sm sm:p-6">
+          <h2 className="text-xl font-bold text-gray-900">Mijn planning</h2>
+          <p className="mt-2 text-gray-600">Nog geen afspraken gepland.</p>
+        </section>
 
-        <p>
-          Datum: {opdracht.gewenste_datum || "Nog niet gepland"}
-        </p>
-
-        <p>
-          Tijd: {opdracht.gewenste_tijd || "Nog niet gepland"}
-        </p>
-
-        <p>Status: {opdracht.status}</p>
-        <p>Jouw vergoeding: {opdracht.professional_bedrag != null ? `€${Number(opdracht.professional_bedrag).toFixed(2).replace(".", ",")}` : "Nog niet berekend"}</p>
-      </div>
-    ))
-  )}
-</section>
-
-      <section className="mt-8 rounded-2xl bg-white p-5 shadow-sm sm:p-6">
-        <h2 className="text-xl font-bold text-gray-900">Mijn planning</h2>
-        <p className="mt-2 text-gray-600">Nog geen afspraken gepland.</p>
-      </section>
-
-     <section className="mt-8 rounded-2xl bg-white p-5 shadow-sm sm:p-6"> 
-        <h2 className="text-xl font-bold text-gray-900">Verdiensten</h2>
-        <p className="mt-2 text-gray-600">Beheer hier je uitbetalingen via Stripe.</p>
-        <button
-        className="mt-4 w-full rounded-xl bg-blue-600 px-4 py-3 font-semibold text-white hover:bg-blue-700 disabled:opacity-50 sm:w-auto"
-  onClick={startStripeConnect}
->
-  Uitbetalingen instellen
-</button>
-      </section>
+        <section className="mt-8 rounded-2xl bg-white p-5 shadow-sm sm:p-6">
+          <h2 className="text-xl font-bold text-gray-900">Verdiensten</h2>
+          <p className="mt-2 text-gray-600">
+            {professional?.uitbetalingen_actief ? "Uitbetalingen via Stripe zijn actief." : "Beheer hier je uitbetalingen via Stripe."}
+          </p>
+          <button className="mt-4 w-full rounded-xl bg-blue-600 px-4 py-3 font-semibold text-white hover:bg-blue-700 disabled:opacity-50 sm:w-auto" onClick={startStripeConnect}>
+            {professional?.uitbetalingen_actief ? "Stripe-gegevens beheren" : "Uitbetalingen instellen"}
+          </button>
+        </section>
       </div>
     </main>
   );
