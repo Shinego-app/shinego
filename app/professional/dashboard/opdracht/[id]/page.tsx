@@ -14,6 +14,7 @@ export default function OpdrachtPage() {
   const [laden, setLaden] = useState(true);
   const [uitbetalenBezig, setUitbetalenBezig] = useState(false);
   const [afrekeningBezig, setAfrekeningBezig] = useState(false);
+  const [annulerenBezig, setAnnulerenBezig] = useState(false);
 
   useEffect(() => {
     async function laadOpdracht() {
@@ -60,6 +61,63 @@ export default function OpdrachtPage() {
 
     if (!error) {
       setOpdracht({ ...opdracht, status: "onderweg" });
+    }
+  }
+
+  async function annuleerOpdracht() {
+    if (annulerenBezig) return;
+
+    const reden = window.prompt("Reden van annulering:");
+    if (reden === null) return;
+    if (!reden.trim()) {
+      alert("Vul een reden van annulering in.");
+      return;
+    }
+
+    const bevestigd = window.confirm(
+      "Weet je zeker dat je deze opdracht wilt annuleren? De opdracht wordt opnieuw beschikbaar voor een andere professional."
+    );
+    if (!bevestigd) return;
+
+    setAnnulerenBezig(true);
+
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session?.access_token) {
+        alert("Je sessie is verlopen. Log opnieuw in.");
+        return;
+      }
+
+      const response = await fetch("/api/professional-opdracht-annuleren", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          booking_id: opdrachtId,
+          reden: reden.trim(),
+        }),
+      });
+
+      const resultaat = await response.json();
+
+      if (!response.ok) {
+        alert(resultaat.error || "Opdracht annuleren mislukt.");
+        return;
+      }
+
+      alert("Opdracht is geannuleerd en opnieuw beschikbaar gemaakt.");
+      router.push("/professional/dashboard");
+      router.refresh();
+    } catch (error) {
+      console.error("Opdracht annuleren mislukt:", error);
+      alert("Opdracht annuleren mislukt.");
+    } finally {
+      setAnnulerenBezig(false);
     }
   }
 
@@ -219,8 +277,19 @@ export default function OpdrachtPage() {
         </button>
       )}
 
+      {(opdracht.status === "toegewezen" || opdracht.status === "onderweg") && (
+        <button
+          type="button"
+          onClick={annuleerOpdracht}
+          disabled={annulerenBezig}
+          style={{ marginTop: "12px", marginLeft: opdracht.status === "toegewezen" ? "12px" : "0" }}
+        >
+          {annulerenBezig ? "Opdracht annuleren..." : "Opdracht annuleren"}
+        </button>
+      )}
+
       {opdracht.status === "onderweg" && (
-        <button type="button" onClick={afrondOpdracht}>
+        <button type="button" onClick={afrondOpdracht} style={{ marginLeft: "12px" }}>
           Opdracht afronden
         </button>
       )}
