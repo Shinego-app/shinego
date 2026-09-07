@@ -14,7 +14,7 @@ export async function POST(request: Request) {
 
     let professionalQuery = supabaseAdmin
       .from("professionals")
-      .select("id, stripe_account_id, bedrijfsnaam, voornaam, achternaam, telefoon, postcode, woonplaats, straat, huisnummer, toevoeging, kvk_nummer, btw_nummer");
+      .select("id, stripe_account_id, uitbetalingen_actief, bedrijfsnaam, voornaam, achternaam, telefoon, postcode, woonplaats, straat, huisnummer, toevoeging, kvk_nummer, btw_nummer");
 
     if (requestedProfessionalId) {
       professionalQuery = professionalQuery.eq("id", requestedProfessionalId);
@@ -29,20 +29,81 @@ export async function POST(request: Request) {
     }
 
     const professional_id = professional.id;
+    const adresRegel = [
+      professional.straat,
+      professional.huisnummer,
+      professional.toevoeging,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .trim();
+
+    const kvkNummer = professional.kvk_nummer?.replace(/\D/g, "");
+    const btwNummer = professional.btw_nummer
+      ?.replace(/[\s.\-]/g, "")
+      .toUpperCase();
+
+    const idNumbers = [
+      ...(kvkNummer ? [{ type: "nl_kvk", value: kvkNummer }] : []),
+      ...(btwNummer ? [{ type: "nl_vat", value: btwNummer }] : []),
+    ];
+
+    const accountPrefill = {
+      contact_email: email.trim().toLowerCase(),
+      display_name: professional.bedrijfsnaam,
+      contact_phone: professional.telefoon,
+      identity: {
+        business_details: {
+          registered_name: professional.bedrijfsnaam,
+          phone: professional.telefoon,
+          ...(idNumbers.length > 0 ? { id_numbers: idNumbers } : {}),
+          address: {
+            country: "nl",
+            line1: adresRegel,
+            postal_code: professional.postcode?.trim().toUpperCase(),
+            city: professional.woonplaats?.trim(),
+          },
+        },
+      },
+      defaults: {
+        profile: {
+          doing_business_as: professional.bedrijfsnaam,
+          product_description: "Glazenwasservice via ShineGo",
+        },
+      },
+    };
+
     let account: any;
 
     if (professional.stripe_account_id) {
       account = { id: professional.stripe_account_id };
-    } else {
-      const adresRegel = [
-        professional.straat,
-        professional.huisnummer,
-        professional.toevoeging,
-      ]
-        .filter(Boolean)
-        .join(" ")
-        .trim();
 
+      // Vul een nog niet afgeronde onboarding opnieuw vanuit ShineGo aan.
+      // Actieve accounts slaan we over, omdat geverifieerde identiteit daarna
+      // door de professional via Stripe beheerd moet worden.
+      if (!professional.uitbetalingen_actief) {
+        const updateResponse = await fetch(
+          `https://api.stripe.com/v2/core/accounts/${professional.stripe_account_id}`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
+              "Content-Type": "application/json",
+              "Stripe-Version": "2026-07-29.preview",
+            },
+            body: JSON.stringify(accountPrefill),
+          }
+        );
+
+        const updatedAccount = await updateResponse.json();
+        if (!updateResponse.ok) {
+          throw new Error(
+            updatedAccount?.error?.message ||
+              "Bestaande Stripe-account kon niet worden aangevuld."
+          );
+        }
+      }
+    } else {
       const accountResponse = await fetch("https://api.stripe.com/v2/core/accounts", {
         method: "POST",
         headers: {
@@ -51,24 +112,15 @@ export async function POST(request: Request) {
           "Stripe-Version": "2026-07-29.preview",
         },
         body: JSON.stringify({
-          contact_email: email.trim().toLowerCase(),
-          display_name: professional.bedrijfsnaam,
-          contact_phone: professional.telefoon,
+          ...accountPrefill,
           dashboard: "express",
           identity: {
             country: "nl",
             entity_type: "company",
-            business_details: {
-              phone: professional.telefoon,
-              address: {
-                country: "nl",
-                line1: adresRegel,
-                postal_code: professional.postcode?.trim().toUpperCase(),
-                city: professional.woonplaats?.trim(),
-              },
-            },
+            ...accountPrefill.identity,
           },
           defaults: {
+            ...accountPrefill.defaults,
             responsibilities: {
               fees_collector: "application",
               losses_collector: "application",
