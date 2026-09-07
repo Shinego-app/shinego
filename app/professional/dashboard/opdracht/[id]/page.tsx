@@ -13,6 +13,7 @@ export default function OpdrachtPage() {
   const [opdracht, setOpdracht] = useState<any>(null);
   const [laden, setLaden] = useState(true);
   const [uitbetalenBezig, setUitbetalenBezig] = useState(false);
+  const [afrekeningBezig, setAfrekeningBezig] = useState(false);
 
   useEffect(() => {
     async function laadOpdracht() {
@@ -116,6 +117,46 @@ export default function OpdrachtPage() {
     }
   }
 
+  async function mailAfrekening() {
+    if (afrekeningBezig) return;
+
+    setAfrekeningBezig(true);
+
+    try {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session?.access_token) {
+        alert("Je sessie is verlopen. Log opnieuw in.");
+        return;
+      }
+
+      const response = await fetch("/api/professional-afrekening", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ booking_id: opdrachtId }),
+      });
+
+      const resultaat = await response.json();
+
+      if (!response.ok) {
+        alert(resultaat.error || "Afrekening verzenden mislukt.");
+        return;
+      }
+
+      alert("Uitbetalingsafrekening is per e-mail verzonden.");
+    } catch (error) {
+      console.error("Afrekening verzenden mislukt:", error);
+      alert("Afrekening verzenden mislukt.");
+    } finally {
+      setAfrekeningBezig(false);
+    }
+  }
+
   if (laden) {
     return (
       <main style={{ padding: "24px" }}>
@@ -196,7 +237,19 @@ export default function OpdrachtPage() {
       )}
 
       {opdracht.uitbetaald === true && (
-        <p style={{ marginTop: "16px" }}>Uitbetaling uitgevoerd.</p>
+        <>
+          <p style={{ marginTop: "16px" }}>Uitbetaling uitgevoerd.</p>
+          <button
+            type="button"
+            onClick={mailAfrekening}
+            disabled={afrekeningBezig}
+            style={{ marginTop: "8px" }}
+          >
+            {afrekeningBezig
+              ? "Afrekening verzenden..."
+              : "Afrekening e-mailen"}
+          </button>
+        </>
       )}
     </main>
   );
