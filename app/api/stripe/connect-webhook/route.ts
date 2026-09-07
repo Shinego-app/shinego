@@ -41,7 +41,10 @@ if (eventType === "v2.core.account[configuration.recipient].capability_status_up
 });
 }
 
-return NextResponse.json({ received: true });
+return NextResponse.json({
+  received: true,
+  eventType,
+});
 } 
 
   
