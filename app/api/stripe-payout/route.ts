@@ -28,12 +28,13 @@ export async function POST(request: Request) {
         { status: 404 }
       );
     }
+
     if (booking.status !== "afgerond") {
-  return NextResponse.json(
-    { error: "Boeking is nog niet afgerond." },
-    { status: 400 }
-  );
-}
+      return NextResponse.json(
+        { error: "Boeking is nog niet afgerond." },
+        { status: 400 }
+      );
+    }
 
     if (!booking.professional_id) {
       return NextResponse.json(
@@ -70,9 +71,49 @@ export async function POST(request: Request) {
       );
     }
 
-    if (professional.uitbetalingen_actief !== true) {
+    const accountStatusResponse = await fetch(
+      `https://api.stripe.com/v2/core/accounts/${encodeURIComponent(
+        professional.stripe_account_id
+      )}?include[0]=configuration.recipient`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
+          "Stripe-Version": "2026-07-29.preview",
+        },
+      }
+    );
+
+    const stripeAccount = await accountStatusResponse.json();
+
+    if (!accountStatusResponse.ok) {
+      console.error("Stripe accountstatus fout:", stripeAccount);
       return NextResponse.json(
-        { error: "Uitbetalingen voor deze professional zijn niet actief." },
+        { error: "Stripe-accountstatus kon niet worden gecontroleerd." },
+        { status: 400 }
+      );
+    }
+
+    const transferStatus =
+      stripeAccount.configuration?.recipient?.capabilities?.stripe_balance
+        ?.stripe_transfers?.status;
+
+    const payoutsActive = transferStatus === "active";
+
+    const { error: statusUpdateError } = await supabaseAdmin
+      .from("professionals")
+      .update({ uitbetalingen_actief: payoutsActive })
+      .eq("id", booking.professional_id);
+
+    if (statusUpdateError) {
+      throw statusUpdateError;
+    }
+
+    if (!payoutsActive) {
+      return NextResponse.json(
+        {
+          error: `Uitbetalingen zijn in Stripe niet actief (${transferStatus ?? "onbekend"}).`,
+        },
         { status: 400 }
       );
     }
@@ -87,37 +128,37 @@ export async function POST(request: Request) {
     }
 
     if (!booking.stripe_payment_id) {
-  return NextResponse.json(
-    { error: "Stripe betaling ontbreekt bij deze boeking." },
-    { status: 400 }
-  );
-}
+      return NextResponse.json(
+        { error: "Stripe betaling ontbreekt bij deze boeking." },
+        { status: 400 }
+      );
+    }
 
-const paymentIntent = await stripe.paymentIntents.retrieve(
-  booking.stripe_payment_id
-);
+    const paymentIntent = await stripe.paymentIntents.retrieve(
+      booking.stripe_payment_id
+    );
 
-const chargeId =
-  typeof paymentIntent.latest_charge === "string"
-    ? paymentIntent.latest_charge
-    : paymentIntent.latest_charge?.id;
+    const chargeId =
+      typeof paymentIntent.latest_charge === "string"
+        ? paymentIntent.latest_charge
+        : paymentIntent.latest_charge?.id;
 
-if (!chargeId) {
-  return NextResponse.json(
-    { error: "Geen Stripe charge gevonden voor deze betaling." },
-    { status: 400 }
-  );
-}
+    if (!chargeId) {
+      return NextResponse.json(
+        { error: "Geen Stripe charge gevonden voor deze betaling." },
+        { status: 400 }
+      );
+    }
 
-const transfer = await stripe.transfers.create({
-  amount,
-  currency: "eur",
-  destination: professional.stripe_account_id,
-  source_transaction: chargeId,
-  metadata: {
-    booking_id: String(booking.id),
-  },
-});
+    const transfer = await stripe.transfers.create({
+      amount,
+      currency: "eur",
+      destination: professional.stripe_account_id,
+      source_transaction: chargeId,
+      metadata: {
+        booking_id: String(booking.id),
+      },
+    });
 
     const { error: updateError } = await supabaseAdmin
       .from("boekingen")
@@ -126,9 +167,7 @@ const transfer = await stripe.transfers.create({
         uitbetaald_bedrag: Number(booking.professional_bedrag),
         stripe_transfer_id: transfer.id,
         factuurnummer: booking.factuurnummer ?? maakFactuurnummer(booking.id),
-        
       })
-      
       .eq("id", booking.id);
 
     if (updateError) {
