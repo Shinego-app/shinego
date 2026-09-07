@@ -12,6 +12,7 @@ export default function OpdrachtPage() {
 
   const [opdracht, setOpdracht] = useState<any>(null);
   const [laden, setLaden] = useState(true);
+  const [uitbetalenBezig, setUitbetalenBezig] = useState(false);
 
   useEffect(() => {
     async function laadOpdracht() {
@@ -62,25 +63,58 @@ export default function OpdrachtPage() {
   }
 
   async function afrondOpdracht() {
-  const response = await fetch("/api/opdracht-afronden", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      booking_id: opdrachtId,
-    }),
-  });
+    const response = await fetch("/api/opdracht-afronden", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        booking_id: opdrachtId,
+      }),
+    });
 
-  const resultaat = await response.json();
+    const resultaat = await response.json();
 
-  if (!response.ok) {
-    console.error("Afronden mislukt:", resultaat);
-    return;
+    if (!response.ok) {
+      console.error("Afronden mislukt:", resultaat);
+      return;
+    }
+
+    setOpdracht({ ...opdracht, status: "afgerond" });
   }
 
-  setOpdracht({ ...opdracht, status: "afgerond" });
-}
+  async function voerUitbetalingUit() {
+    if (uitbetalenBezig) return;
+
+    setUitbetalenBezig(true);
+
+    try {
+      const response = await fetch("/api/stripe-payout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          booking_id: opdrachtId,
+        }),
+      });
+
+      const resultaat = await response.json();
+
+      if (!response.ok) {
+        alert(resultaat.error || "Uitbetaling mislukt.");
+        return;
+      }
+
+      alert("Uitbetaling geslaagd.");
+      setOpdracht({ ...opdracht, uitbetaald: true });
+    } catch (error) {
+      console.error("Uitbetaling mislukt:", error);
+      alert("Uitbetaling mislukt.");
+    } finally {
+      setUitbetalenBezig(false);
+    }
+  }
 
   if (laden) {
     return (
@@ -148,6 +182,21 @@ export default function OpdrachtPage() {
         <button type="button" onClick={afrondOpdracht}>
           Opdracht afronden
         </button>
+      )}
+
+      {opdracht.status === "afgerond" && opdracht.uitbetaald !== true && (
+        <button
+          type="button"
+          onClick={voerUitbetalingUit}
+          disabled={uitbetalenBezig}
+          style={{ marginTop: "16px" }}
+        >
+          {uitbetalenBezig ? "Uitbetaling uitvoeren..." : "Uitbetaling uitvoeren"}
+        </button>
+      )}
+
+      {opdracht.uitbetaald === true && (
+        <p style={{ marginTop: "16px" }}>Uitbetaling uitgevoerd.</p>
       )}
     </main>
   );
