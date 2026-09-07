@@ -30,17 +30,10 @@ declare global {
   }
 }
 
-const SHINEGO_PREFILLED_REQUIREMENTS = [
-  "contact_email",
-  "contact_phone",
-  "display_name",
-  "identity.business_details.registered_name",
-  "identity.business_details.phone",
-  "identity.business_details.address.*",
-  "identity.business_details.id_numbers.*",
-  "defaults.profile.doing_business_as",
-  "defaults.profile.product_description",
-];
+type OpenRequirement = {
+  description: string;
+  status: string;
+};
 
 export default function UitbetalingenPage() {
   const router = useRouter();
@@ -49,7 +42,7 @@ export default function UitbetalingenPage() {
   const [scriptKlaar, setScriptKlaar] = useState(false);
   const gestartRef = useRef(false);
 
-  async function haalSessionOp() {
+  async function haalTokenOp() {
     const { data: sessionData } = await supabase.auth.getSession();
     const token = sessionData.session?.access_token;
 
@@ -57,9 +50,36 @@ export default function UitbetalingenPage() {
       throw new Error("Je sessie is verlopen. Log opnieuw in.");
     }
 
+    return token;
+  }
+
+  async function haalRequirementsOp(token: string) {
+    const response = await fetch("/api/stripe-connect/requirements", {
+      method: "GET",
+      headers: { Authorization: `Bearer ${token}` },
+      cache: "no-store",
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.error || "Stripe-verificatie kon niet worden opgehaald.");
+    }
+
+    const requirements = Array.isArray(result.requirements)
+      ? (result.requirements as OpenRequirement[])
+      : [];
+
+    return requirements
+      .map((entry) => entry.description)
+      .filter((description): description is string => Boolean(description));
+  }
+
+  async function haalSessionOp(token?: string) {
+    const authToken = token || (await haalTokenOp());
+
     const response = await fetch("/api/stripe-connect/session", {
       method: "POST",
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${authToken}` },
     });
 
     const result = await response.json();
@@ -76,7 +96,15 @@ export default function UitbetalingenPage() {
 
     async function startEmbeddedOnboarding() {
       try {
-        const eersteSession = await haalSessionOp();
+        const token = await haalTokenOp();
+        const openRequirements = await haalRequirementsOp(token);
+
+        if (openRequirements.length === 0) {
+          router.push("/professional/dashboard?stripe=return");
+          return;
+        }
+
+        const eersteSession = await haalSessionOp(token);
 
         if (!window.StripeConnect) {
           throw new Error("Stripe Connect kon niet worden geladen.");
@@ -101,15 +129,11 @@ export default function UitbetalingenPage() {
 
         const onboarding = stripeConnect.create("account-onboarding");
 
-        // ShineGo heeft deze bedrijfsgegevens al veilig aan Stripe geleverd.
-        // Verberg ze daarom in de embedded flow, zodat de professional ze
-        // niet nogmaals hoeft te controleren of in te voeren. Stripe toont
-        // alleen nog werkelijk openstaande verificatievereisten.
         onboarding.setCollectionOptions?.({
           fields: "currently_due",
           futureRequirements: "omit",
           requirements: {
-            exclude: SHINEGO_PREFILLED_REQUIREMENTS,
+            only: openRequirements,
           },
         });
 
