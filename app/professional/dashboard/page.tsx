@@ -132,13 +132,19 @@ export default function ProfessionalDashboardPage() {
   async function startStripeConnect() {
     if (!professional?.email) return;
 
+    const { data: sessionData } = await supabase.auth.getSession();
+    const token = sessionData.session?.access_token;
+    if (!token) {
+      alert("Je sessie is verlopen. Log opnieuw in.");
+      return;
+    }
+
     const stripeResponse = await fetch("/api/stripe-connect", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        email: professional.email.trim().toLowerCase(),
-        professional_id: professional.id,
-      }),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     const stripeData = await stripeResponse.json();
