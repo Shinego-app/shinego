@@ -59,9 +59,7 @@ export async function POST(request: Request) {
             country: "nl",
             entity_type: "company",
             business_details: {
-              doing_business_as: professional.bedrijfsnaam,
               phone: professional.telefoon,
-              product_description: "Glazenwassen via ShineGo",
               address: {
                 country: "nl",
                 line1: adresRegel,
