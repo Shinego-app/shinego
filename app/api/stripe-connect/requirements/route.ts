@@ -32,9 +32,9 @@ export async function GET(request: Request) {
     }
 
     const params = new URLSearchParams();
-    params.append("include[]", "requirements");
-    params.append("include[]", "future_requirements");
-    params.append("include[]", "configuration.recipient");
+    params.append("include", "requirements");
+    params.append("include", "future_requirements");
+    params.append("include", "configuration.recipient");
 
     const response = await fetch(
       `https://api.stripe.com/v2/core/accounts/${encodeURIComponent(professional.stripe_account_id)}?${params.toString()}`,
