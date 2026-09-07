@@ -95,10 +95,7 @@ export async function POST(request: Request) {
               "Content-Type": "application/json",
               "Stripe-Version": STRIPE_API_VERSION,
             },
-            body: JSON.stringify({
-              ...accountPrefill,
-              dashboard: "none",
-            }),
+            body: JSON.stringify(accountPrefill),
           }
         );
 
@@ -129,15 +126,8 @@ export async function POST(request: Request) {
           defaults: {
             ...accountPrefill.defaults,
             locales: ["nl-NL"],
-            responsibilities: {
-              fees_collector: "application",
-              losses_collector: "application",
-            },
           },
           configuration: {
-            merchant: {
-              capabilities: { card_payments: { requested: true } },
-            },
             recipient: {
               capabilities: {
                 stripe_balance: { stripe_transfers: { requested: true } },
