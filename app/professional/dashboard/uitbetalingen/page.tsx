@@ -16,11 +16,31 @@ declare global {
       }) => {
         create: (name: string) => HTMLElement & {
           setOnExit?: (callback: () => void) => void;
+          setCollectionOptions?: (options: {
+            fields: "currently_due" | "eventually_due";
+            futureRequirements?: "omit" | "include";
+            requirements?: {
+              exclude?: string[];
+              only?: string[];
+            };
+          }) => void;
         };
       };
     };
   }
 }
+
+const SHINEGO_PREFILLED_REQUIREMENTS = [
+  "contact_email",
+  "contact_phone",
+  "display_name",
+  "identity.business_details.registered_name",
+  "identity.business_details.phone",
+  "identity.business_details.address.*",
+  "identity.business_details.id_numbers.*",
+  "defaults.profile.doing_business_as",
+  "defaults.profile.product_description",
+];
 
 export default function UitbetalingenPage() {
   const router = useRouter();
@@ -80,6 +100,19 @@ export default function UitbetalingenPage() {
         });
 
         const onboarding = stripeConnect.create("account-onboarding");
+
+        // ShineGo heeft deze bedrijfsgegevens al veilig aan Stripe geleverd.
+        // Verberg ze daarom in de embedded flow, zodat de professional ze
+        // niet nogmaals hoeft te controleren of in te voeren. Stripe toont
+        // alleen nog werkelijk openstaande verificatievereisten.
+        onboarding.setCollectionOptions?.({
+          fields: "currently_due",
+          futureRequirements: "omit",
+          requirements: {
+            exclude: SHINEGO_PREFILLED_REQUIREMENTS,
+          },
+        });
+
         onboarding.setOnExit?.(() => {
           router.push("/professional/dashboard?stripe=return");
         });
@@ -117,7 +150,7 @@ export default function UitbetalingenPage() {
         <section className="rounded-2xl bg-white p-5 shadow-sm sm:p-7">
           <h1 className="text-2xl font-bold text-gray-900">Uitbetalingen instellen</h1>
           <p className="mt-2 text-gray-600">
-            Je eerder ingevulde ShineGo-gegevens worden gebruikt voor de verificatie. Stripe vraagt alleen om bevestiging en eventuele aanvullende gegevens die wettelijk nodig zijn.
+            Je bedrijfs- en contactgegevens zijn al vanuit ShineGo aan Stripe doorgegeven. Hieronder verschijnen alleen gegevens die Stripe nog nodig heeft voor verificatie of uitbetaling.
           </p>
 
           {fout ? (
