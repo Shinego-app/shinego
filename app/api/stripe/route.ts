@@ -3,14 +3,25 @@ import Stripe from "stripe";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(request: Request) {
+  const { amount, email, name, bookingId } = await request.json();
 
-  const { amount, email,bookingId } = await request.json();
-console.log("STRIPE MODE:", process.env.STRIPE_SECRET_KEY?.startsWith("sk_live_") ? "LIVE" : "TEST");
-console.log("Stripe ontvangt:", { amount, email });
+  console.log(
+    "STRIPE MODE:",
+    process.env.STRIPE_SECRET_KEY?.startsWith("sk_live_") ? "LIVE" : "TEST"
+  );
+  console.log("Stripe ontvangt:", { amount, email, name });
 
-const session = await stripe.checkout.sessions.create({
-  mode: "payment",
-  customer_email: email,
+  const customer = await stripe.customers.create({
+    email,
+    name,
+    metadata: {
+      bookingId: String(bookingId),
+    },
+  });
+
+  const session = await stripe.checkout.sessions.create({
+    mode: "payment",
+    customer: customer.id,
     line_items: [
       {
         price_data: {
@@ -23,7 +34,7 @@ const session = await stripe.checkout.sessions.create({
         quantity: 1,
       },
     ],
-   metadata: { bookingId: String(bookingId) }, 
+    metadata: { bookingId: String(bookingId) },
     success_url: "https://www.shinego.nl?betaling/succes",
     cancel_url: "https://www.shinego.nl?betaling=geannuleerd",
   });
