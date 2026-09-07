@@ -1,8 +1,12 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
+import { Resend } from "resend";
 import { supabaseAdmin } from "../../../lib/supabaseAdmin";
 import { maakFactuurnummer } from "@/lib/factuur";
+import { maakProfessionalAfrekeningPdf } from "@/lib/professionalAfrekening";
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const resend = new Resend(process.env.RESEND_API_KEY!);
 
 export async function POST(request: Request) {
   try {
@@ -53,7 +57,9 @@ export async function POST(request: Request) {
     const { data: professional, error: professionalError } =
       await supabaseAdmin
         .from("professionals")
-        .select("stripe_account_id, uitbetalingen_actief")
+        .select(
+          "stripe_account_id, uitbetalingen_actief, user_id, bedrijfsnaam, kvk_nummer, btw_nummer"
+        )
         .eq("id", booking.professional_id)
         .single();
 
@@ -160,13 +166,16 @@ export async function POST(request: Request) {
       },
     });
 
+    const factuurnummer =
+      booking.factuurnummer ?? maakFactuurnummer(Number(booking.id));
+
     const { error: updateError } = await supabaseAdmin
       .from("boekingen")
       .update({
         uitbetaald: true,
         uitbetaald_bedrag: Number(booking.professional_bedrag),
         stripe_transfer_id: transfer.id,
-        factuurnummer: booking.factuurnummer ?? maakFactuurnummer(booking.id),
+        factuurnummer,
       })
       .eq("id", booking.id);
 
@@ -174,9 +183,71 @@ export async function POST(request: Request) {
       throw updateError;
     }
 
+    let afrekeningVerzonden = false;
+
+    try {
+      if (professional.user_id) {
+        const { data: authUserData, error: authUserError } =
+          await supabaseAdmin.auth.admin.getUserById(professional.user_id);
+
+        const professionalEmail = authUserData.user?.email;
+
+        if (!authUserError && professionalEmail) {
+          const klantbedrag = Number(booking.totaalprijs ?? 0);
+          const professionalBedrag = Number(booking.professional_bedrag ?? 0);
+          const platformCommissie = Number(
+            booking.platform_commissie ??
+              Math.max(0, klantbedrag - professionalBedrag)
+          );
+
+          const pdfBytes = await maakProfessionalAfrekeningPdf({
+            factuurnummer,
+            datum: new Date().toLocaleDateString("nl-NL"),
+            professionalBedrijfsnaam: professional.bedrijfsnaam,
+            professionalKvK: professional.kvk_nummer,
+            professionalBtwNummer: professional.btw_nummer,
+            bookingId: booking.id,
+            klantbedrag,
+            platformCommissie,
+            professionalBedrag,
+            stripeTransferId: transfer.id,
+          });
+
+          const { error: emailError } = await resend.emails.send({
+            from: "ShineGo <noreply@shinego.nl>",
+            to: professionalEmail,
+            subject: `Uitbetalingsafrekening ${factuurnummer} - ShineGo`,
+            html: `
+              <p>Beste ${professional.bedrijfsnaam},</p>
+              <p>De uitbetaling voor opdracht ${booking.id} is uitgevoerd.</p>
+              <p>In de bijlage vind je de uitbetalingsafrekening.</p>
+              <p>Met vriendelijke groet,<br />ShineGo</p>
+            `,
+            attachments: [
+              {
+                filename: `afrekening-${factuurnummer}.pdf`,
+                content: Buffer.from(pdfBytes),
+              },
+            ],
+          });
+
+          if (!emailError) {
+            afrekeningVerzonden = true;
+          } else {
+            console.error("Afrekening e-mail fout:", emailError);
+          }
+        } else if (authUserError) {
+          console.error("Professional e-mail ophalen fout:", authUserError);
+        }
+      }
+    } catch (emailError) {
+      console.error("Afrekening na uitbetaling verzenden fout:", emailError);
+    }
+
     return NextResponse.json({
       success: true,
       transfer_id: transfer.id,
+      afrekening_verzonden: afrekeningVerzonden,
     });
   } catch (error) {
     console.error("Stripe payout fout:", error);
