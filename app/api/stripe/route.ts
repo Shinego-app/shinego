@@ -11,16 +11,9 @@ export async function POST(request: Request) {
   );
   console.log("Stripe ontvangt:", { amount, email });
 
-  const customer = await stripe.customers.create({
-    email,
-    metadata: {
-      bookingId: String(bookingId),
-    },
-  });
-
   const session = await stripe.checkout.sessions.create({
     mode: "payment",
-    customer: customer.id,
+    customer_email: email,
     line_items: [
       {
         price_data: {
