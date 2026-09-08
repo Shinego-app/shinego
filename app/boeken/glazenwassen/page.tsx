@@ -72,6 +72,25 @@ export default function GlazenwassenPage() {
     window.location.href = `/boeken/glazenwassen/details?type=${type}`
   }
 
+  function offerteAanvragen() {
+    const gegevens = {
+      woningtype,
+      verdiepingen,
+      ramen,
+      glasOppervlak,
+      telescoop,
+      type,
+      frequentie,
+    };
+
+    localStorage.setItem(
+      "shinegoGlazenwassen",
+      JSON.stringify(gegevens)
+    );
+
+    window.location.href = `/boeken/glazenwassen/details?type=${type}`;
+  }
+
   return (
     <main className="min-h-screen bg-gray-50">
       {/* HEADER */}
@@ -177,7 +196,7 @@ export default function GlazenwassenPage() {
         <h2 className="px-6 text-xl font-bold text-gray-900">
          bereikbaarheid van het glas 
          </h2>
-         <button type="button" onClick={()=> setTelescoop( !telescoop)} className={`mt-4 rounded-xl border-2 p-5 font-bold ${telescoop ?"border-blue-600 bg-blue50 text-blue-700" :"border-gray-200 bg-white text-gray-900"}`}>Telescoop nodig</button>
+         <button type="button" onClick={()=> setTelescoop( !telescoop)} className={`mt-4 rounded-xl border-2 p-5 font-bold ${telescoop ?"border-blue-600 bg-blue50 text-blue-700" :"border-gray-200 bg-white text-gray-900"}`}>Steel telescopic</button>
          </div>
         )}   
         {/* VERDIEPINGEN */}
@@ -384,18 +403,28 @@ export default function GlazenwassenPage() {
             ← Vorige
           </a>
 
-          <button
-            type="button"
-            disabled={!kanVerder}
-            onClick={gaVerder}
-            className={`rounded-xl px-10 py-4 text-lg font-bold transition ${
-              kanVerder
-                ? "bg-blue-600 text-white shadow-md hover:bg-blue-700"
-                : "cursor-not-allowed bg-gray-200 text-gray-400"
-            }`}
-          >
-            Verder →
-          </button>
+          {woningtype === "bedrijfspand" && glasOppervlak === "500+" ? (
+            <button
+              type="button"
+              onClick={offerteAanvragen}
+              className="rounded-xl bg-blue-600 px-10 py-4 text-lg font-bold text-white shadow-md hover:bg-blue-700"
+            >
+              Offerte aanvragen
+            </button>
+          ) : (
+            <button
+              type="button"
+              disabled={!kanVerder}
+              onClick={gaVerder}
+              className={`rounded-xl px-10 py-4 text-lg font-bold transition ${
+                kanVerder
+                  ? "bg-blue-600 text-white shadow-md hover:bg-blue-700"
+                  : "cursor-not-allowed bg-gray-200 text-gray-400"
+              }`}
+            >
+              Verder →
+            </button>
+          )}
         </div>
       </section>
     </main>
