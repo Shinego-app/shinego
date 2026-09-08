@@ -1,7 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useParams } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
@@ -18,14 +17,8 @@ export default function OpdrachtPage() {
 
   useEffect(() => {
     async function laadOpdracht() {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-
-      if (!user) {
-        setLaden(false);
-        return;
-      }
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) { setLaden(false); return; }
 
       const { data: professional } = await supabase
         .from("professionals")
@@ -33,10 +26,7 @@ export default function OpdrachtPage() {
         .eq("user_id", user.id)
         .single();
 
-      if (!professional) {
-        setLaden(false);
-        return;
-      }
+      if (!professional) { setLaden(false); return; }
 
       const { data } = await supabase
         .from("boekingen")
@@ -59,9 +49,7 @@ export default function OpdrachtPage() {
       .eq("id", opdrachtId)
       .eq("professional_id", opdracht.professional_id);
 
-    if (!error) {
-      setOpdracht({ ...opdracht, status: "onderweg" });
-    }
+    if (!error) setOpdracht({ ...opdracht, status: "onderweg" });
   }
 
   async function annuleerOpdracht() {
@@ -82,10 +70,7 @@ export default function OpdrachtPage() {
     setAnnulerenBezig(true);
 
     try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
+      const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) {
         alert("Je sessie is verlopen. Log opnieuw in.");
         return;
@@ -97,14 +82,10 @@ export default function OpdrachtPage() {
           "Content-Type": "application/json",
           Authorization: `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify({
-          booking_id: opdrachtId,
-          reden: reden.trim(),
-        }),
+        body: JSON.stringify({ booking_id: opdrachtId, reden: reden.trim() }),
       });
 
       const resultaat = await response.json();
-
       if (!response.ok) {
         alert(resultaat.error || "Opdracht annuleren mislukt.");
         return;
@@ -124,16 +105,11 @@ export default function OpdrachtPage() {
   async function afrondOpdracht() {
     const response = await fetch("/api/opdracht-afronden", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        booking_id: opdrachtId,
-      }),
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ booking_id: opdrachtId }),
     });
 
     const resultaat = await response.json();
-
     if (!response.ok) {
       console.error("Afronden mislukt:", resultaat);
       return;
@@ -144,22 +120,16 @@ export default function OpdrachtPage() {
 
   async function voerUitbetalingUit() {
     if (uitbetalenBezig) return;
-
     setUitbetalenBezig(true);
 
     try {
       const response = await fetch("/api/stripe-payout", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          booking_id: opdrachtId,
-        }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ booking_id: opdrachtId }),
       });
 
       const resultaat = await response.json();
-
       if (!response.ok) {
         alert(resultaat.error || "Uitbetaling mislukt.");
         return;
@@ -177,14 +147,10 @@ export default function OpdrachtPage() {
 
   async function mailAfrekening() {
     if (afrekeningBezig) return;
-
     setAfrekeningBezig(true);
 
     try {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
+      const { data: { session } } = await supabase.auth.getSession();
       if (!session?.access_token) {
         alert("Je sessie is verlopen. Log opnieuw in.");
         return;
@@ -200,7 +166,6 @@ export default function OpdrachtPage() {
       });
 
       const resultaat = await response.json();
-
       if (!response.ok) {
         alert(resultaat.error || "Afrekening verzenden mislukt.");
         return;
@@ -216,110 +181,134 @@ export default function OpdrachtPage() {
   }
 
   if (laden) {
-    return (
-      <main style={{ padding: "24px" }}>
-        Opdracht laden...
-      </main>
-    );
+    return <main className="min-h-screen bg-slate-50 px-5 py-10 text-slate-700">Opdracht laden...</main>;
   }
 
   if (!opdracht) {
-    return (
-      <main style={{ padding: "24px" }}>
-        Opdracht niet gevonden.
-      </main>
-    );
+    return <main className="min-h-screen bg-slate-50 px-5 py-10 text-slate-700">Opdracht niet gevonden.</main>;
   }
 
+  const statusLabel = String(opdracht.status || "Onbekend").replaceAll("_", " ");
+
   return (
-    <main
-      style={{
-        padding: "24px",
-        backgroundColor: "#ffffff",
-        minHeight: "100vh",
-        color: "#000000",
-      }}
-    >
-      <button
-        type="button"
-        onClick={() => router.push("/professional/dashboard")}
-      >
-        Terug naar dashboard
-      </button>
-
-      <h1>Opdracht</h1>
-
-      <p>
-        Klant: {opdracht.voornaam} {opdracht.achternaam}
-      </p>
-      <p>Datum: {opdracht.gewenste_datum || "Nog niet gepland"}</p>
-      <p>Tijd: {opdracht.gewenste_tijd || "Nog niet gepland"}</p>
-      <p>Status: {opdracht.status || "Onbekend"}</p>
-      <p>
-        Adres: {opdracht.straat} {opdracht.huisnummer}
-      </p>
-      <p>Plaats: {opdracht.plaats}</p>
-      <p>Telefoon: {opdracht.telefoon}</p>
-      <p>Woningtype: {opdracht.woningtype || "Niet opgegeven"}</p>
-      <p>Aantal ramen: {opdracht.aantal_ramen || "Niet opgegeven"}</p>
-      <p>Bereikbaarheid: {opdracht.bereikbaarheid || "Niet opgegeven"}</p>
-      <p>
-        Verdiepingen:{" "}
-        {opdracht.verdiepingen?.join(", ") || "Niet opgegeven"}
-      </p>
-      <p>
-        Jouw vergoeding: €{opdracht.professional_bedrag || "0,00"}
-      </p>
-
-      {opdracht.status === "toegewezen" && (
-        <button type="button" onClick={startOpdracht}>
-          Opdracht starten
-        </button>
-      )}
-
-      {(opdracht.status === "toegewezen" || opdracht.status === "onderweg") && (
+    <main className="min-h-screen bg-gradient-to-b from-blue-50 to-slate-50 px-4 py-8 sm:px-6">
+      <div className="mx-auto max-w-4xl">
         <button
           type="button"
-          onClick={annuleerOpdracht}
-          disabled={annulerenBezig}
-          style={{ marginTop: "12px", marginLeft: opdracht.status === "toegewezen" ? "12px" : "0" }}
+          onClick={() => router.push("/professional/dashboard")}
+          className="mb-5 rounded-xl border border-slate-200 bg-white px-4 py-2.5 font-semibold text-slate-700 shadow-sm hover:border-blue-200 hover:text-blue-700"
         >
-          {annulerenBezig ? "Opdracht annuleren..." : "Opdracht annuleren"}
+          ← Terug naar dashboard
         </button>
-      )}
 
-      {opdracht.status === "onderweg" && (
-        <button type="button" onClick={afrondOpdracht} style={{ marginLeft: "12px" }}>
-          Opdracht afronden
-        </button>
-      )}
+        <div className="overflow-hidden rounded-3xl bg-slate-950 text-white shadow-xl">
+          <div className="px-6 py-7 sm:px-8">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm font-bold uppercase tracking-wider text-blue-400">ShineGo opdracht</p>
+                <h1 className="mt-2 text-3xl font-extrabold">{opdracht.voornaam} {opdracht.achternaam}</h1>
+                <p className="mt-2 text-slate-300">{opdracht.gewenste_datum || "Nog niet gepland"} · {opdracht.gewenste_tijd || "Nog niet gepland"}</p>
+              </div>
+              <span className="w-fit rounded-full bg-blue-500/15 px-4 py-2 text-sm font-bold capitalize text-blue-300 ring-1 ring-blue-400/20">
+                {statusLabel}
+              </span>
+            </div>
+          </div>
+        </div>
 
-      {opdracht.status === "afgerond" && opdracht.uitbetaald !== true && (
-        <button
-          type="button"
-          onClick={voerUitbetalingUit}
-          disabled={uitbetalenBezig}
-          style={{ marginTop: "16px" }}
-        >
-          {uitbetalenBezig ? "Uitbetaling uitvoeren..." : "Uitbetaling uitvoeren"}
-        </button>
-      )}
+        <div className="mt-6 grid gap-6 md:grid-cols-2">
+          <section className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
+            <p className="text-sm font-bold uppercase tracking-wider text-blue-600">Klant & locatie</p>
+            <div className="mt-5 space-y-4 text-sm">
+              <Info label="Adres" value={`${opdracht.straat || ""} ${opdracht.huisnummer || ""}`.trim() || "Niet opgegeven"} />
+              <Info label="Plaats" value={opdracht.plaats || "Niet opgegeven"} />
+              <Info label="Telefoon" value={opdracht.telefoon || "Niet opgegeven"} />
+            </div>
+          </section>
 
-      {opdracht.uitbetaald === true && (
-        <>
-          <p style={{ marginTop: "16px" }}>Uitbetaling uitgevoerd.</p>
-          <button
-            type="button"
-            onClick={mailAfrekening}
-            disabled={afrekeningBezig}
-            style={{ marginTop: "8px" }}
-          >
-            {afrekeningBezig
-              ? "Afrekening verzenden..."
-              : "Afrekening e-mailen"}
-          </button>
-        </>
-      )}
+          <section className="rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
+            <p className="text-sm font-bold uppercase tracking-wider text-blue-600">Opdrachtgegevens</p>
+            <div className="mt-5 space-y-4 text-sm">
+              <Info label="Woningtype" value={opdracht.woningtype || "Niet opgegeven"} />
+              <Info label="Aantal ramen" value={opdracht.aantal_ramen || "Niet opgegeven"} />
+              <Info label="Bereikbaarheid" value={opdracht.bereikbaarheid || "Niet opgegeven"} />
+              <Info label="Verdiepingen" value={opdracht.verdiepingen?.join(", ") || "Niet opgegeven"} />
+            </div>
+          </section>
+        </div>
+
+        <section className="mt-6 rounded-3xl border border-blue-100 bg-blue-50 p-6">
+          <p className="text-sm font-bold uppercase tracking-wider text-blue-700">Jouw vergoeding</p>
+          <p className="mt-2 text-3xl font-extrabold text-slate-950">€{opdracht.professional_bedrag || "0,00"}</p>
+        </section>
+
+        <section className="mt-6 rounded-3xl border border-slate-100 bg-white p-6 shadow-sm">
+          <h2 className="text-xl font-bold text-slate-900">Acties</h2>
+          <p className="mt-1 text-sm text-slate-500">Kies alleen de actie die bij de huidige status hoort.</p>
+
+          <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+            {opdracht.status === "toegewezen" && (
+              <button type="button" onClick={startOpdracht} className="rounded-xl bg-blue-600 px-5 py-3 font-bold text-white hover:bg-blue-700">
+                Opdracht starten
+              </button>
+            )}
+
+            {opdracht.status === "onderweg" && (
+              <button type="button" onClick={afrondOpdracht} className="rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white hover:bg-emerald-700">
+                Opdracht afronden
+              </button>
+            )}
+
+            {(opdracht.status === "toegewezen" || opdracht.status === "onderweg") && (
+              <button
+                type="button"
+                onClick={annuleerOpdracht}
+                disabled={annulerenBezig}
+                className="rounded-xl border border-red-200 bg-red-50 px-5 py-3 font-bold text-red-700 hover:bg-red-100 disabled:opacity-50"
+              >
+                {annulerenBezig ? "Opdracht annuleren..." : "Opdracht annuleren"}
+              </button>
+            )}
+
+            {opdracht.status === "afgerond" && opdracht.uitbetaald !== true && (
+              <button
+                type="button"
+                onClick={voerUitbetalingUit}
+                disabled={uitbetalenBezig}
+                className="rounded-xl bg-slate-950 px-5 py-3 font-bold text-white hover:bg-slate-800 disabled:opacity-50"
+              >
+                {uitbetalenBezig ? "Uitbetaling uitvoeren..." : "Uitbetaling uitvoeren"}
+              </button>
+            )}
+
+            {opdracht.uitbetaald === true && (
+              <button
+                type="button"
+                onClick={mailAfrekening}
+                disabled={afrekeningBezig}
+                className="rounded-xl bg-blue-600 px-5 py-3 font-bold text-white hover:bg-blue-700 disabled:opacity-50"
+              >
+                {afrekeningBezig ? "Afrekening verzenden..." : "Afrekening e-mailen"}
+              </button>
+            )}
+          </div>
+
+          {opdracht.uitbetaald === true && (
+            <div className="mt-4 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
+              ✓ Uitbetaling uitgevoerd
+            </div>
+          )}
+        </section>
+      </div>
     </main>
+  );
+}
+
+function Info({ label, value }: { label: string; value: any }) {
+  return (
+    <div className="flex items-start justify-between gap-4 border-b border-slate-100 pb-3 last:border-0 last:pb-0">
+      <span className="text-slate-500">{label}</span>
+      <span className="text-right font-semibold text-slate-900">{String(value)}</span>
+    </div>
   );
 }
