@@ -56,31 +56,31 @@ export default function PrijsPage() {
  const bedrijfsPrijs =
   gegevens.glasOppervlak === "0-15"
     ? gegevens.telescoop
-      ? 65
+      ? 59
       : 39
     : gegevens.glasOppervlak === "16-30"
-    ? gegevens.telescoop
-      ? 85
-      : 55
-    : gegevens.glasOppervlak === "31-50"
-    ? gegevens.telescoop
-      ? 125
-      : 75
-    : gegevens.glasOppervlak === "51-100"
-    ? gegevens.telescoop
-      ? 225
-      : 150
-    : gegevens.glasOppervlak === "101-200"
-    ? gegevens.telescoop
-      ? 400
-      : 275
-    : gegevens.glasOppervlak === "201-500"
-    ? gegevens.telescoop
-      ? 850
-      : 600
-    : gegevens.glasOppervlak === "500+"
-? -1
-: 0;
+      ? gegevens.telescoop
+        ? 79
+        : 59
+      : gegevens.glasOppervlak === "31-50"
+        ? gegevens.telescoop
+          ? 119
+          : 89
+        : gegevens.glasOppervlak === "51-100"
+          ? gegevens.telescoop
+            ? 219
+            : 159
+          : gegevens.glasOppervlak === "101-200"
+            ? gegevens.telescoop
+              ? 399
+              : 289
+            : gegevens.glasOppervlak === "201-500"
+              ? gegevens.telescoop
+                ? 849
+                : 599
+              : gegevens.glasOppervlak === "500+"
+                ? -1
+                : 0;
    const basisprijs =
   gegevens.type === "bedrijf"
     ? bedrijfsPrijs
@@ -149,6 +149,13 @@ const totaal = subtotaal - kortingBedrag;
   }, [gegevens, details]);
 
   function doorgaan() {
+    if (
+  gegevens?.woningtype === "bedrijfspand" &&
+  gegevens.glasOppervlak === "500+"
+) {
+  alert("Voor bedrijfspanden vanaf 500 m² maken we een offerte op maat.");
+  return;
+}
     localStorage.setItem(
       "shinegoPrijs",
       JSON.stringify(prijs)
@@ -232,8 +239,11 @@ const totaal = subtotaal - kortingBedrag;
             </p>
 
             <div className="mt-3 text-6xl font-bold">
-              €{prijs.totaal.toFixed(2).replace(".", ",")}
-            </div>
+  {gegevens.woningtype === "bedrijfspand" &&
+  gegevens.glasOppervlak === "500+"
+    ? "Offerte op maat"
+    : `€${prijs.totaal.toFixed(2).replace(".", ",")}`}
+</div>
 
             <p className="mt-3 text-blue-100">
               Voor glazenwassen buitenzijde
