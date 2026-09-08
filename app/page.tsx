@@ -23,9 +23,9 @@ export default function Home() {
         <div className="absolute -left-20 top-10 h-72 w-72 rounded-full bg-white/10 blur-3xl" />
         <div className="absolute -right-24 bottom-0 h-96 w-96 rounded-full bg-cyan-300/20 blur-3xl" />
 
-        <div className="relative mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 sm:py-16 md:grid-cols-2 md:items-center md:gap-12 md:py-24">
+        <div className="relative mx-auto grid max-w-7xl gap-7 px-4 py-8 sm:gap-10 sm:px-6 sm:py-16 md:grid-cols-2 md:items-center md:gap-12 md:py-24">
           <div>
-            <div className="mb-5 inline-flex rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-blue-50 backdrop-blur">
+            <div className="mb-4 inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-sm font-semibold text-blue-50 backdrop-blur sm:mb-5 sm:px-4 sm:py-2">
               Glazenwasser nodig? ShineGo regelt het.
             </div>
 
@@ -34,20 +34,20 @@ export default function Home() {
               <span className="block text-cyan-100">Snel geregeld.</span>
             </h1>
 
-            <p className="mt-6 max-w-xl text-lg leading-8 text-blue-50 md:text-xl">
+            <p className="mt-4 max-w-xl text-base leading-7 text-blue-50 sm:mt-6 sm:text-lg sm:leading-8 md:text-xl">
               Boek eenvoudig een glazenwasser, zie vooraf wat je betaalt en kies een moment dat jou uitkomt.
             </p>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <a href="/boeken" className="rounded-xl bg-white px-6 py-4 text-center text-base font-extrabold text-blue-700 shadow-xl shadow-blue-950/20 transition hover:-translate-y-0.5 hover:bg-blue-50 sm:px-7 sm:text-lg">
+            <div className="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row">
+              <a href="/boeken" className="rounded-xl bg-white px-6 py-3.5 text-center text-base font-extrabold text-blue-700 shadow-xl shadow-blue-950/20 transition hover:-translate-y-0.5 hover:bg-blue-50 sm:px-7 sm:py-4 sm:text-lg">
                 Boek een glazenwasser
               </a>
-              <a href="/professional" className="rounded-xl border border-white/30 bg-white/10 px-6 py-4 text-center text-base font-semibold text-white backdrop-blur transition hover:bg-white/20 sm:px-7 sm:text-lg">
+              <a href="/professional" className="rounded-xl border border-white/30 bg-white/10 px-6 py-3.5 text-center text-base font-semibold text-white backdrop-blur transition hover:bg-white/20 sm:px-7 sm:py-4 sm:text-lg">
                 Word glazenwasser
               </a>
             </div>
 
-            <div className="mt-8 grid gap-3 text-sm font-semibold text-blue-50 sm:flex sm:flex-wrap sm:gap-x-6">
+            <div className="mt-5 grid gap-2 text-sm font-semibold text-blue-50 sm:mt-8 sm:flex sm:flex-wrap sm:gap-x-6 sm:gap-y-3">
               <span>✓ Vooraf vaste prijs</span>
               <span>✓ Gecontroleerde glazenwassers</span>
               <span>✓ Veilig betalen</span>
