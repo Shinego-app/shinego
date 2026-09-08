@@ -6,6 +6,7 @@ type Gegevens = {
   woningtype: string;
   verdiepingen: string[];
   ramen: number;
+  glasOppervlak: string;
   telescoop: boolean;
   type: string;
   frequentie: string;
@@ -21,7 +22,17 @@ export default function DetailsPage() {
     const opgeslagen = localStorage.getItem("shinegoGlazenwassen");
 
     if (opgeslagen) {
-      setGegevens(JSON.parse(opgeslagen));
+      const opgeslagenGegevens: Gegevens = JSON.parse(opgeslagen);
+
+      if (
+        opgeslagenGegevens.woningtype === "bedrijfspand" &&
+        opgeslagenGegevens.glasOppervlak === "500+"
+      ) {
+        window.location.href = "/contact?offerte=500plus";
+        return;
+      }
+
+      setGegevens(opgeslagenGegevens);
     }
   }, []);
 
