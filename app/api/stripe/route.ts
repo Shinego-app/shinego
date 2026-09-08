@@ -3,17 +3,16 @@ import Stripe from "stripe";
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(request: Request) {
-  const { amount, email, name, bookingId } = await request.json();
+  const { amount, email, bookingId } = await request.json();
 
   console.log(
     "STRIPE MODE:",
     process.env.STRIPE_SECRET_KEY?.startsWith("sk_live_") ? "LIVE" : "TEST"
   );
-  console.log("Stripe ontvangt:", { amount, email, name });
+  console.log("Stripe ontvangt:", { amount, email });
 
   const customer = await stripe.customers.create({
     email,
-    name,
     metadata: {
       bookingId: String(bookingId),
     },
