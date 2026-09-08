@@ -157,9 +157,10 @@ export default function Home() {
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-10 text-sm md:flex-row md:items-center md:justify-between">
           <div><span className="font-extrabold text-white">Shine<span className="text-sky-400">Go</span></span> © 2026</div>
           <div className="flex flex-wrap gap-6">
-            <a href="#" className="transition hover:text-white">Privacy</a>
-            <a href="#" className="transition hover:text-white">Voorwaarden</a>
-            <a href="#" className="transition hover:text-white">Contact</a>
+            <a href="/veelgestelde-vragen" className="transition hover:text-white">Veelgestelde vragen</a>
+            <a href="/privacy" className="transition hover:text-white">Privacy</a>
+            <a href="/voorwaarden" className="transition hover:text-white">Voorwaarden</a>
+            <a href="/contact" className="transition hover:text-white">Contact</a>
           </div>
         </div>
       </footer>
