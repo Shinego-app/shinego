@@ -16,15 +16,31 @@
   --font-mono: var(--font-geist-mono);
 }
 
+* {
+  box-sizing: border-box;
+}
+
 html {
   background: var(--background);
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
+  margin: 0;
+  overflow-x: hidden;
   background: linear-gradient(180deg, #f8fbff 0%, #ffffff 46%, #f8fbff 100%);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
 }
 
 ::selection {
@@ -35,6 +51,8 @@ body {
 input,
 select,
 textarea {
+  min-width: 0;
+  max-width: 100%;
   color: #0f172a;
   background-color: #ffffff;
   border-color: #cbd5e1;
@@ -61,6 +79,10 @@ button {
 
 button:not(:disabled):active {
   transform: translateY(1px);
+}
+
+button:disabled {
+  cursor: not-allowed;
 }
 
 .bg-gray-50 {
@@ -117,4 +139,47 @@ main a[class*="bg-blue-600"]:hover {
 main button[class*="bg-red"],
 main a[class*="bg-red"] {
   box-shadow: 0 10px 22px rgb(220 38 38 / 0.14);
+}
+
+@media (max-width: 640px) {
+  body {
+    min-width: 320px;
+  }
+
+  main h1 {
+    font-size: clamp(2rem, 10vw, 2.6rem);
+    line-height: 1.08;
+  }
+
+  main h2 {
+    line-height: 1.15;
+  }
+
+  main p,
+  main li,
+  main label {
+    overflow-wrap: anywhere;
+  }
+
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+
+  button,
+  a[class*="rounded"] {
+    touch-action: manipulation;
+  }
+
+  main button[class*="px-10"],
+  main a[class*="px-10"] {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+
+  main .text-6xl {
+    font-size: 2.75rem;
+    line-height: 1;
+  }
 }
