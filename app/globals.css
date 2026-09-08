@@ -1,8 +1,12 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #f8fbff;
+  --foreground: #0f172a;
+  --shinego-blue: #2563eb;
+  --shinego-blue-dark: #1d4ed8;
+  --shinego-navy: #0f172a;
+  --shinego-soft: #eff6ff;
 }
 
 @theme inline {
@@ -12,15 +16,105 @@
   --font-mono: var(--font-geist-mono);
 }
 
-
+html {
+  background: var(--background);
+}
 
 body {
-  background: var(--background);
+  background: linear-gradient(180deg, #f8fbff 0%, #ffffff 46%, #f8fbff 100%);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
+
+::selection {
+  background: #bfdbfe;
+  color: #0f172a;
+}
+
 input,
 select,
 textarea {
-  color: #111827;
+  color: #0f172a;
+  background-color: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
+  transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--shinego-blue) !important;
+  box-shadow: 0 0 0 4px rgb(37 99 235 / 0.10) !important;
+  outline: none;
+}
+
+button,
+a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button {
+  transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease, border-color 160ms ease;
+}
+
+button:not(:disabled):active {
+  transform: translateY(1px);
+}
+
+.bg-gray-50 {
+  background-color: #f8fbff !important;
+}
+
+.border-gray-200 {
+  border-color: #e2e8f0 !important;
+}
+
+.border-gray-300 {
+  border-color: #cbd5e1 !important;
+}
+
+.text-gray-900,
+.text-gray-800 {
+  color: #0f172a !important;
+}
+
+.text-gray-700,
+.text-gray-600 {
+  color: #475569 !important;
+}
+
+.text-gray-500 {
+  color: #64748b !important;
+}
+
+.shadow-sm {
+  box-shadow: 0 8px 24px rgb(15 23 42 / 0.06) !important;
+}
+
+main form,
+main section {
+  accent-color: var(--shinego-blue);
+}
+
+main h1,
+main h2,
+main h3 {
+  letter-spacing: -0.02em;
+}
+
+main button[class*="bg-blue-600"],
+main a[class*="bg-blue-600"] {
+  box-shadow: 0 10px 22px rgb(37 99 235 / 0.18);
+}
+
+main button[class*="bg-blue-600"]:hover,
+main a[class*="bg-blue-600"]:hover {
+  box-shadow: 0 14px 28px rgb(37 99 235 / 0.24);
+}
+
+main button[class*="bg-red"],
+main a[class*="bg-red"] {
+  box-shadow: 0 10px 22px rgb(220 38 38 / 0.14);
 }
