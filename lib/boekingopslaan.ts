@@ -36,6 +36,9 @@ export type NieuweBoeking = {
   gewenste_datum?: string;
   gewenste_tijd?: string;
 
+  akkoord_voorwaarden?: boolean;
+  akkoord_start_binnen_bedenktijd?: boolean;
+
   professional_id?: string | null;
 };
 
@@ -72,8 +75,8 @@ export async function boekingOpslaan(boeking: NieuweBoeking) {
         verdieping_toeslag: boeking.verdieping_toeslag ?? 0,
         bereik_toeslag: boeking.bereik_toeslag ?? 0,
         kozijnen_toeslag: boeking.kozijnen_toeslag ?? 0,
-       korting_percentage: boeking.korting_percentage ?? 0,
-       korting_bedrag: boeking.korting_bedrag ?? 0,
+        korting_percentage: boeking.korting_percentage ?? 0,
+        korting_bedrag: boeking.korting_bedrag ?? 0,
         totaalprijs: boeking.totaalprijs,
 
         status: "nieuw",
@@ -82,12 +85,13 @@ export async function boekingOpslaan(boeking: NieuweBoeking) {
         gewenste_datum: boeking.gewenste_datum || null,
         gewenste_tijd: boeking.gewenste_tijd || null,
         thuis_nodig: boeking.thuis_nodig || null,
+        akkoord_voorwaarden: boeking.akkoord_voorwaarden ?? false,
+        akkoord_start_binnen_bedenktijd:
+          boeking.akkoord_start_binnen_bedenktijd ?? false,
         professional_id: boeking.professional_id ?? null,
       },
     ])
-    .select("id")
-    
-    
+    .select("id");
 
   if (error) {
     console.error("Fout bij opslaan ShineGo-boeking:", error);
