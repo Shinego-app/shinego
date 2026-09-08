@@ -182,10 +182,13 @@ export default function BevestigenPage() {
           ? "Elke 12 weken"
           : "Eenmalig";
 
+  const rijClass = "flex flex-col gap-1 sm:flex-row sm:justify-between sm:gap-5";
+  const waardeClass = "break-words font-bold text-gray-900 sm:max-w-[60%] sm:text-right";
+
   return (
     <main className="min-h-screen bg-gray-50">
       <header className="border-b border-gray-200 bg-white">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-5">
+        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-4 sm:px-6 sm:py-5">
           <a href="/" className="text-2xl font-bold text-blue-600">
             ShineGo
           </a>
@@ -199,42 +202,41 @@ export default function BevestigenPage() {
         </div>
       </header>
 
-      <section className="mx-auto max-w-3xl px-6 py-12">
-        <div className="mb-10">
-          <h1 className="text-4xl font-bold text-gray-900">Controleer je boeking</h1>
-          <p className="mt-3 text-lg text-gray-600">
+      <section className="mx-auto max-w-3xl px-4 py-8 sm:px-6 sm:py-12">
+        <div className="mb-8 sm:mb-10">
+          <h1 className="text-3xl font-bold leading-tight text-gray-900 sm:text-4xl">
+            Controleer je boeking
+          </h1>
+          <p className="mt-3 text-base leading-7 text-gray-600 sm:text-lg">
             Controleer je gegevens en de totaalprijs voordat je naar de betaling gaat.
           </p>
         </div>
 
         {!klus || !details || !prijs || !klant ? (
-          <div className="rounded-2xl border border-gray-200 bg-white p-8">
+          <div className="rounded-2xl border border-gray-200 bg-white p-6 sm:p-8">
             <p className="text-gray-600">Boekingsgegevens laden...</p>
           </div>
         ) : (
           <>
-            <div className="rounded-3xl border border-gray-200 bg-white p-7">
+            <div className="rounded-3xl border border-gray-200 bg-white p-5 sm:p-7">
               <h2 className="text-xl font-bold text-gray-900">Klantgegevens</h2>
-              <div className="mt-5 space-y-3">
-                <div className="flex justify-between gap-5">
+              <div className="mt-5 space-y-4">
+                <div className={rijClass}>
                   <span className="text-gray-500">Naam</span>
-                  <strong className="text-right text-gray-900">
-                    {klant.voornaam} {klant.achternaam}
-                  </strong>
+                  <strong className={waardeClass}>{klant.voornaam} {klant.achternaam}</strong>
                 </div>
-                <div className="flex justify-between gap-5">
+                <div className={rijClass}>
                   <span className="text-gray-500">E-mail</span>
-                  <strong className="text-right text-gray-900">{klant.email}</strong>
+                  <strong className={waardeClass}>{klant.email}</strong>
                 </div>
-                <div className="flex justify-between gap-5">
+                <div className={rijClass}>
                   <span className="text-gray-500">Telefoon</span>
-                  <strong className="text-right text-gray-900">{klant.telefoon}</strong>
+                  <strong className={waardeClass}>{klant.telefoon}</strong>
                 </div>
-                <div className="flex justify-between gap-5">
+                <div className={rijClass}>
                   <span className="text-gray-500">Adres</span>
-                  <strong className="text-right text-gray-900">
-                    {klant.straat} {klant.huisnummer}
-                    {klant.toevoeging ? ` ${klant.toevoeging}` : ""}
+                  <strong className={waardeClass}>
+                    {klant.straat} {klant.huisnummer}{klant.toevoeging ? ` ${klant.toevoeging}` : ""}
                     <br />
                     {klant.postcode} {klant.plaats}
                   </strong>
@@ -242,113 +244,76 @@ export default function BevestigenPage() {
               </div>
             </div>
 
-            <div className="mt-6 rounded-3xl border border-gray-200 bg-white p-7">
+            <div className="mt-5 rounded-3xl border border-gray-200 bg-white p-5 sm:mt-6 sm:p-7">
               <h2 className="text-xl font-bold text-gray-900">Opdracht</h2>
-              <div className="mt-5 space-y-3">
-                <div className="flex justify-between gap-5">
-                  <span className="text-gray-500">Dienst</span>
-                  <strong className="text-right text-gray-900">Glazenwassen</strong>
-                </div>
-                <div className="flex justify-between gap-5">
-                  <span className="text-gray-500">Woningtype</span>
-                  <strong className="text-right text-gray-900">{klus.woningtype}</strong>
-                </div>
-                <div className="flex justify-between gap-5">
-                  <span className="text-gray-500">Soort glasbewassing</span>
-                  <strong className="text-right text-gray-900">{soortGlasbewassing}</strong>
-                </div>
-                <div className="flex justify-between gap-5">
-                  <span className="text-gray-500">Frequentie</span>
-                  <strong className="text-right text-gray-900">{frequentieTekst}</strong>
-                </div>
+              <div className="mt-5 space-y-4">
+                <div className={rijClass}><span className="text-gray-500">Dienst</span><strong className={waardeClass}>Glazenwassen</strong></div>
+                <div className={rijClass}><span className="text-gray-500">Woningtype</span><strong className={waardeClass}>{klus.woningtype}</strong></div>
+                <div className={rijClass}><span className="text-gray-500">Soort glasbewassing</span><strong className={waardeClass}>{soortGlasbewassing}</strong></div>
+                <div className={rijClass}><span className="text-gray-500">Frequentie</span><strong className={waardeClass}>{frequentieTekst}</strong></div>
                 {klus.verdiepingen.length > 0 && (
-                  <div className="flex justify-between gap-5">
-                    <span className="text-gray-500">Verdiepingen</span>
-                    <strong className="text-right text-gray-900">
-                      {klus.verdiepingen.join(", ")}
-                    </strong>
-                  </div>
+                  <div className={rijClass}><span className="text-gray-500">Verdiepingen</span><strong className={waardeClass}>{klus.verdiepingen.join(", ")}</strong></div>
                 )}
-                <div className="flex justify-between gap-5">
-                  <span className="text-gray-500">Aantal ramen</span>
-                  <strong className="text-right text-gray-900">{klus.ramen}</strong>
-                </div>
-                <div className="flex justify-between gap-5">
-                  <span className="text-gray-500">Bereikbaarheid</span>
-                  <strong className="text-right text-gray-900">
-                    {details.bereikbaar === "ja" ? "Goed bereikbaar" : "Moeilijk bereikbaar"}
-                  </strong>
-                </div>
-                <div className="flex justify-between gap-5">
-                  <span className="text-gray-500">Gewenste datum</span>
-                  <strong className="text-right text-gray-900">{klant.gewensteDatum}</strong>
-                </div>
-                <div className="flex justify-between gap-5">
-                  <span className="text-gray-500">Gewenste tijd</span>
-                  <strong className="text-right text-gray-900">{klant.gewensteTijd}</strong>
-                </div>
-                <div className="flex justify-between gap-5">
-                  <span className="text-gray-500">Moet je thuis zijn?</span>
-                  <strong className="text-right text-gray-900">
-                    {klant.thuisNodig === "ja" ? "Ja" : klant.thuisNodig === "nee" ? "Nee" : "-"}
-                  </strong>
-                </div>
+                <div className={rijClass}><span className="text-gray-500">Aantal ramen</span><strong className={waardeClass}>{klus.ramen}</strong></div>
+                <div className={rijClass}><span className="text-gray-500">Bereikbaarheid</span><strong className={waardeClass}>{details.bereikbaar === "ja" ? "Goed bereikbaar" : "Moeilijk bereikbaar"}</strong></div>
+                <div className={rijClass}><span className="text-gray-500">Gewenste datum</span><strong className={waardeClass}>{klant.gewensteDatum}</strong></div>
+                <div className={rijClass}><span className="text-gray-500">Gewenste tijd</span><strong className={waardeClass}>{klant.gewensteTijd}</strong></div>
+                <div className={rijClass}><span className="text-gray-500">Moet je thuis zijn?</span><strong className={waardeClass}>{klant.thuisNodig === "ja" ? "Ja" : klant.thuisNodig === "nee" ? "Nee" : "-"}</strong></div>
               </div>
             </div>
 
-            <div className="mt-6 rounded-3xl bg-blue-600 p-7 text-white">
-              <div className="flex items-center justify-between gap-5">
+            <div className="mt-5 rounded-3xl bg-blue-600 p-5 text-white sm:mt-6 sm:p-7">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between sm:gap-5">
                 <div>
                   <p className="text-sm text-blue-100">Totaalprijs</p>
                   <p className="mt-1 font-semibold">{soortGlasbewassing}</p>
                   {prijs.kortingPercentage > 0 && (
                     <p className="mt-2 text-sm text-blue-100">
-                      Abonnementskorting ({Math.round(prijs.kortingPercentage * 100)}%): - €
-                      {prijs.kortingBedrag.toFixed(2).replace(".", ",")}
+                      Abonnementskorting ({Math.round(prijs.kortingPercentage * 100)}%): - €{prijs.kortingBedrag.toFixed(2).replace(".", ",")}
                     </p>
                   )}
                 </div>
-                <div className="text-4xl font-bold">
-                  €{prijs.totaal.toFixed(2).replace(".", ",")}
-                </div>
+                <div className="text-4xl font-bold">€{prijs.totaal.toFixed(2).replace(".", ",")}</div>
               </div>
             </div>
 
-            <div className="mt-6 rounded-3xl border border-gray-200 bg-white p-7">
+            <div className="mt-5 rounded-3xl border border-gray-200 bg-white p-5 sm:mt-6 sm:p-7">
               <h2 className="text-xl font-bold text-gray-900">Voorwaarden en bedenktijd</h2>
               <p className="mt-3 text-sm leading-6 text-gray-600">
-                Lees vóór het betalen de algemene voorwaarden en het annuleringsbeleid. Als je afspraak
-                binnen de wettelijke bedenktijd valt, hebben we je uitdrukkelijke toestemming nodig om de
-                dienstverlening binnen die periode te mogen starten.
+                Lees vóór het betalen de algemene voorwaarden en het annuleringsbeleid. Als je afspraak binnen de wettelijke bedenktijd valt, hebben we je uitdrukkelijke toestemming nodig om de dienstverlening binnen die periode te mogen starten.
               </p>
 
-              <label className="mt-6 flex cursor-pointer items-start gap-3">
+              <label className={`mt-6 flex cursor-pointer items-start gap-4 rounded-2xl border-2 p-4 transition ${akkoordVoorwaarden ? "border-blue-600 bg-blue-50" : "border-gray-200 bg-white hover:border-blue-300"}`}>
                 <input
                   type="checkbox"
                   checked={akkoordVoorwaarden}
                   onChange={(event) => setAkkoordVoorwaarden(event.target.checked)}
-                  className="mt-1 h-5 w-5 rounded border-gray-300"
+                  className="sr-only"
                 />
+                <span className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border-2 text-base font-bold ${akkoordVoorwaarden ? "border-blue-600 bg-blue-600 text-white" : "border-gray-400 bg-white text-transparent"}`}>
+                  ✓
+                </span>
                 <span className="text-sm leading-6 text-gray-700">
                   Ik ga akkoord met de{" "}
-                  <a href="/voorwaarden" target="_blank" className="font-semibold text-blue-600 underline">
+                  <a href="/voorwaarden" target="_blank" className="font-semibold text-blue-600 underline" onClick={(event) => event.stopPropagation()}>
                     algemene voorwaarden
                   </a>{" "}
                   en het daarin opgenomen annuleringsbeleid.
                 </span>
               </label>
 
-              <label className="mt-4 flex cursor-pointer items-start gap-3">
+              <label className={`mt-4 flex cursor-pointer items-start gap-4 rounded-2xl border-2 p-4 transition ${akkoordStartBedenktijd ? "border-blue-600 bg-blue-50" : "border-gray-200 bg-white hover:border-blue-300"}`}>
                 <input
                   type="checkbox"
                   checked={akkoordStartBedenktijd}
                   onChange={(event) => setAkkoordStartBedenktijd(event.target.checked)}
-                  className="mt-1 h-5 w-5 rounded border-gray-300"
+                  className="sr-only"
                 />
+                <span className={`mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border-2 text-base font-bold ${akkoordStartBedenktijd ? "border-blue-600 bg-blue-600 text-white" : "border-gray-400 bg-white text-transparent"}`}>
+                  ✓
+                </span>
                 <span className="text-sm leading-6 text-gray-700">
-                  Ik verzoek ShineGo uitdrukkelijk om de dienstverlening, indien nodig, al binnen mijn
-                  wettelijke bedenktijd te laten starten. Ik begrijp dat ik bij herroeping mogelijk moet
-                  betalen voor het deel van de dienst dat op mijn verzoek al is uitgevoerd.
+                  Ik verzoek ShineGo uitdrukkelijk om de dienstverlening, indien nodig, al binnen mijn wettelijke bedenktijd te laten starten. Ik begrijp dat ik bij herroeping mogelijk moet betalen voor het deel van de dienst dat op mijn verzoek al is uitgevoerd.
                 </span>
               </label>
             </div>
@@ -360,10 +325,10 @@ export default function BevestigenPage() {
               </div>
             )}
 
-            <div className="mt-10 flex items-center justify-between gap-5 border-t border-gray-200 pt-8">
+            <div className="mt-8 flex flex-col gap-3 border-t border-gray-200 pt-6 sm:mt-10 sm:flex-row sm:items-center sm:justify-between sm:gap-5 sm:pt-8">
               <a
                 href="/boeken/glazenwassen/gegevens"
-                className="font-semibold text-gray-600 hover:text-gray-900"
+                className="order-2 rounded-xl px-4 py-3 text-center font-semibold text-gray-600 hover:text-gray-900 sm:order-1 sm:p-0"
               >
                 ← Vorige
               </a>
@@ -372,14 +337,14 @@ export default function BevestigenPage() {
                 type="button"
                 onClick={bevestigBoeking}
                 disabled={bezig}
-                className={`rounded-xl px-10 py-4 text-lg font-bold text-white ${
+                className={`order-1 w-full rounded-xl px-6 py-4 text-lg font-bold text-white sm:order-2 sm:w-auto sm:px-10 ${
                   bezig ? "cursor-not-allowed bg-blue-400" : "bg-blue-600 hover:bg-blue-700"
                 }`}
               >
                 {bezig ? "Betaling starten..." : "Boeken en betalen"}
               </button>
             </div>
-            <p className="mt-3 text-right text-sm text-gray-500">
+            <p className="mt-3 text-center text-sm text-gray-500 sm:text-right">
               Door op “Boeken en betalen” te klikken ga je een betalingsverplichting aan.
             </p>
           </>
