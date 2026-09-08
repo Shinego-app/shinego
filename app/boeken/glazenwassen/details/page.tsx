@@ -92,13 +92,23 @@ export default function DetailsPage() {
 
         <div className="rounded-3xl border border-gray-200 bg-white p-5 sm:p-7">
           <h2 className="text-xl font-bold text-gray-900">1. Zijn alle ramen goed bereikbaar?</h2>
-          <p className="mt-2 leading-6 text-gray-500">Denk bijvoorbeeld aan ramen boven een aanbouw, serre of moeilijk bereikbare plek.</p>
+          <p className="mt-2 leading-6 text-gray-500">
+            Kies op basis van obstakels rondom de ramen. De verdieping hoef je hier niet mee te rekenen; die heb je al apart gekozen.
+          </p>
           <div className="mt-5 grid gap-3 sm:mt-6 sm:grid-cols-2 sm:gap-4">
             <button type="button" onClick={() => setBereikbaar("ja")} className={`rounded-2xl border-2 p-4 text-left transition sm:p-5 ${bereikbaar === "ja" ? "border-blue-600 bg-blue-50" : "border-gray-200 hover:border-blue-300"}`}>
-              <div className="text-2xl">✓</div><h3 className="mt-2 font-bold text-gray-900 sm:mt-3">Ja, goed bereikbaar</h3><p className="mt-1 text-sm text-gray-500">De ramen zijn normaal bereikbaar.</p>
+              <div className="text-2xl">✓</div>
+              <h3 className="mt-2 font-bold text-gray-900 sm:mt-3">Goed bereikbaar</h3>
+              <p className="mt-1 text-sm leading-5 text-gray-500">
+                De glazenwasser kan normaal bij de ramen komen vanaf de grond, een balkon of een veilige werkplek. Er zit geen serre, uitbouw, schuin dak of ander obstakel voor.
+              </p>
             </button>
             <button type="button" onClick={() => setBereikbaar("nee")} className={`rounded-2xl border-2 p-4 text-left transition sm:p-5 ${bereikbaar === "nee" ? "border-blue-600 bg-blue-50" : "border-gray-200 hover:border-blue-300"}`}>
-              <div className="text-2xl">🪜</div><h3 className="mt-2 font-bold text-gray-900 sm:mt-3">Moeilijk bereikbaar</h3><p className="mt-1 text-sm text-gray-500">Voor sommige ramen is extra bereik nodig.</p>
+              <div className="text-2xl">🪜</div>
+              <h3 className="mt-2 font-bold text-gray-900 sm:mt-3">Extra lastig bereikbaar</h3>
+              <p className="mt-1 text-sm leading-5 text-gray-500">
+                Eén of meer ramen zitten bijvoorbeeld boven een serre of uitbouw, achter een obstakel of boven een schuin dak, waardoor extra bereik of werk nodig is.
+              </p>
             </button>
           </div>
         </div>
