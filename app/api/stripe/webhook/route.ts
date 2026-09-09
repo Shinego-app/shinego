@@ -39,13 +39,24 @@ export async function POST(request: Request) {
     );
   }
 
+  let event: Stripe.Event;
+
   try {
-    const event = stripe.webhooks.constructEvent(
+    event = stripe.webhooks.constructEvent(
       body,
       signature,
       process.env.STRIPE_WEBHOOK_SECRET!
     );
+  } catch (error) {
+    console.error("Stripe webhook verificatie fout:", error);
 
+    return NextResponse.json(
+      { error: "Webhook verificatie mislukt" },
+      { status: 400 }
+    );
+  }
+
+  try {
     if (event.type === "checkout.session.completed") {
       const session = event.data.object as Stripe.Checkout.Session;
       const bookingId = session.metadata?.bookingId;
@@ -84,56 +95,78 @@ export async function POST(request: Request) {
           throw updateError;
         }
 
-        // Alleen een bevestigingsmail sturen wanneer deze webhook de boeking
-        // daadwerkelijk van onbetaald naar betaald heeft gezet. Hierdoor
-        // veroorzaakt een herhaalde Stripe-webhook geen dubbele e-mail.
-        if (bijgewerkteBoeking?.email) {
-          const adres = `${bijgewerkteBoeking.straat ?? ""} ${
-            bijgewerkteBoeking.huisnummer ?? ""
+        let boekingVoorMail = bijgewerkteBoeking;
+
+        if (!boekingVoorMail) {
+          const { data: bestaandeBoeking, error: bestaandeBoekingError } =
+            await supabaseAdmin
+              .from("boekingen")
+              .select(
+                "id, voornaam, achternaam, email, straat, huisnummer, toevoeging, postcode, plaats, gewenste_datum, gewenste_tijd, totaalprijs, betaald, stripe_payment_id"
+              )
+              .eq("id", bookingId)
+              .eq("betaald", true)
+              .eq("stripe_payment_id", paymentId)
+              .maybeSingle();
+
+          if (bestaandeBoekingError) {
+            throw bestaandeBoekingError;
+          }
+
+          boekingVoorMail = bestaandeBoeking;
+        }
+
+        if (boekingVoorMail?.email) {
+          const adres = `${boekingVoorMail.straat ?? ""} ${
+            boekingVoorMail.huisnummer ?? ""
           }${
-            bijgewerkteBoeking.toevoeging
-              ? ` ${bijgewerkteBoeking.toevoeging}`
+            boekingVoorMail.toevoeging
+              ? ` ${boekingVoorMail.toevoeging}`
               : ""
-          }, ${bijgewerkteBoeking.postcode ?? ""} ${
-            bijgewerkteBoeking.plaats ?? ""
+          }, ${boekingVoorMail.postcode ?? ""} ${
+            boekingVoorMail.plaats ?? ""
           }`.trim();
 
-          const { error: emailError } = await resend.emails.send({
-            from: "ShineGo <noreply@shinego.nl>",
-            to: bijgewerkteBoeking.email,
-            subject: `Betaling ontvangen - ShineGo boeking ${bijgewerkteBoeking.id}`,
-            html: `
-              <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111827;">
-                <h2 style="color: #2563eb;">Je betaling is ontvangen</h2>
-                <p>Beste ${bijgewerkteBoeking.voornaam ?? "klant"},</p>
-                <p>Bedankt. We hebben je betaling voor je ShineGo-boeking ontvangen.</p>
+          const { error: emailError } = await resend.emails.send(
+            {
+              from: "ShineGo <noreply@shinego.nl>",
+              to: boekingVoorMail.email,
+              subject: `Betaling ontvangen - ShineGo boeking ${boekingVoorMail.id}`,
+              html: `
+                <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111827;">
+                  <h2 style="color: #2563eb;">Je betaling is ontvangen</h2>
+                  <p>Beste ${boekingVoorMail.voornaam ?? "klant"},</p>
+                  <p>Bedankt. We hebben je betaling voor je ShineGo-boeking ontvangen.</p>
 
-                <div style="margin: 24px 0; padding: 18px; background: #f9fafb; border-radius: 12px;">
-                  <p style="margin: 0 0 8px;"><strong>Boekingsnummer:</strong> ${bijgewerkteBoeking.id}</p>
-                  <p style="margin: 0 0 8px;"><strong>Dienst:</strong> Glazenwassen</p>
-                  <p style="margin: 0 0 8px;"><strong>Gewenste datum:</strong> ${formatDatum(
-                    bijgewerkteBoeking.gewenste_datum
-                  )}</p>
-                  <p style="margin: 0 0 8px;"><strong>Gewenste tijd:</strong> ${
-                    bijgewerkteBoeking.gewenste_tijd || "Nog niet gekozen"
-                  }</p>
-                  <p style="margin: 0 0 8px;"><strong>Adres:</strong> ${adres}</p>
-                  <p style="margin: 0;"><strong>Betaald:</strong> ${formatBedrag(
-                    bijgewerkteBoeking.totaalprijs
-                  )}</p>
+                  <div style="margin: 24px 0; padding: 18px; background: #f9fafb; border-radius: 12px;">
+                    <p style="margin: 0 0 8px;"><strong>Boekingsnummer:</strong> ${boekingVoorMail.id}</p>
+                    <p style="margin: 0 0 8px;"><strong>Dienst:</strong> Glazenwassen</p>
+                    <p style="margin: 0 0 8px;"><strong>Gewenste datum:</strong> ${formatDatum(
+                      boekingVoorMail.gewenste_datum
+                    )}</p>
+                    <p style="margin: 0 0 8px;"><strong>Gewenste tijd:</strong> ${
+                      boekingVoorMail.gewenste_tijd || "Nog niet gekozen"
+                    }</p>
+                    <p style="margin: 0 0 8px;"><strong>Adres:</strong> ${adres}</p>
+                    <p style="margin: 0;"><strong>Betaald:</strong> ${formatBedrag(
+                      boekingVoorMail.totaalprijs
+                    )}</p>
+                  </div>
+
+                  <p>Je boeking wordt nu verder verwerkt. Zodra er een professional aan je opdracht is gekoppeld, blijft de opdracht via ShineGo beheerd.</p>
+                  <p>Bewaar deze e-mail voor je administratie.</p>
+                  <p>Met vriendelijke groet,<br /><strong>ShineGo</strong></p>
                 </div>
-
-                <p>Je boeking wordt nu verder verwerkt. Zodra er een professional aan je opdracht is gekoppeld, blijft de opdracht via ShineGo beheerd.</p>
-                <p>Bewaar deze e-mail voor je administratie.</p>
-                <p>Met vriendelijke groet,<br /><strong>ShineGo</strong></p>
-              </div>
-            `,
-          });
+              `,
+            },
+            {
+              idempotencyKey: `payment-confirmation/${boekingVoorMail.id}`,
+            }
+          );
 
           if (emailError) {
-            // De betaling is al correct verwerkt. Een tijdelijk mailprobleem mag
-            // Stripe daarom niet laten denken dat de betaling zelf is mislukt.
             console.error("Boekingsbevestiging verzenden mislukt:", emailError);
+            throw new Error("Boekingsbevestiging verzenden mislukt");
           }
         }
       }
@@ -141,11 +174,11 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ received: true });
   } catch (error) {
-    console.error("Stripe webhook fout:", error);
+    console.error("Stripe webhook verwerking fout:", error);
 
     return NextResponse.json(
-      { error: "Webhook verificatie mislukt" },
-      { status: 400 }
+      { error: "Webhook verwerking mislukt" },
+      { status: 500 }
     );
   }
 }
