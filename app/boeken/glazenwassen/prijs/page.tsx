@@ -125,7 +125,7 @@ export default function PrijsPage() {
       gegevens?.woningtype === "bedrijfspand" &&
       gegevens.glasOppervlak === "500+"
     ) {
-      alert("Voor bedrijfspanden vanaf 500 m² maken we een offerte op maat.");
+      window.location.href = "/contact?offerte=500plus";
       return;
     }
 
@@ -258,7 +258,7 @@ export default function PrijsPage() {
         </div>
 
         <div className="mt-8 flex flex-col gap-3 border-t border-gray-200 pt-6 sm:mt-10 sm:flex-row sm:items-center sm:justify-between sm:pt-8">
-          <button type="button" onClick={doorgaan} className="order-1 w-full rounded-xl bg-blue-600 px-6 py-4 text-base font-bold text-white shadow-md hover:bg-blue-700 sm:order-2 sm:w-auto sm:px-10 sm:text-lg">Doorgaan met boeken →</button>
+          <button type="button" onClick={doorgaan} className="order-1 w-full rounded-xl bg-blue-600 px-6 py-4 text-base font-bold text-white shadow-md hover:bg-blue-700 sm:order-2 sm:w-auto sm:px-10 sm:text-lg">{offerteOpMaat ? "Offerte aanvragen →" : "Doorgaan met boeken →"}</button>
           <a href="/boeken/glazenwassen/details" className="order-2 text-center font-semibold text-gray-600 hover:text-gray-900 sm:order-1 sm:text-left">← Vorige</a>
         </div>
       </section>
