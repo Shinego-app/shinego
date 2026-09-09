@@ -27,7 +27,7 @@ export default function PrijzenPage() {
           {[
             ["1", "Basisprijs", "De basisprijs hangt af van het type glasbewassing dat je kiest, bijvoorbeeld buitenramen, binnenramen of telescoopsteel."],
             ["2", "Aantal ramen", "Voor woningen en appartementen telt het aantal ramen mee in de prijs. Je ziet dit bedrag apart terug in de prijsopbouw."],
-            ["3", "Hoogte", "Voor ramen op hogere verdiepingen kan een toeslag gelden. De huidige toeslagen zijn €7,50 voor de 1e, €15 voor de 2e, €22,50 voor de 3e en €30 voor de 4e verdieping en hoger."],
+            ["3", "Hoogte", "Voor hogere verdiepingen kan een toeslag gelden. Bij 2 verdiepingen is de toeslag €15 en bij 3 verdiepingen €22,50."],
             ["4", "Extra opties", "Kozijnen schoonmaken en moeilijk bereikbare ramen kunnen extra werk betekenen. Eventuele toeslagen worden vooraf zichtbaar gemaakt."],
           ].map(([nummer, titel, tekst]) => (
             <div key={titel} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-7">
@@ -41,7 +41,7 @@ export default function PrijzenPage() {
         <div className="mt-6 rounded-3xl bg-slate-950 p-6 text-white sm:p-8">
           <h2 className="text-2xl font-extrabold">Regelmatig laten schoonmaken?</h2>
           <p className="mt-3 max-w-3xl leading-7 text-slate-300">
-            Kies je voor een terugkerende opdracht, dan wordt de abonnementskorting automatisch in je prijs verwerkt: 10% bij elke 4 weken, 7% bij elke 8 weken en 5% bij elke 12 weken.
+            Kies je voor een terugkerende opdracht, dan wordt de abonnementskorting automatisch in je prijs verwerkt: 12% bij elke 4 weken, 10% bij elke 8 weken en 7% bij elke 12 weken.
           </p>
         </div>
 
