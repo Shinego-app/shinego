@@ -94,8 +94,10 @@ export default function PrijsPage() {
             : 0;
 
     let verdiepingToeslag = 0;
+    if (gegevens.verdiepingen.includes("1")) verdiepingToeslag += 7.5;
     if (gegevens.verdiepingen.includes("2")) verdiepingToeslag += 15;
-    if (gegevens.verdiepingen.includes("3")) verdiepingToeslag += 45;
+    if (gegevens.verdiepingen.includes("3")) verdiepingToeslag += 22.5;
+    if (gegevens.verdiepingen.includes("4")) verdiepingToeslag += 30;
 
     const bereikToeslag = details.bereikbaar === "nee" ? 15 : 0;
     const kozijnenToeslag = details.kozijnen
