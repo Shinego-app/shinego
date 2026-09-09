@@ -156,15 +156,20 @@ export async function POST(request: Request) {
       );
     }
 
-    const transfer = await stripe.transfers.create({
-      amount,
-      currency: "eur",
-      destination: professional.stripe_account_id,
-      source_transaction: chargeId,
-      metadata: {
-        booking_id: String(booking.id),
+    const transfer = await stripe.transfers.create(
+      {
+        amount,
+        currency: "eur",
+        destination: professional.stripe_account_id,
+        source_transaction: chargeId,
+        metadata: {
+          booking_id: String(booking.id),
+        },
       },
-    });
+      {
+        idempotencyKey: `shinego-payout-booking-${booking.id}`,
+      }
+    );
 
     const factuurnummer =
       booking.factuurnummer ?? maakFactuurnummer(Number(booking.id));
