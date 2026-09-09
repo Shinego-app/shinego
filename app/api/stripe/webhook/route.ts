@@ -7,6 +7,15 @@ import { Resend } from "resend";
 const resend = new Resend(process.env.RESEND_API_KEY!);
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
+function escapeHtml(value: string | number | null | undefined) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 function formatBedrag(value: number | string | null | undefined) {
   return `€${Number(value ?? 0).toFixed(2).replace(".", ",")}`;
 }
@@ -127,6 +136,15 @@ export async function POST(request: Request) {
             boekingVoorMail.plaats ?? ""
           }`.trim();
 
+          const veiligeVoornaam = escapeHtml(boekingVoorMail.voornaam ?? "klant");
+          const veiligeBoekingId = escapeHtml(boekingVoorMail.id);
+          const veiligeDatum = escapeHtml(formatDatum(boekingVoorMail.gewenste_datum));
+          const veiligeTijd = escapeHtml(
+            boekingVoorMail.gewenste_tijd || "Nog niet gekozen"
+          );
+          const veiligAdres = escapeHtml(adres);
+          const veiligBedrag = escapeHtml(formatBedrag(boekingVoorMail.totaalprijs));
+
           const { error: emailError } = await resend.emails.send(
             {
               from: "ShineGo <noreply@shinego.nl>",
@@ -135,22 +153,16 @@ export async function POST(request: Request) {
               html: `
                 <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #111827;">
                   <h2 style="color: #2563eb;">Je betaling is ontvangen</h2>
-                  <p>Beste ${boekingVoorMail.voornaam ?? "klant"},</p>
+                  <p>Beste ${veiligeVoornaam},</p>
                   <p>Bedankt. We hebben je betaling voor je ShineGo-boeking ontvangen.</p>
 
                   <div style="margin: 24px 0; padding: 18px; background: #f9fafb; border-radius: 12px;">
-                    <p style="margin: 0 0 8px;"><strong>Boekingsnummer:</strong> ${boekingVoorMail.id}</p>
+                    <p style="margin: 0 0 8px;"><strong>Boekingsnummer:</strong> ${veiligeBoekingId}</p>
                     <p style="margin: 0 0 8px;"><strong>Dienst:</strong> Glazenwassen</p>
-                    <p style="margin: 0 0 8px;"><strong>Gewenste datum:</strong> ${formatDatum(
-                      boekingVoorMail.gewenste_datum
-                    )}</p>
-                    <p style="margin: 0 0 8px;"><strong>Gewenste tijd:</strong> ${
-                      boekingVoorMail.gewenste_tijd || "Nog niet gekozen"
-                    }</p>
-                    <p style="margin: 0 0 8px;"><strong>Adres:</strong> ${adres}</p>
-                    <p style="margin: 0;"><strong>Betaald:</strong> ${formatBedrag(
-                      boekingVoorMail.totaalprijs
-                    )}</p>
+                    <p style="margin: 0 0 8px;"><strong>Gewenste datum:</strong> ${veiligeDatum}</p>
+                    <p style="margin: 0 0 8px;"><strong>Gewenste tijd:</strong> ${veiligeTijd}</p>
+                    <p style="margin: 0 0 8px;"><strong>Adres:</strong> ${veiligAdres}</p>
+                    <p style="margin: 0;"><strong>Betaald:</strong> ${veiligBedrag}</p>
                   </div>
 
                   <p>Je boeking wordt nu verder verwerkt. Zodra er een professional aan je opdracht is gekoppeld, blijft de opdracht via ShineGo beheerd.</p>
