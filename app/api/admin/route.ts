@@ -7,6 +7,7 @@ export async function GET() {
       await supabaseAdmin
         .from("boekingen")
         .select("*")
+        .eq("betaald", true)
         .order("created_at", { ascending: false });
 
     if (boekingenError) {
@@ -122,6 +123,7 @@ const { data: booking, error: bookingError } = await supabaseAdmin
     status: "toegewezen",
 })
   .eq("id", booking_id)
+  .eq("betaald", true)
   .select("*");
 
 if (bookingError) {
@@ -133,6 +135,13 @@ if (bookingError) {
       details: bookingError.message,
     },
     { status: 500 }
+  );
+}
+
+if (!booking || booking.length === 0) {
+  return NextResponse.json(
+    { error: "Alleen betaalde boekingen kunnen worden toegewezen." },
+    { status: 400 }
   );
 }
 
