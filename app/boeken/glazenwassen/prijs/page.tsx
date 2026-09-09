@@ -86,18 +86,16 @@ export default function PrijsPage() {
 
     const kortingPercentage =
       gegevens.frequentie === "4weken"
-        ? 0.1
+        ? 0.12
         : gegevens.frequentie === "8weken"
-          ? 0.07
+          ? 0.1
           : gegevens.frequentie === "12weken"
-            ? 0.05
+            ? 0.07
             : 0;
 
     let verdiepingToeslag = 0;
-    if (gegevens.verdiepingen.includes("1")) verdiepingToeslag += 7.5;
     if (gegevens.verdiepingen.includes("2")) verdiepingToeslag += 15;
     if (gegevens.verdiepingen.includes("3")) verdiepingToeslag += 22.5;
-    if (gegevens.verdiepingen.includes("4")) verdiepingToeslag += 30;
 
     const bereikToeslag = details.bereikbaar === "nee" ? 15 : 0;
     const kozijnenToeslag = details.kozijnen
@@ -257,6 +255,7 @@ export default function PrijsPage() {
         <div className="mt-6 rounded-2xl bg-blue-50 p-5 sm:p-6">
           <p className="font-semibold text-blue-900">✓ Duidelijke prijs vooraf</p>
           <p className="mt-2 text-sm leading-relaxed text-blue-800">Je ziet vooraf wat de opdracht kost. Eventuele wijzigingen tijdens de klus worden niet automatisch toegevoegd zonder akkoord.</p>
+          <a href="/prijzen" className="mt-3 inline-block text-sm font-bold text-blue-700 underline underline-offset-4 hover:text-blue-900">Bekijk hoe onze prijzen zijn opgebouwd →</a>
         </div>
 
         <div className="mt-8 flex flex-col gap-3 border-t border-gray-200 pt-6 sm:mt-10 sm:flex-row sm:items-center sm:justify-between sm:pt-8">
