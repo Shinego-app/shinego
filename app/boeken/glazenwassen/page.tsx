@@ -57,6 +57,23 @@ export default function GlazenwassenPage() {
         })
       );
       window.location.replace("/boeken/glazenwassen/details");
+      return;
+    }
+
+    if (type === "bedrijf") {
+      localStorage.setItem(
+        "shinegoGlazenwassen",
+        JSON.stringify({
+          woningtype: "bedrijfspand",
+          verdiepingen: ["1"],
+          ramen: 0,
+          glasOppervlak: "",
+          telescoop: false,
+          type: "bedrijf",
+          frequentie: "eenmalig",
+        })
+      );
+      window.location.replace("/boeken/glazenwassen/details");
     }
   }, []);
 
