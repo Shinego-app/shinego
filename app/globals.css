@@ -111,11 +111,22 @@ main button[class*="bg-blue-600"]:hover, main a[class*="bg-blue-600"]:hover {
 }
 main button[class*="bg-red"], main a[class*="bg-red"] { box-shadow: 0 10px 22px rgb(220 38 38 / 0.14); }
 
-/* Jouw situatie: echte glazenwasserfoto zoals het ontwerp */
+/* Homepage: echte moderne glasgevel zoals de ontwerp-master */
+div:has(> svg[aria-label="Schone moderne ramen"]) {
+  background:
+    linear-gradient(180deg, rgb(222 241 255 / .04), rgb(222 241 255 / .10)),
+    url("https://www.glassolutions.pl/sites/mac3.glassolutions.pl/files/2026-05/fot.123rf-duze-okna-w-domu-energooszczedn-okna-Glassolutions-szyby-premium-CLIMATOP%C2%AE-PRIME_1.jpg") center / cover no-repeat !important;
+}
+
+div:has(> svg[aria-label="Schone moderne ramen"]) > svg[aria-label="Schone moderne ramen"] {
+  display: none;
+}
+
+/* Jouw situatie: echte glazenwasser met telescoopsteel */
 aside:has(> svg[aria-label="Glazenwasser met telescoopsteel"]) {
   background:
-    linear-gradient(180deg, rgb(225 243 255 / .06), rgb(223 241 255 / .16)),
-    url("https://images.pexels.com/photos/37440103/pexels-photo-37440103.jpeg?auto=compress&cs=tinysrgb&w=1200") center / cover no-repeat !important;
+    linear-gradient(180deg, rgb(225 243 255 / .04), rgb(223 241 255 / .10)),
+    url("https://egel.fi/assets/img/team/ikkunoidenpesu.jpg") center / cover no-repeat !important;
 }
 
 aside:has(> svg[aria-label="Glazenwasser met telescoopsteel"]) > svg[aria-label="Glazenwasser met telescoopsteel"] {
