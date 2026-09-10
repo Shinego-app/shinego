@@ -47,7 +47,6 @@ export default function PrijsPage() {
     const prijsPerRaam = gegevens.type === "binnen" ? 3.2 : gegevens.type === "telewash" ? 3 : gegevens.type === "bedrijf" ? 0 : 2;
     const ramenPrijs = gegevens.type === "bedrijf" ? 0 : gegevens.ramen * prijsPerRaam;
     const totaalVoorKorting = gegevens.woningtype === "bedrijfspand" ? bedrijfsPrijs : basisprijs + ramenPrijs;
-
     const kortingPercentage = gegevens.frequentie === "4weken" ? 0.12 : gegevens.frequentie === "8weken" ? 0.1 : gegevens.frequentie === "12weken" ? 0.07 : 0;
 
     let verdiepingToeslag = 0;
@@ -64,7 +63,8 @@ export default function PrijsPage() {
   }, [gegevens, details]);
 
   function doorgaan() {
-    if (gegevens?.woningtype === "bedrijfspand" && gegevens.glasOppervlak === "500+") {
+    if (!gegevens) return;
+    if (gegevens.woningtype === "bedrijfspand" && gegevens.glasOppervlak === "500+") {
       window.location.href = "/contact?offerte=500plus";
       return;
     }
@@ -72,110 +72,78 @@ export default function PrijsPage() {
     window.location.href = "/boeken/glazenwassen/gegevens";
   }
 
+  const geld = (bedrag: number) => `€ ${bedrag.toFixed(2).replace(".", ",")}`;
+  const stappen = ["Keuze", "Details", "Prijs", "Gegevens", "Bevestigen"];
+
   if (!gegevens || !details) {
-    return <main className="flex min-h-screen items-center justify-center bg-[#eef8ff] px-4"><div className="rounded-2xl border border-sky-100 bg-white p-6 shadow-lg"><p className="text-[#66809a]">Gegevens laden...</p></div></main>;
+    return <main className="flex min-h-screen items-center justify-center bg-[#fbfdff]"><p className="text-[#7c91aa]">Gegevens laden...</p></main>;
   }
 
   const offerteOpMaat = gegevens.woningtype === "bedrijfspand" && gegevens.glasOppervlak === "500+";
-  const stappen = ["Keuze", "Situatie", "Details", "Prijs", "Gegevens"];
-  const geld = (bedrag: number) => `€${bedrag.toFixed(2).replace(".", ",")}`;
 
   return (
-    <main className="min-h-screen bg-[#eef8ff] text-[#0b2b5b]">
-      <header className="border-b border-sky-100 bg-white/90 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
-          <a href="/" className="text-2xl font-extrabold tracking-tight text-[#0b3d75]">Shine<span className="text-[#1683f8]">Go✦</span></a>
-          <a href="/boeken/glazenwassen/details" className="rounded-xl border border-sky-200 bg-white px-4 py-2 text-sm font-bold text-[#245d91]">← Terug</a>
-        </div>
-      </header>
+    <main className="min-h-screen bg-[#fbfdff] text-[#16355f]">
+      <div className="mx-auto max-w-5xl px-5 py-7 sm:px-8 sm:py-10">
+        <header className="flex items-center justify-between">
+          <a href="/" className="text-[28px] font-extrabold tracking-tight text-[#123c70]">Shine<span className="text-[#4d7ef0]">Go</span><span className="ml-1 text-[#6e96f5]">✦</span></a>
+          <a href="/" aria-label="Menu" className="flex h-10 w-10 items-center justify-center rounded-xl text-2xl text-[#6b83a2] hover:bg-[#f0f5ff]">≡</a>
+        </header>
 
-      <section className="mx-auto max-w-6xl px-4 py-7 sm:px-6 sm:py-10">
-        <div className="mb-7 rounded-3xl border border-sky-100 bg-white/75 px-4 py-4 shadow-sm sm:px-6">
-          <div className="grid grid-cols-5 gap-1 sm:gap-3">
-            {stappen.map((stap, index) => {
-              const nummer = index + 1;
-              const actief = nummer === 4;
-              const klaar = nummer < 4;
-              return (
-                <div key={stap} className="text-center">
-                  <div className="flex items-center">
-                    <div className={`h-px flex-1 ${index === 0 ? "bg-transparent" : klaar || actief ? "bg-[#9fd1ff]" : "bg-sky-100"}`} />
-                    <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-extrabold ${actief ? "bg-[#1683f8] text-white shadow-md" : klaar ? "bg-[#dff1ff] text-[#1177df]" : "border border-sky-200 bg-white text-[#66809a]"}`}>{nummer}</div>
-                    <div className={`h-px flex-1 ${index === stappen.length - 1 ? "bg-transparent" : klaar ? "bg-[#9fd1ff]" : "bg-sky-100"}`} />
-                  </div>
-                  <div className={`mt-2 text-[10px] font-semibold sm:text-xs ${actief ? "text-[#1177df]" : "text-[#66809a]"}`}>{stap}</div>
+        <div className="mt-4 grid grid-cols-5 gap-1">
+          {stappen.map((stap, index) => {
+            const actief = index === 2;
+            const klaar = index < 2;
+            return (
+              <div key={stap} className="text-center">
+                <div className="flex items-center">
+                  <span className={`h-px flex-1 ${index === 0 ? "bg-transparent" : klaar || actief ? "bg-[#b9c9ed]" : "bg-[#e2eaf6]"}`} />
+                  <span className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${actief ? "bg-[#4f78e8] text-white" : klaar ? "bg-[#e9efff] text-[#4f78e8]" : "text-[#7690ad]"}`}>{index + 1}</span>
+                  <span className={`h-px flex-1 ${index === 4 ? "bg-transparent" : klaar ? "bg-[#b9c9ed]" : "bg-[#e2eaf6]"}`} />
                 </div>
-              );
-            })}
-          </div>
+                <div className={`mt-1 text-[10px] sm:text-xs ${actief ? "font-bold text-[#4f78e8]" : "text-[#7c91aa]"}`}>{stap}</div>
+              </div>
+            );
+          })}
         </div>
 
-        <div className="relative overflow-hidden rounded-[2rem] border border-sky-100 bg-gradient-to-br from-white via-[#f8fcff] to-[#dff1ff] p-5 shadow-lg sm:p-8">
-          <div className="pointer-events-none absolute -right-16 -top-16 h-72 w-72 rounded-full bg-[#bfe3ff]/45 blur-3xl" />
-          <div className="relative grid gap-7 lg:grid-cols-[1.1fr_.9fr] lg:gap-10">
+        <section className="mt-7 rounded-[30px] bg-white px-5 py-7 shadow-[0_18px_60px_rgba(45,77,120,0.10)] sm:px-9 sm:py-9">
+          <div className="grid gap-9 lg:grid-cols-[1.2fr_.8fr] lg:gap-14">
             <div>
-              <p className="text-sm font-extrabold uppercase tracking-[0.16em] text-[#1683f8]">Jouw prijs</p>
-              <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">Helder. Vooraf. Zonder verrassingen.</h1>
-              <p className="mt-3 text-base leading-7 text-[#5b7591]">Hier zie je precies hoe jouw ShineGo-prijs is opgebouwd.</p>
+              <h1 className="text-3xl font-extrabold tracking-tight text-[#18375f] sm:text-4xl">Jouw prijs</h1>
+              <p className="mt-2 text-sm text-[#778ba4] sm:text-base">Hier zie je een overzicht van de prijs.</p>
 
-              <div className="mt-7 overflow-hidden rounded-[1.75rem] border border-sky-100 bg-white shadow-lg">
-                <div className="bg-gradient-to-br from-[#dff1ff] via-[#eef8ff] to-white px-5 py-6 sm:px-7">
-                  <div className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#1683f8]">Totaalprijs</div>
-                  <div className={`mt-2 font-extrabold text-[#0b2b5b] ${offerteOpMaat ? "text-3xl" : "text-5xl sm:text-6xl"}`}>{offerteOpMaat ? "Offerte op maat" : geld(prijs.totaal)}</div>
-                  <p className="mt-2 text-sm text-[#66809a]">Voor de gekozen glasbewassing</p>
-                </div>
-
-                <div className="p-5 sm:p-7">
-                  <h2 className="text-xl font-extrabold">Prijsopbouw</h2>
-                  <div className="mt-5 divide-y divide-sky-100">
-                    <div className="flex items-center justify-between gap-4 py-3"><span className="text-[#5b7591]">{gegevens.woningtype === "bedrijfspand" ? "Zakelijke glasprijs" : "Basisprijs"}</span><strong>{offerteOpMaat ? "Offerte" : geld(gegevens.woningtype === "bedrijfspand" ? prijs.bedrijfsPrijs : prijs.basisprijs)}</strong></div>
-                    {gegevens.woningtype !== "bedrijfspand" && <div className="flex items-center justify-between gap-4 py-3"><span className="text-[#5b7591]">{gegevens.ramen} ramen</span><strong>{geld(prijs.ramenPrijs)}</strong></div>}
-                    {prijs.verdiepingToeslag > 0 && <div className="flex items-center justify-between gap-4 py-3"><span className="text-[#5b7591]">Hoogtetoeslag</span><strong>{geld(prijs.verdiepingToeslag)}</strong></div>}
-                    {prijs.bereikToeslag > 0 && <div className="flex items-center justify-between gap-4 py-3"><span className="text-[#5b7591]">Moeilijk bereikbaar</span><strong>{geld(prijs.bereikToeslag)}</strong></div>}
-                    {prijs.kozijnenToeslag > 0 && <div className="flex items-center justify-between gap-4 py-3"><span className="text-[#5b7591]">Kozijnen schoonmaken</span><strong>{geld(prijs.kozijnenToeslag)}</strong></div>}
-                    {prijs.kortingPercentage > 0 && <div className="flex items-center justify-between gap-4 py-3"><span className="text-[#5b7591]">Abonnementskorting ({Math.round(prijs.kortingPercentage * 100)}%)</span><strong className="text-emerald-600">- {geld(prijs.kortingBedrag)}</strong></div>}
-                    <div className="flex items-center justify-between gap-4 pt-5 text-xl"><span className="font-extrabold">Totaal</span><strong className="text-2xl text-[#1683f8]">{offerteOpMaat ? "Offerte" : geld(prijs.totaal)}</strong></div>
-                  </div>
-                </div>
+              <div className="mt-7 divide-y divide-[#edf2f7] text-sm">
+                <div className="flex items-center justify-between py-4"><span className="text-[#536b86]">{gegevens.woningtype === "bedrijfspand" ? "Zakelijke glasprijs" : `Basisprijs (${gegevens.ramen} ramen)`}</span><strong className="text-[#29496f]">{offerteOpMaat ? "Offerte" : geld(gegevens.woningtype === "bedrijfspand" ? prijs.bedrijfsPrijs : prijs.basisprijs + prijs.ramenPrijs)}</strong></div>
+                {prijs.verdiepingToeslag > 0 && <div className="flex items-center justify-between py-4"><span className="text-[#536b86]">Hoogtetoeslag</span><strong className="text-[#29496f]">{geld(prijs.verdiepingToeslag)}</strong></div>}
+                {prijs.kozijnenToeslag > 0 && <div className="flex items-center justify-between py-4"><span className="text-[#536b86]">Kozijnen schoonmaken</span><strong className="text-[#29496f]">{geld(prijs.kozijnenToeslag)}</strong></div>}
+                {prijs.bereikToeslag > 0 && <div className="flex items-center justify-between py-4"><span className="text-[#536b86]">Moeilijk bereikbaar</span><strong className="text-[#29496f]">{geld(prijs.bereikToeslag)}</strong></div>}
+                {prijs.kortingPercentage > 0 && <div className="flex items-center justify-between py-4"><span className="text-[#536b86]">Periodieke korting ({Math.round(prijs.kortingPercentage * 100)}%)</span><strong className="text-emerald-600">- {geld(prijs.kortingBedrag)}</strong></div>}
+                <div className="flex items-center justify-between pt-5 text-lg"><span className="font-extrabold text-[#29496f]">Totaal</span><strong className="text-3xl font-extrabold text-[#29496f]">{offerteOpMaat ? "Offerte" : geld(prijs.totaal)}</strong></div>
               </div>
 
-              <div className="mt-6 rounded-2xl border border-emerald-100 bg-emerald-50 p-5">
-                <div className="flex gap-3"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-white">✓</span><div><div className="font-extrabold text-emerald-800">Vaste prijs vooraf</div><p className="mt-1 text-sm leading-5 text-emerald-700">Extra werkzaamheden worden niet zomaar toegevoegd zonder jouw akkoord.</p></div></div>
+              <div className="mt-7 rounded-2xl bg-[#f1fbf3] px-4 py-4">
+                <div className="flex gap-3"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#70b879] text-white">✓</span><div><strong className="text-sm text-[#3c6a43]">Vaste prijs</strong><p className="mt-1 text-xs leading-5 text-[#6d8b72]">Geen verrassingen, je weet vooraf precies wat je aan toe bent.</p></div></div>
               </div>
 
-              <a href="/prijzen" className="mt-4 inline-flex items-center gap-2 rounded-xl border border-sky-200 bg-white px-4 py-3 text-sm font-extrabold text-[#1177df]">ⓘ Hoe zijn onze prijzen opgebouwd? →</a>
+              <a href="/prijzen" className="mt-4 flex items-center justify-between rounded-xl border border-transparent px-1 py-3 text-sm font-semibold text-[#61789c] hover:text-[#496fda]"><span>ⓘ &nbsp;Hoe zijn onze prijzen opgebouwd?</span><span>›</span></a>
             </div>
 
-            <aside className="lg:pt-12">
-              <div className="sticky top-24 rounded-[1.75rem] border border-sky-100 bg-white/90 p-6 shadow-lg">
-                <h2 className="text-xl font-extrabold">Jouw opdracht</h2>
-                <div className="mt-5 space-y-4 text-sm">
-                  {[
-                    ["Woningtype", gegevens.woningtype],
-                    ["Frequentie", gegevens.frequentie === "4weken" ? "Elke 4 weken" : gegevens.frequentie === "8weken" ? "Elke 8 weken" : gegevens.frequentie === "12weken" ? "Elke 12 weken" : "Eenmalig"],
-                    ["Telescoopsteel", gegevens.telescoop ? "Ja" : "Nee"],
-                    ["Verdiepingen", gegevens.verdiepingen.join(", ") || "-"],
-                    [gegevens.woningtype === "bedrijfspand" ? "Glasoppervlak" : "Aantal ramen", gegevens.woningtype === "bedrijfspand" ? `${gegevens.glasOppervlak} m²` : String(gegevens.ramen)],
-                    ["Bereikbaarheid", details.bereikbaar === "ja" ? "Goed bereikbaar" : "Moeilijk bereikbaar"],
-                    ["Kozijnen", details.kozijnen ? "Ja" : "Nee"],
-                  ].map(([label, value]) => (
-                    <div key={label} className="flex items-start justify-between gap-4 border-b border-sky-50 pb-3 last:border-0"><span className="text-[#66809a]">{label}</span><strong className="max-w-[55%] text-right">{value}</strong></div>
-                  ))}
-                </div>
-                <div className="mt-6 grid gap-3">
-                  <div className="rounded-2xl bg-[#eaf5ff] p-4"><div className="font-extrabold">💶 Eerlijke prijzen</div><div className="mt-1 text-sm text-[#66809a]">Duidelijke opbouw vooraf</div></div>
-                  <div className="rounded-2xl bg-[#eaf5ff] p-4"><div className="font-extrabold">🛡️ Geen verrassingen</div><div className="mt-1 text-sm text-[#66809a]">Je ziet het bedrag vóór je betaalt</div></div>
-                </div>
+            <aside className="relative min-h-[360px]">
+              <div className="space-y-5 pt-1">
+                <div className="flex gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f0f4ff] text-xl">🏷️</span><div><strong className="block text-sm text-[#375575]">Eerlijke prijzen</strong><span className="text-xs text-[#8998aa]">Duidelijke opbouw</span></div></div>
+                <div className="flex gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f1f7ff] text-xl">🗓️</span><div><strong className="block text-sm text-[#375575]">Geen verrassingen</strong><span className="text-xs text-[#8998aa]">Vaste tarieven</span></div></div>
+                <div className="flex gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f1f7ff] text-xl">🛡️</span><div><strong className="block text-sm text-[#375575]">Betrouwbare professionals</strong><span className="text-xs text-[#8998aa]">Gecontroleerd door ShineGo</span></div></div>
               </div>
+              <div className="absolute bottom-6 right-5 -rotate-6 text-2xl font-medium italic text-[#7a8291]">Dat is<br />ShineGo</div>
             </aside>
           </div>
 
-          <div className="relative mt-8 flex flex-col-reverse gap-3 border-t border-sky-100 pt-6 sm:flex-row sm:items-center sm:justify-between">
-            <a href="/boeken/glazenwassen/details" className="rounded-xl border border-sky-200 bg-white px-6 py-3.5 text-center font-bold text-[#245d91]">← Terug</a>
-            <button type="button" onClick={doorgaan} className="rounded-xl bg-[#1683f8] px-7 py-4 text-base font-extrabold text-white shadow-lg hover:bg-[#0d6fd8]">{offerteOpMaat ? "Offerte aanvragen →" : "Verder →"}</button>
+          <div className="mt-8 flex items-center justify-between border-t border-[#edf2f7] pt-5">
+            <a href="/boeken/glazenwassen/details" className="px-2 py-3 text-sm font-bold text-[#8090a3]">← Terug</a>
+            <button type="button" onClick={doorgaan} className="min-w-44 rounded-xl bg-[#5578dc] px-7 py-3.5 text-sm font-extrabold text-white shadow-[0_8px_20px_rgba(73,103,190,.24)] hover:bg-[#466bd4]">{offerteOpMaat ? "Offerte aanvragen →" : "Verder →"}</button>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </main>
   );
 }
