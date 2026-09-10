@@ -202,16 +202,54 @@ export default function DetailsPage() {
               </div>
             </div>
 
-            <aside className="relative hidden min-h-[650px] overflow-hidden bg-gradient-to-br from-[#f3f8ff] via-[#e7f2ff] to-[#dcecff] lg:block">
-              <div className="absolute inset-10 rounded-[30px] border border-white/90 bg-white/55 p-5 shadow-[0_18px_45px_rgba(69,101,145,.12)] backdrop-blur-sm">
-                <div className="grid h-full grid-cols-2 gap-4">
-                  <div className="rounded-[22px] border border-white bg-gradient-to-b from-[#d8efff] to-white" />
-                  <div className="rounded-[22px] border border-white bg-gradient-to-b from-[#e7f5ff] to-white" />
-                  <div className="rounded-[22px] border border-white bg-gradient-to-b from-[#eef8ff] to-[#dfefff]" />
-                  <div className="rounded-[22px] border border-white bg-gradient-to-b from-[#dceeff] to-white" />
-                </div>
-              </div>
-              <div className="absolute bottom-8 right-8 -rotate-6 text-right text-2xl font-medium italic text-[#667a96]">Schoon.<br />Veilig.<br />Professioneel.</div>
+            <aside className="relative hidden min-h-[650px] overflow-hidden bg-gradient-to-br from-[#dff2ff] via-[#edf8ff] to-[#d5e9fb] lg:block">
+              <svg viewBox="0 0 420 700" className="absolute inset-0 h-full w-full" role="img" aria-label="Glazenwasser met telescoopsteel">
+                <defs>
+                  <linearGradient id="detailGlass" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stopColor="#7cc1ec" />
+                    <stop offset="55%" stopColor="#ccecff" />
+                    <stop offset="100%" stopColor="#f8fdff" />
+                  </linearGradient>
+                  <linearGradient id="detailSky" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="#bfe6ff" />
+                    <stop offset="100%" stopColor="#eaf8ff" />
+                  </linearGradient>
+                  <filter id="detailShadow" x="-30%" y="-30%" width="160%" height="160%">
+                    <feDropShadow dx="0" dy="16" stdDeviation="15" floodColor="#426b8e" floodOpacity="0.2" />
+                  </filter>
+                </defs>
+                <rect width="420" height="700" fill="url(#detailSky)" />
+                <circle cx="340" cy="92" r="48" fill="#ffffff" opacity="0.62" />
+                <path d="M72 55 L373 30 L392 610 L88 644 Z" fill="#ffffff" opacity="0.8" filter="url(#detailShadow)" />
+                <path d="M96 83 L353 63 L368 580 L110 611 Z" fill="url(#detailGlass)" stroke="#ffffff" strokeWidth="8" />
+                <path d="M225 72 L239 597" stroke="#ffffff" strokeWidth="9" />
+                <path d="M102 282 L359 262" stroke="#ffffff" strokeWidth="9" />
+                <path d="M106 444 L363 424" stroke="#ffffff" strokeWidth="9" />
+                <g opacity="0.58" stroke="#ffffff" strokeLinecap="round">
+                  <path d="M130 121 L202 115" strokeWidth="6" />
+                  <path d="M255 107 L324 101" strokeWidth="6" />
+                  <path d="M133 323 L197 318" strokeWidth="5" />
+                  <path d="M260 315 L330 309" strokeWidth="5" />
+                </g>
+                <g filter="url(#detailShadow)">
+                  <path d="M54 640 L245 240" stroke="#324f6d" strokeWidth="12" strokeLinecap="round" />
+                  <path d="M245 240 L304 155" stroke="#587a9d" strokeWidth="10" strokeLinecap="round" />
+                  <path d="M276 160 L332 134" stroke="#263d55" strokeWidth="13" strokeLinecap="round" />
+                  <path d="M327 124 L344 150" stroke="#263d55" strokeWidth="10" strokeLinecap="round" />
+                </g>
+                <g transform="translate(190 230)">
+                  <circle cx="0" cy="0" r="20" fill="#efb38f" />
+                  <path d="M-18 -4 Q0 -28 20 -5" fill="#263d55" />
+                  <path d="M-16 20 Q1 6 19 22 L31 78 Q0 98 -31 78 Z" fill="#2f6bcf" />
+                  <path d="M-27 77 L-42 145" stroke="#183a62" strokeWidth="18" strokeLinecap="round" />
+                  <path d="M23 77 L38 145" stroke="#183a62" strokeWidth="18" strokeLinecap="round" />
+                  <path d="M-12 38 L41 14" stroke="#efb38f" strokeWidth="13" strokeLinecap="round" />
+                </g>
+                <path d="M310 164 C292 190 290 222 301 245" fill="none" stroke="#ffffff" strokeWidth="5" opacity="0.72" strokeLinecap="round" />
+                <circle cx="306" cy="158" r="6" fill="#ffffff" opacity="0.9" />
+                <circle cx="300" cy="255" r="4" fill="#ffffff" opacity="0.74" />
+              </svg>
+              <div className="absolute bottom-8 right-8 -rotate-6 rounded-2xl bg-white/78 px-4 py-3 text-right text-2xl font-medium italic leading-7 text-[#667a96] shadow-sm backdrop-blur-sm">Schoon.<br />Veilig.<br />Professioneel.</div>
             </aside>
           </div>
         </section>
