@@ -68,13 +68,11 @@ export default function GlazenwassenPage() {
         </div>
 
         <section className="relative mt-7 overflow-hidden rounded-[30px] bg-white px-5 py-7 shadow-[0_18px_60px_rgba(45,77,120,0.10)] sm:px-9 sm:py-9">
-          <div className="pointer-events-none absolute right-0 top-0 h-60 w-52 overflow-hidden rounded-bl-[80px] opacity-80">
-            <img
-              src="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=700&q=82"
-              alt="Moderne woning"
-              className="h-full w-full object-cover"
-            />
-            <div className="absolute inset-0 bg-gradient-to-l from-transparent to-white/70" />
+          <div className="pointer-events-none absolute right-5 top-5 hidden h-44 w-44 grid-cols-2 gap-2 rounded-[28px] border border-[#e2edf8] bg-[#f5faff] p-3 opacity-90 sm:grid">
+            <div className="rounded-xl border border-white bg-gradient-to-b from-[#dbeeff] to-white" />
+            <div className="rounded-xl border border-white bg-gradient-to-b from-[#e8f6ff] to-white" />
+            <div className="rounded-xl border border-white bg-gradient-to-b from-[#edf7ff] to-[#dfefff]" />
+            <div className="rounded-xl border border-white bg-gradient-to-b from-[#dceeff] to-white" />
           </div>
 
           <div className="relative max-w-3xl">
