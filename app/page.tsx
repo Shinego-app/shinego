@@ -105,8 +105,52 @@ export default function Home() {
         </div>
       </section>
 
-      <section id="hoe" className="px-4 py-8 sm:px-6 sm:py-10">
-        <div className="mx-auto max-w-5xl"><h2 className="text-center text-3xl font-extrabold tracking-tight text-[#0b3d75]">Zo werkt ShineGo</h2><div className="mt-6 grid gap-4 md:grid-cols-3">{[["1","Kies je glasbewassing","Geef aan wat er gedaan moet worden."],["2","Bekijk je vaste prijs","Je ziet vooraf duidelijk wat de opdracht kost."],["3","Wij regelen de rest","ShineGo koppelt een beschikbare professional."]].map(([nr,titel,tekst])=><div key={nr} className="rounded-2xl border border-[#d5e9f8] bg-white/90 p-5"><span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#1683f8] font-extrabold text-white">{nr}</span><h3 className="mt-4 text-lg font-extrabold">{titel}</h3><p className="mt-2 text-sm leading-6 text-[#6685a1]">{tekst}</p></div>)}</div></div>
+      <section id="hoe" className="px-4 py-10 sm:px-6 sm:py-14">
+        <div className="mx-auto max-w-[1180px]">
+          <div className="text-center">
+            <p className="text-xs font-extrabold uppercase tracking-[.18em] text-[#1683f8]">Eenvoudig geregeld</p>
+            <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-[#0b3d75] sm:text-4xl">Zo werkt ShineGo</h2>
+            <p className="mx-auto mt-3 max-w-2xl text-sm leading-6 text-[#6b86a0] sm:text-base">Van keuze tot afspraak in drie duidelijke stappen.</p>
+          </div>
+
+          <div className="mt-8 grid gap-5 md:grid-cols-3">
+            <div className="relative overflow-hidden rounded-[26px] border border-[#d5e9f8] bg-white p-6 shadow-[0_14px_36px_rgba(46,79,119,.08)]">
+              <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full bg-[#edf7ff]" />
+              <div className="relative">
+                <div className="flex items-center justify-between">
+                  <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#1683f8] text-xl font-extrabold text-white shadow-[0_10px_22px_rgba(22,131,248,.22)]">1</span>
+                  <span className="text-3xl">🪟</span>
+                </div>
+                <h3 className="mt-6 text-xl font-extrabold text-[#123c70]">Kies je glasbewassing</h3>
+                <p className="mt-3 text-sm leading-6 text-[#6685a1]">Geef aan om welk type woning of pand het gaat en wat er gedaan moet worden.</p>
+              </div>
+            </div>
+
+            <div className="relative overflow-hidden rounded-[26px] border border-[#d5e9f8] bg-white p-6 shadow-[0_14px_36px_rgba(46,79,119,.08)]">
+              <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full bg-[#edf7ff]" />
+              <div className="relative">
+                <div className="flex items-center justify-between">
+                  <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#1683f8] text-xl font-extrabold text-white shadow-[0_10px_22px_rgba(22,131,248,.22)]">2</span>
+                  <span className="text-3xl">€</span>
+                </div>
+                <h3 className="mt-6 text-xl font-extrabold text-[#123c70]">Bekijk je vaste prijs</h3>
+                <p className="mt-3 text-sm leading-6 text-[#6685a1]">Je ziet vooraf duidelijk wat de opdracht kost. Geen verrassingen achteraf.</p>
+              </div>
+            </div>
+
+            <div className="relative overflow-hidden rounded-[26px] border border-[#d5e9f8] bg-white p-6 shadow-[0_14px_36px_rgba(46,79,119,.08)]">
+              <div className="absolute -right-8 -top-8 h-28 w-28 rounded-full bg-[#edf7ff]" />
+              <div className="relative">
+                <div className="flex items-center justify-between">
+                  <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#1683f8] text-xl font-extrabold text-white shadow-[0_10px_22px_rgba(22,131,248,.22)]">3</span>
+                  <span className="text-3xl">✓</span>
+                </div>
+                <h3 className="mt-6 text-xl font-extrabold text-[#123c70]">Wij regelen de rest</h3>
+                <p className="mt-3 text-sm leading-6 text-[#6685a1]">ShineGo koppelt een beschikbare professional en jij ontvangt de afspraakgegevens.</p>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
 
       <section className="px-4 pb-10 sm:px-6"><div className="mx-auto max-w-5xl rounded-[26px] border border-[#d5e9f8] bg-gradient-to-r from-[#eef8ff] to-[#e4f3ff] p-6 sm:p-8"><div className="grid gap-5 md:grid-cols-[1fr_auto] md:items-center"><div><div className="text-sm font-extrabold uppercase tracking-[.14em] text-[#1683f8]">Voor glazenwassers</div><h2 className="mt-2 text-2xl font-extrabold text-[#0b3d75]">Meer opdrachten. Jij bepaalt wanneer.</h2><p className="mt-2 text-sm text-[#6685a1]">Ontvang opdrachten in jouw regio en kies zelf welke opdrachten je aanneemt.</p></div><a href="/professional" className="rounded-xl bg-[#1683f8] px-6 py-3.5 text-center text-sm font-extrabold text-white shadow-[0_8px_20px_rgba(22,131,248,.24)]">Aanmelden als glazenwasser →</a></div></div></section>
