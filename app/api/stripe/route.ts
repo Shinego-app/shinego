@@ -69,8 +69,8 @@ export async function POST(request: Request) {
       metadata: {
         bookingId: String(booking.id),
       },
-      success_url: "https://www.shinego.nl?betaling=succes",
-      cancel_url: "https://www.shinego.nl?betaling=geannuleerd",
+      success_url: "https://www.shinego.nl/boeken/glazenwassen/succes?betaling=succes",
+      cancel_url: "https://www.shinego.nl/boeken/glazenwassen/bevestigen?betaling=geannuleerd",
     });
 
     return NextResponse.json({ url: session.url });
