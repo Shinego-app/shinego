@@ -10,7 +10,7 @@ export default function Home() {
       icon: "🏢",
       titel: "Appartement / flat",
       tekst: "Ideaal voor appartementen",
-      href: "/boeken/glazenwassen?type=buiten",
+      href: "/boeken/glazenwassen?type=appartement",
     },
     {
       icon: "🏬",
