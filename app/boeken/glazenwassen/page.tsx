@@ -6,17 +6,49 @@ type Keuze = {
   id: string;
   titel: string;
   tekst: string;
-  icoon: string;
+  afbeelding: string;
   woningtype: string;
   type: string;
   telescoop: boolean;
 };
 
 const keuzes: Keuze[] = [
-  { id: "woning", titel: "Woning", tekst: "Rijtjeshuis, twee-onder-een-kap, vrijstaande woning of villa", icoon: "🏡", woningtype: "", type: "buiten", telescoop: false },
-  { id: "appartement", titel: "Appartement / flat", tekst: "Ideaal voor appartementen", icoon: "🏢", woningtype: "appartement", type: "buiten", telescoop: false },
-  { id: "bedrijf", titel: "Winkel / bedrijfspand", tekst: "Voor zakelijke panden", icoon: "🏬", woningtype: "bedrijfspand", type: "bedrijf", telescoop: false },
-  { id: "hoog", titel: "Gevel / hoog glas", tekst: "Telewash met telescoopsteel", icoon: "🏙️", woningtype: "tussenwoning", type: "telewash", telescoop: true },
+  {
+    id: "woning",
+    titel: "Woning",
+    tekst: "Rijtjeshuis, twee-onder-een-kap, vrijstaande woning of villa",
+    afbeelding: "https://littwin-offingen.de/produkte/fenster/img/internorm-kunststoff-alu-fenster-lg.jpg",
+    woningtype: "",
+    type: "buiten",
+    telescoop: false,
+  },
+  {
+    id: "appartement",
+    titel: "Appartement / flat",
+    tekst: "Ideaal voor appartementen",
+    afbeelding: "https://www.marsh.com/content/dam/marsh/Imagery/marsh-2/thumbnail-768x768/modern-apartment-building-in-urban-setting-768x768.jpeg",
+    woningtype: "appartement",
+    type: "buiten",
+    telescoop: false,
+  },
+  {
+    id: "bedrijf",
+    titel: "Winkel / bedrijfspand",
+    tekst: "Voor zakelijke panden",
+    afbeelding: "https://isoflex.co.in/Images/commercial.jpg",
+    woningtype: "bedrijfspand",
+    type: "bedrijf",
+    telescoop: false,
+  },
+  {
+    id: "hoog",
+    titel: "Gevel / hoog glas",
+    tekst: "Telewash met telescoopsteel",
+    afbeelding: "https://egel.fi/assets/img/team/ikkunoidenpesu.jpg",
+    woningtype: "tussenwoning",
+    type: "telewash",
+    telescoop: true,
+  },
 ];
 
 export default function GlazenwassenPage() {
@@ -140,13 +172,6 @@ export default function GlazenwassenPage() {
         </div>
 
         <section className="relative mt-7 overflow-hidden rounded-[30px] bg-white px-5 py-7 shadow-[0_18px_60px_rgba(45,77,120,0.10)] sm:px-9 sm:py-9">
-          <div className="pointer-events-none absolute right-5 top-5 hidden h-44 w-44 grid-cols-2 gap-2 rounded-[28px] border border-[#e2edf8] bg-[#f5faff] p-3 opacity-90 sm:grid">
-            <div className="rounded-xl border border-white bg-gradient-to-b from-[#dbeeff] to-white" />
-            <div className="rounded-xl border border-white bg-gradient-to-b from-[#e8f6ff] to-white" />
-            <div className="rounded-xl border border-white bg-gradient-to-b from-[#edf7ff] to-[#dfefff]" />
-            <div className="rounded-xl border border-white bg-gradient-to-b from-[#dceeff] to-white" />
-          </div>
-
           <div className="relative max-w-3xl">
             <h1 className="text-3xl font-extrabold tracking-tight text-[#18375f] sm:text-4xl">Kies je glasbewassing</h1>
             <p className="mt-2 text-sm text-[#778ba4] sm:text-base">Wat kunnen we voor je doen?</p>
@@ -157,10 +182,12 @@ export default function GlazenwassenPage() {
                   key={optie.id}
                   type="button"
                   onClick={() => kies(optie)}
-                  className={`group min-h-[126px] rounded-2xl border p-5 text-left transition ${gekozen === optie.id ? "border-[#6287ef] bg-[#f3f7ff] shadow-md" : "border-[#dbe5f2] bg-white hover:-translate-y-0.5 hover:border-[#9bb6f6] hover:shadow-md"}`}
+                  className={`group overflow-hidden rounded-2xl border text-left transition ${gekozen === optie.id ? "border-[#6287ef] bg-[#f3f7ff] shadow-md" : "border-[#dbe5f2] bg-white hover:-translate-y-0.5 hover:border-[#9bb6f6] hover:shadow-md"}`}
                 >
-                  <div className="flex h-full items-center gap-4">
-                    <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[#f2f6fb] text-4xl">{optie.icoon}</div>
+                  <div className="h-36 overflow-hidden bg-[#edf5fc]">
+                    <img src={optie.afbeelding} alt={optie.titel} className="h-full w-full object-cover transition duration-300 group-hover:scale-[1.02]" />
+                  </div>
+                  <div className="flex min-h-[105px] items-center gap-3 p-5">
                     <div className="min-w-0">
                       <div className="text-lg font-extrabold text-[#1c3d69]">{optie.titel}</div>
                       <div className="mt-1 text-sm leading-5 text-[#7a8da5]">{optie.tekst}</div>
