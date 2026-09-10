@@ -1,12 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f8fbff;
-  --foreground: #0f172a;
-  --shinego-blue: #2563eb;
-  --shinego-blue-dark: #1d4ed8;
-  --shinego-navy: #0f172a;
-  --shinego-soft: #eff6ff;
+  --background: #f4f9ff;
+  --foreground: #0b2b5b;
+  --shinego-blue: #1683f8;
+  --shinego-blue-dark: #0d6fd8;
+  --shinego-navy: #0b2b5b;
+  --shinego-soft: #eaf5ff;
+  --shinego-baby: #dff1ff;
+  --shinego-line: #c9e3fb;
 }
 
 @theme inline {
@@ -16,9 +18,7 @@
   --font-mono: var(--font-geist-mono);
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 html {
   background: var(--background);
@@ -29,157 +29,95 @@ html {
 body {
   margin: 0;
   overflow-x: hidden;
-  background: linear-gradient(180deg, #f8fbff 0%, #ffffff 46%, #f8fbff 100%);
+  background: linear-gradient(180deg, #eef8ff 0%, #f9fcff 45%, #eef8ff 100%);
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
 
-img,
-svg,
-video,
-canvas {
-  max-width: 100%;
-}
+img, svg, video, canvas { max-width: 100%; }
 
-::selection {
-  background: #bfdbfe;
-  color: #0f172a;
-}
+::selection { background: #bfe3ff; color: #0b2b5b; }
 
-input,
-select,
-textarea {
+input, select, textarea {
   min-width: 0;
   max-width: 100%;
-  color: #0f172a;
-  background-color: #ffffff;
-  border-color: #cbd5e1;
-  box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
+  color: #0b2b5b;
+  background-color: rgba(255,255,255,.92);
+  border-color: #c9e3fb;
+  box-shadow: 0 1px 2px rgb(11 43 91 / 0.03);
   transition: border-color 160ms ease, box-shadow 160ms ease, background-color 160ms ease;
 }
 
-input:focus,
-select:focus,
-textarea:focus {
+input:focus, select:focus, textarea:focus {
   border-color: var(--shinego-blue) !important;
-  box-shadow: 0 0 0 4px rgb(37 99 235 / 0.10) !important;
+  box-shadow: 0 0 0 4px rgb(22 131 248 / 0.10) !important;
   outline: none;
 }
 
-button,
-a {
-  -webkit-tap-highlight-color: transparent;
+button, a { -webkit-tap-highlight-color: transparent; }
+button { transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease, border-color 160ms ease; }
+button:not(:disabled):active { transform: translateY(1px); }
+button:disabled { cursor: not-allowed; }
+
+/* Calm ShineGo customer palette */
+.bg-gray-50 { background-color: #f4f9ff !important; }
+.bg-blue-50 { background-color: #eaf5ff !important; }
+.bg-blue-100 { background-color: #dff1ff !important; }
+.border-gray-200 { border-color: #d9e9f7 !important; }
+.border-gray-300 { border-color: #c9dff2 !important; }
+.border-blue-100, .border-blue-200 { border-color: #c9e3fb !important; }
+.text-gray-900, .text-gray-800 { color: #0b2b5b !important; }
+.text-gray-700, .text-gray-600 { color: #466482 !important; }
+.text-gray-500 { color: #66809a !important; }
+.text-blue-900 { color: #0b3d75 !important; }
+.text-blue-800 { color: #245d91 !important; }
+.bg-blue-600 { background-color: #1683f8 !important; }
+.hover\:bg-blue-700:hover { background-color: #0d6fd8 !important; }
+.border-blue-600 { border-color: #1683f8 !important; }
+.text-blue-600 { color: #1177df !important; }
+
+.shadow-sm { box-shadow: 0 8px 24px rgb(37 99 235 / 0.055) !important; }
+.shadow-lg { box-shadow: 0 18px 45px rgb(37 99 235 / 0.09) !important; }
+
+main form, main section { accent-color: var(--shinego-blue); }
+main h1, main h2, main h3 { letter-spacing: -0.025em; }
+
+/* Booking flow: soft glassy cards and quieter background */
+main.min-h-screen.bg-gray-50 {
+  background:
+    radial-gradient(circle at 92% 4%, rgb(191 227 255 / .42), transparent 28rem),
+    linear-gradient(180deg, #eef8ff 0%, #f8fcff 38%, #eef8ff 100%) !important;
 }
 
-button {
-  transition: transform 160ms ease, box-shadow 160ms ease, background-color 160ms ease, border-color 160ms ease;
+main.min-h-screen.bg-gray-50 > header {
+  background-color: rgba(255,255,255,.86) !important;
+  border-color: #d9e9f7 !important;
+  backdrop-filter: blur(14px);
 }
 
-button:not(:disabled):active {
-  transform: translateY(1px);
+main.min-h-screen.bg-gray-50 section > div[class*="bg-white"],
+main.min-h-screen.bg-gray-50 section > form[class*="bg-white"] {
+  border-color: #d9e9f7 !important;
+  box-shadow: 0 14px 38px rgb(37 99 235 / .065);
 }
 
-button:disabled {
-  cursor: not-allowed;
+main button[class*="bg-blue-600"], main a[class*="bg-blue-600"] {
+  box-shadow: 0 10px 22px rgb(22 131 248 / 0.18);
 }
-
-.bg-gray-50 {
-  background-color: #f8fbff !important;
+main button[class*="bg-blue-600"]:hover, main a[class*="bg-blue-600"]:hover {
+  box-shadow: 0 14px 28px rgb(22 131 248 / 0.24);
 }
-
-.border-gray-200 {
-  border-color: #e2e8f0 !important;
-}
-
-.border-gray-300 {
-  border-color: #cbd5e1 !important;
-}
-
-.text-gray-900,
-.text-gray-800 {
-  color: #0f172a !important;
-}
-
-.text-gray-700,
-.text-gray-600 {
-  color: #475569 !important;
-}
-
-.text-gray-500 {
-  color: #64748b !important;
-}
-
-.shadow-sm {
-  box-shadow: 0 8px 24px rgb(15 23 42 / 0.06) !important;
-}
-
-main form,
-main section {
-  accent-color: var(--shinego-blue);
-}
-
-main h1,
-main h2,
-main h3 {
-  letter-spacing: -0.02em;
-}
-
-main button[class*="bg-blue-600"],
-main a[class*="bg-blue-600"] {
-  box-shadow: 0 10px 22px rgb(37 99 235 / 0.18);
-}
-
-main button[class*="bg-blue-600"]:hover,
-main a[class*="bg-blue-600"]:hover {
-  box-shadow: 0 14px 28px rgb(37 99 235 / 0.24);
-}
-
-main button[class*="bg-red"],
-main a[class*="bg-red"] {
-  box-shadow: 0 10px 22px rgb(220 38 38 / 0.14);
-}
+main button[class*="bg-red"], main a[class*="bg-red"] { box-shadow: 0 10px 22px rgb(220 38 38 / 0.14); }
 
 @media (max-width: 640px) {
-  body {
-    min-width: 320px;
-  }
-
-  main h1 {
-    font-size: clamp(2rem, 10vw, 2.6rem);
-    line-height: 1.08;
-  }
-
-  main h2 {
-    line-height: 1.15;
-  }
-
-  main p,
-  main li,
-  main label {
-    overflow-wrap: anywhere;
-  }
-
-  input,
-  select,
-  textarea {
-    font-size: 16px;
-  }
-
-  button,
-  a[class*="rounded"] {
-    touch-action: manipulation;
-  }
-
-  main button[class*="px-10"],
-  main a[class*="px-10"] {
-    padding-left: 1.25rem;
-    padding-right: 1.25rem;
-  }
-
-  main .text-6xl {
-    font-size: 2.75rem;
-    line-height: 1;
-  }
+  body { min-width: 320px; }
+  main h1 { font-size: clamp(2rem, 10vw, 2.6rem); line-height: 1.08; }
+  main h2 { line-height: 1.15; }
+  main p, main li, main label { overflow-wrap: anywhere; }
+  input, select, textarea { font-size: 16px; }
+  button, a[class*="rounded"] { touch-action: manipulation; }
+  main button[class*="px-10"], main a[class*="px-10"] { padding-left: 1.25rem; padding-right: 1.25rem; }
+  main .text-6xl { font-size: 2.75rem; line-height: 1; }
 }
