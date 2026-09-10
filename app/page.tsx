@@ -1,122 +1,141 @@
 export default function Home() {
   const diensten = [
-    ["✨", "Ramen buiten wassen", "Buitenzijde van je ramen", "/boeken/glazenwassen?type=buiten"],
-    ["🧼", "Ramen binnen wassen", "Binnenzijde van je ramen", "/boeken/glazenwassen?type=binnen"],
-    ["🪟", "Telescoopsteel", "Voor ramen op hoogte", "/boeken/glazenwassen?type=telewash"],
-    ["🏢", "Winkel / bedrijfspand", "Glasbewassing voor bedrijven", "/boeken/glazenwassen?type=bedrijf"],
+    ["🏡", "Woning", "Glasbewassing voor je woning", "/boeken/glazenwassen?type=buiten"],
+    ["🏢", "Appartement / flat", "Voor appartementen en flats", "/boeken/glazenwassen?type=buiten"],
+    ["🏬", "Winkel / bedrijfspand", "Voor zakelijke panden", "/boeken/glazenwassen?type=bedrijf"],
+    ["🪟", "Gevel / hoog glas", "Met telescoopsteel", "/boeken/glazenwassen?type=telewash"],
   ];
 
   const heroFoto =
-    "https://images.unsplash.com/photo-1769780265587-037ee842c0b0?auto=format&fit=crop&fm=jpg&q=82&w=1800";
+    "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1600&q=88";
 
   return (
-    <main className="min-h-screen bg-white text-[#0b2b5b]">
-      <header className="sticky top-0 z-30 border-b border-[#e4f0fa] bg-white/95 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6">
-          <a href="/" className="shrink-0 text-2xl font-extrabold tracking-tight text-[#0b3d75]">
-            Shine<span className="text-[#1683f8]">Go</span><span className="ml-0.5 text-[#4ab5ff]">✦</span>
+    <main className="min-h-screen overflow-hidden bg-[#f6fbff] text-[#17375f]">
+      <header className="relative z-40 border-b border-white/70 bg-white/90 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-5 px-5 py-5 sm:px-7">
+          <a href="/" className="shrink-0 text-[28px] font-extrabold tracking-tight text-[#123c70]">
+            Shine<span className="text-[#4d7ef0]">Go</span><span className="ml-1 text-[#6e96f5]">✦</span>
           </a>
 
-          <nav className="hidden items-center gap-8 md:flex">
-            <a href="#diensten" className="font-medium text-[#5c7188] transition hover:text-[#1683f8]">Diensten</a>
-            <a href="#hoe-het-werkt" className="font-medium text-[#5c7188] transition hover:text-[#1683f8]">Hoe het werkt</a>
-            <a href="/prijzen" className="font-medium text-[#5c7188] transition hover:text-[#1683f8]">Prijzen</a>
-            <a href="/veelgestelde-vragen" className="font-medium text-[#5c7188] transition hover:text-[#1683f8]">Veelgestelde vragen</a>
+          <nav className="hidden items-center gap-9 md:flex">
+            <a href="#diensten" className="text-sm font-semibold text-[#6e8299] transition hover:text-[#4d7ef0]">Diensten</a>
+            <a href="#hoe-het-werkt" className="text-sm font-semibold text-[#6e8299] transition hover:text-[#4d7ef0]">Hoe het werkt</a>
+            <a href="/prijzen" className="text-sm font-semibold text-[#6e8299] transition hover:text-[#4d7ef0]">Prijzen</a>
+            <a href="/veelgestelde-vragen" className="text-sm font-semibold text-[#6e8299] transition hover:text-[#4d7ef0]">Veelgestelde vragen</a>
           </nav>
 
-          <a href="/professional/login" className="rounded-xl border border-[#c9e3fb] bg-white px-4 py-2.5 text-sm font-bold text-[#0b3d75] transition hover:border-[#1683f8] sm:px-5 sm:text-base">
+          <a href="/professional/login" className="rounded-xl border border-[#d8e4f2] bg-white px-4 py-2.5 text-sm font-bold text-[#315074] shadow-sm transition hover:border-[#9bb6f6] hover:text-[#4d7ef0]">
             Inloggen
           </a>
         </div>
       </header>
 
-      <section className="overflow-hidden bg-gradient-to-br from-[#eef8ff] via-[#f8fcff] to-white">
-        <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 sm:py-16 lg:grid-cols-2 lg:items-center lg:gap-16 lg:py-24">
-          <div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#cbe6fb] bg-white px-4 py-2 text-sm font-semibold text-[#2f638f] shadow-sm">
-              <span className="text-[#1683f8]">✦</span>
-              Glazenwasser nodig? ShineGo regelt het.
-            </div>
+      <section className="relative">
+        <div className="pointer-events-none absolute -left-40 top-20 h-96 w-96 rounded-full bg-[#dff1ff] blur-3xl" />
+        <div className="pointer-events-none absolute -right-40 top-0 h-[32rem] w-[32rem] rounded-full bg-[#d9e7ff] blur-3xl" />
 
-            <h1 className="mt-6 max-w-2xl text-4xl font-extrabold leading-[1.04] tracking-tight sm:text-5xl lg:text-6xl">
-              Schone ramen.
-              <span className="block text-[#1683f8]">Snel geregeld.</span>
-            </h1>
+        <div className="relative mx-auto max-w-6xl px-5 pb-16 pt-8 sm:px-7 sm:pb-20 sm:pt-12">
+          <div className="overflow-hidden rounded-[34px] border border-white bg-white/95 shadow-[0_24px_70px_rgba(44,83,130,0.14)]">
+            <div className="grid lg:grid-cols-[1.02fr_.98fr]">
+              <div className="relative z-10 flex flex-col justify-center px-6 py-10 sm:px-10 sm:py-14 lg:px-12 lg:py-16">
+                <div className="inline-flex w-fit items-center gap-2 rounded-full border border-[#dce8f5] bg-[#f8fbff] px-4 py-2 text-xs font-bold text-[#6c829d] shadow-sm sm:text-sm">
+                  <span className="text-[#4d7ef0]">✦</span>
+                  ShineGo regelt het.
+                </div>
 
-            <p className="mt-5 max-w-xl text-lg leading-8 text-[#5c7188]">
-              Boek eenvoudig een glazenwasser, zie vooraf wat je betaalt en kies een moment dat jou uitkomt.
-            </p>
+                <h1 className="mt-6 max-w-xl text-[42px] font-extrabold leading-[0.98] tracking-[-0.04em] text-[#17375f] sm:text-6xl lg:text-[64px]">
+                  Schone ramen.
+                  <span className="mt-2 block text-[#4d7ef0]">Snel geregeld.</span>
+                </h1>
 
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <a href="/boeken" className="rounded-xl bg-[#1683f8] px-7 py-4 text-center text-lg font-extrabold text-white shadow-lg shadow-blue-200/60 transition hover:bg-[#0d6fd8]">
-                Boek een glazenwasser →
-              </a>
-              <a href="#hoe-het-werkt" className="rounded-xl border border-[#c9e3fb] bg-white px-7 py-4 text-center text-lg font-bold text-[#0b3d75] transition hover:border-[#1683f8]">
-                Hoe het werkt
-              </a>
-            </div>
+                <p className="mt-6 max-w-lg text-base leading-7 text-[#6f839b] sm:text-lg sm:leading-8">
+                  Boek eenvoudig een glazenwasser, zie vooraf wat je betaalt en kies een moment dat jou uitkomt.
+                </p>
 
-            <div className="mt-8 flex flex-wrap gap-x-7 gap-y-3 text-sm font-semibold text-[#486680]">
-              <span><span className="mr-2 text-[#1683f8]">✓</span>Vaste prijs</span>
-              <span><span className="mr-2 text-[#1683f8]">✓</span>Veilig betalen</span>
-              <span><span className="mr-2 text-[#1683f8]">✓</span>Gecontroleerd</span>
+                <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                  <a href="/boeken" className="rounded-xl bg-[#5578dc] px-7 py-4 text-center text-base font-extrabold text-white shadow-[0_10px_25px_rgba(73,103,190,.28)] transition hover:bg-[#466bd4]">
+                    Boek een glazenwasser →
+                  </a>
+                  <a href="#hoe-het-werkt" className="rounded-xl border border-[#dbe5f0] bg-white px-7 py-4 text-center text-base font-bold text-[#44617f] transition hover:border-[#9bb6f6] hover:text-[#4d7ef0]">
+                    Hoe het werkt
+                  </a>
+                </div>
+
+                <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-xs font-semibold text-[#698099] sm:text-sm">
+                  <span><span className="mr-2 text-[#4d7ef0]">✓</span>Vaste prijzen</span>
+                  <span><span className="mr-2 text-[#4d7ef0]">✓</span>Veilig betalen</span>
+                  <span><span className="mr-2 text-[#4d7ef0]">✓</span>Gecontroleerde professionals</span>
+                </div>
+              </div>
+
+              <div className="relative min-h-[440px] overflow-hidden bg-[#eaf3fb] sm:min-h-[520px] lg:min-h-[610px]">
+                <img src={heroFoto} alt="Moderne woning met schone ramen" className="absolute inset-0 h-full w-full object-cover" />
+                <div className="absolute inset-0 bg-gradient-to-r from-white/35 via-transparent to-transparent lg:from-white/25" />
+                <div className="absolute bottom-6 left-6 right-6 rounded-[22px] border border-white/80 bg-white/92 p-5 shadow-xl backdrop-blur-md sm:bottom-8 sm:left-auto sm:right-8 sm:w-72">
+                  <p className="text-xs font-extrabold uppercase tracking-[0.16em] text-[#4d7ef0]">Snel geregeld</p>
+                  <p className="mt-2 text-xl font-extrabold leading-7 text-[#24476f]">Helder resultaat, zonder gedoe.</p>
+                </div>
+              </div>
             </div>
           </div>
 
-          <div className="relative">
-            <div className="overflow-hidden rounded-[2rem] border border-white bg-white p-2 shadow-2xl shadow-blue-100/70">
-              <img
-                src={heroFoto}
-                alt="Moderne woning met grote schone ramen"
-                className="h-[430px] w-full rounded-[1.6rem] object-cover sm:h-[520px]"
-              />
+          <div className="mt-6 grid gap-3 sm:grid-cols-3">
+            <div className="flex items-center gap-3 rounded-2xl border border-white bg-white/80 p-4 shadow-[0_8px_30px_rgba(68,99,135,.07)] backdrop-blur">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#eef5ff] text-xl">🛡️</span>
+              <div><strong className="block text-sm text-[#29496f]">Vaste prijzen</strong><span className="text-xs text-[#8293a8]">Geen verrassingen</span></div>
             </div>
-
-            <div className="absolute -bottom-5 left-5 right-5 rounded-2xl border border-[#d9ebf9] bg-white/95 p-5 shadow-xl backdrop-blur sm:left-auto sm:right-6 sm:w-72">
-              <p className="text-sm font-extrabold uppercase tracking-[0.12em] text-[#1683f8]">Snel geregeld</p>
-              <p className="mt-1 text-xl font-extrabold text-[#0b2b5b]">Helder resultaat, zonder gedoe.</p>
+            <div className="flex items-center gap-3 rounded-2xl border border-white bg-white/80 p-4 shadow-[0_8px_30px_rgba(68,99,135,.07)] backdrop-blur">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f0fbf3] text-xl">✓</span>
+              <div><strong className="block text-sm text-[#29496f]">Betrouwbare professionals</strong><span className="text-xs text-[#8293a8]">Gecontroleerd via ShineGo</span></div>
+            </div>
+            <div className="flex items-center gap-3 rounded-2xl border border-white bg-white/80 p-4 shadow-[0_8px_30px_rgba(68,99,135,.07)] backdrop-blur">
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f4f6ff] text-xl">☆</span>
+              <div><strong className="block text-sm text-[#29496f]">Snel een afspraak</strong><span className="text-xs text-[#8293a8]">Boek in enkele stappen</span></div>
             </div>
           </div>
         </div>
       </section>
 
-      <section id="diensten" className="bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20">
-          <div className="mx-auto max-w-2xl text-center">
-            <p className="font-extrabold uppercase tracking-[0.14em] text-[#1683f8]">Onze diensten</p>
-            <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">Wat wil je laten reinigen?</h2>
-            <p className="mt-4 text-lg text-[#66809a]">Kies de glasbewassing die bij jouw situatie past.</p>
+      <section id="diensten" className="bg-white/70">
+        <div className="mx-auto max-w-6xl px-5 py-16 sm:px-7 sm:py-20">
+          <div className="max-w-2xl">
+            <p className="text-sm font-extrabold uppercase tracking-[0.14em] text-[#4d7ef0]">Onze diensten</p>
+            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-[#18375f] sm:text-4xl">Kies je glasbewassing</h2>
+            <p className="mt-3 text-base text-[#778ba4]">Wat kunnen we voor je doen?</p>
           </div>
 
-          <div className="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="mt-9 grid gap-4 sm:grid-cols-2">
             {diensten.map(([icon, titel, tekst, href]) => (
-              <a key={titel} href={href} className="group rounded-[1.5rem] border border-[#dcecf8] bg-[#f8fcff] p-6 transition hover:-translate-y-1 hover:border-[#a8d7f8] hover:shadow-lg">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#e7f5ff] text-2xl">{icon}</div>
-                <h3 className="mt-5 font-extrabold text-[#0b2b5b] group-hover:text-[#1683f8]">{titel}</h3>
-                <p className="mt-2 text-sm leading-6 text-[#66809a]">{tekst}</p>
+              <a key={titel} href={href} className="group flex min-h-[120px] items-center gap-4 rounded-2xl border border-[#dbe5f2] bg-white p-5 shadow-[0_8px_24px_rgba(51,80,112,.05)] transition hover:-translate-y-0.5 hover:border-[#9bb6f6] hover:shadow-md">
+                <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[#f2f6fb] text-4xl">{icon}</div>
+                <div className="min-w-0">
+                  <h3 className="text-lg font-extrabold text-[#1c3d69]">{titel}</h3>
+                  <p className="mt-1 text-sm leading-5 text-[#7a8da5]">{tekst}</p>
+                </div>
+                <span className="ml-auto text-xl text-[#708bc2] transition group-hover:translate-x-1">›</span>
               </a>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="hoe-het-werkt" className="bg-[#eef8ff]">
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20">
+      <section id="hoe-het-werkt" className="relative bg-[#f2f8ff]">
+        <div className="mx-auto max-w-6xl px-5 py-16 sm:px-7 sm:py-20">
           <div className="text-center">
-            <p className="font-extrabold uppercase tracking-[0.14em] text-[#1683f8]">In drie stappen</p>
-            <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl">Zo werkt ShineGo</h2>
+            <p className="text-sm font-extrabold uppercase tracking-[0.14em] text-[#4d7ef0]">Eenvoudig geregeld</p>
+            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-[#18375f] sm:text-4xl">Zo werkt ShineGo</h2>
           </div>
 
           <div className="mt-10 grid gap-5 md:grid-cols-3">
             {[
               ["1", "Kies je glasbewassing", "Geef aan wat er gedaan moet worden."],
-              ["2", "Bekijk je prijs", "ShineGo berekent vooraf de prijs van de opdracht."],
-              ["3", "Wij regelen de rest", "Een beschikbare glazenwasser kan jouw opdracht uitvoeren."],
+              ["2", "Bekijk je vaste prijs", "Je ziet vooraf precies wat de opdracht kost."],
+              ["3", "Wij regelen de rest", "Een passende professional voert de opdracht uit."],
             ].map(([nummer, titel, tekst]) => (
-              <div key={nummer} className="rounded-[1.6rem] border border-[#d7eaf9] bg-white p-7 text-center shadow-sm">
-                <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-[#1683f8] text-lg font-extrabold text-white">{nummer}</div>
-                <h3 className="mt-5 text-xl font-extrabold">{titel}</h3>
-                <p className="mt-2 leading-7 text-[#66809a]">{tekst}</p>
+              <div key={nummer} className="rounded-[26px] border border-white bg-white p-7 shadow-[0_12px_35px_rgba(55,87,122,.07)]">
+                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-[#5578dc] text-sm font-extrabold text-white shadow-[0_6px_16px_rgba(73,103,190,.2)]">{nummer}</div>
+                <h3 className="mt-5 text-xl font-extrabold text-[#29496f]">{titel}</h3>
+                <p className="mt-2 leading-7 text-[#7a8da5]">{tekst}</p>
               </div>
             ))}
           </div>
@@ -124,26 +143,29 @@ export default function Home() {
       </section>
 
       <section className="bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20">
-          <div className="rounded-[2rem] border border-[#cfe7f8] bg-gradient-to-br from-[#eaf6ff] to-[#dff1ff] px-6 py-10 sm:px-10 sm:py-14 md:px-14">
-            <p className="font-extrabold uppercase tracking-[0.14em] text-[#1683f8]">Voor zelfstandige glazenwassers</p>
-            <h2 className="mt-3 max-w-3xl text-3xl font-extrabold tracking-tight sm:text-4xl">Meer opdrachten. Jij bepaalt wanneer.</h2>
-            <p className="mt-5 max-w-2xl text-lg leading-8 text-[#526f8c]">Ontvang opdrachten in jouw regio, kies zelf welke opdrachten je aanneemt en bepaal wanneer je werkt.</p>
-            <a href="/professional" className="mt-7 inline-block rounded-xl bg-white px-6 py-4 font-extrabold text-[#0b3d75] shadow-sm transition hover:text-[#1683f8]">Gratis aanmelden als glazenwasser</a>
+        <div className="mx-auto max-w-6xl px-5 py-16 sm:px-7 sm:py-20">
+          <div className="relative overflow-hidden rounded-[30px] border border-[#dfeaf6] bg-gradient-to-br from-[#f2f7ff] via-[#eef6ff] to-[#e9f4ff] px-6 py-10 shadow-[0_16px_45px_rgba(61,91,126,.08)] sm:px-10 sm:py-12 lg:px-12">
+            <div className="pointer-events-none absolute -right-12 -top-16 h-64 w-64 rounded-full bg-white/70 blur-2xl" />
+            <div className="relative">
+              <p className="text-sm font-extrabold uppercase tracking-[0.14em] text-[#4d7ef0]">Voor glazenwassers</p>
+              <h2 className="mt-3 max-w-3xl text-3xl font-extrabold tracking-tight text-[#18375f] sm:text-4xl">Meer opdrachten. Jij bepaalt wanneer.</h2>
+              <p className="mt-4 max-w-2xl text-base leading-7 text-[#6f839b] sm:text-lg">Ontvang opdrachten in jouw regio en kies zelf welke opdrachten je aanneemt.</p>
+              <a href="/professional" className="mt-7 inline-block rounded-xl bg-[#5578dc] px-6 py-4 font-extrabold text-white shadow-[0_8px_20px_rgba(73,103,190,.24)] transition hover:bg-[#466bd4]">Gratis aanmelden als glazenwasser →</a>
+            </div>
           </div>
         </div>
       </section>
 
-      <footer className="border-t border-[#d7eaf9] bg-[#eaf5ff] text-[#5d7893]">
-        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-9 text-sm sm:px-6 md:flex-row md:items-center md:justify-between">
-          <div><span className="font-extrabold text-[#0b3d75]">Shine<span className="text-[#1683f8]">Go</span></span> © 2026</div>
+      <footer className="border-t border-[#e1ebf5] bg-[#f3f8fd] text-[#6f8298]">
+        <div className="mx-auto flex max-w-6xl flex-col gap-5 px-5 py-9 text-sm sm:px-7 md:flex-row md:items-center md:justify-between">
+          <div><span className="font-extrabold text-[#123c70]">Shine<span className="text-[#4d7ef0]">Go</span><span className="ml-0.5 text-[#6e96f5]">✦</span></span> © 2026</div>
           <div className="flex flex-wrap gap-x-5 gap-y-3 sm:gap-6">
-            <a href="/prijzen" className="hover:text-[#1683f8]">Prijzen</a>
-            <a href="/veelgestelde-vragen" className="hover:text-[#1683f8]">Veelgestelde vragen</a>
-            <a href="/privacy" className="hover:text-[#1683f8]">Privacy</a>
-            <a href="/cookies" className="hover:text-[#1683f8]">Cookies</a>
-            <a href="/voorwaarden" className="hover:text-[#1683f8]">Voorwaarden</a>
-            <a href="/contact" className="hover:text-[#1683f8]">Contact</a>
+            <a href="/prijzen" className="hover:text-[#4d7ef0]">Prijzen</a>
+            <a href="/veelgestelde-vragen" className="hover:text-[#4d7ef0]">Veelgestelde vragen</a>
+            <a href="/privacy" className="hover:text-[#4d7ef0]">Privacy</a>
+            <a href="/cookies" className="hover:text-[#4d7ef0]">Cookies</a>
+            <a href="/voorwaarden" className="hover:text-[#4d7ef0]">Voorwaarden</a>
+            <a href="/contact" className="hover:text-[#4d7ef0]">Contact</a>
           </div>
         </div>
       </footer>
