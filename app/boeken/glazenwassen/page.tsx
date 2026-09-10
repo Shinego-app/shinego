@@ -24,22 +24,40 @@ export default function GlazenwassenPage() {
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    if (params.get("type") !== "woning") return;
+    const type = params.get("type");
 
-    localStorage.setItem(
-      "shinegoGlazenwassen",
-      JSON.stringify({
-        woningtype: "tussenwoning",
-        verdiepingen: ["1"],
-        ramen: 0,
-        glasOppervlak: "",
-        telescoop: false,
-        type: "buiten",
-        frequentie: "eenmalig",
-      })
-    );
+    if (type === "woning") {
+      localStorage.setItem(
+        "shinegoGlazenwassen",
+        JSON.stringify({
+          woningtype: "tussenwoning",
+          verdiepingen: ["1"],
+          ramen: 0,
+          glasOppervlak: "",
+          telescoop: false,
+          type: "buiten",
+          frequentie: "eenmalig",
+        })
+      );
+      window.location.replace("/boeken/glazenwassen/details");
+      return;
+    }
 
-    window.location.replace("/boeken/glazenwassen/details");
+    if (type === "appartement") {
+      localStorage.setItem(
+        "shinegoGlazenwassen",
+        JSON.stringify({
+          woningtype: "appartement",
+          verdiepingen: [],
+          ramen: 0,
+          glasOppervlak: "",
+          telescoop: false,
+          type: "buiten",
+          frequentie: "eenmalig",
+        })
+      );
+      window.location.replace("/boeken/glazenwassen/details");
+    }
   }, []);
 
   function kies(optie: Keuze) {
