@@ -60,21 +60,13 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="relative order-1 min-h-[390px] overflow-hidden bg-gradient-to-br from-[#cdeaff] via-[#e8f6ff] to-[#b8dcfa] sm:min-h-[470px] lg:order-2 lg:min-h-[560px]">
-              <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,.15),rgba(255,255,255,.7))]" />
-              <div className="absolute -right-12 top-10 h-[420px] w-[78%] rotate-[-4deg] rounded-[36px] border-[10px] border-white/70 bg-gradient-to-br from-[#7ec2ee] via-[#d7f0ff] to-white shadow-[0_30px_55px_rgba(31,86,134,.24)]" />
-              <div className="absolute left-7 top-16 h-[190px] w-[205px] rotate-[-3deg] rounded-[26px] border-[7px] border-white bg-gradient-to-br from-[#59abe4] via-[#a8dcf5] to-[#effaff] shadow-[0_18px_40px_rgba(27,88,143,.22)] sm:left-10 sm:h-[220px] sm:w-[245px]" />
-              <div className="absolute bottom-10 left-[18%] h-[210px] w-[250px] rotate-[2deg] rounded-[26px] border-[7px] border-white bg-gradient-to-br from-[#eef8ff] via-[#9bccec] to-[#ffffff] shadow-[0_20px_42px_rgba(32,83,130,.22)] sm:h-[235px] sm:w-[285px]" />
-
-              <div className="absolute left-[32%] top-[44%] z-30 rounded-2xl bg-white/95 px-5 py-4 shadow-[0_14px_30px_rgba(28,74,116,.18)] backdrop-blur">
-                <div className="text-sm font-extrabold text-[#18375f]">✓ Nieuwste Telewash-techniek</div>
-                <div className="mt-1 text-xs text-[#718aa1]">Veilig, efficiënt en streeploos schoon</div>
-              </div>
-
-              <div className="absolute bottom-7 right-6 z-30 rounded-2xl bg-white/95 px-5 py-4 shadow-[0_14px_30px_rgba(28,74,116,.18)]">
-                <div className="text-sm font-extrabold text-[#18375f]">✓ Voor woningen en bedrijfspanden</div>
-                <div className="mt-1 text-xs text-[#718aa1]">Altijd een passende oplossing</div>
-              </div>
+            <div className="relative order-1 min-h-[390px] overflow-hidden bg-[#dff1ff] sm:min-h-[470px] lg:order-2 lg:min-h-[560px]">
+              <img
+                src="/shinego-hero.png"
+                alt="ShineGo glazenwasser met telescoopsteel"
+                className="absolute inset-0 h-full w-full object-cover object-[72%_center]"
+              />
+              <div className="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-white/70 to-transparent sm:w-28 lg:w-36" />
             </div>
           </div>
         </div>
