@@ -21,7 +21,7 @@ export default function Home() {
     {
       icon: "🪟",
       titel: "Gevel / hoog glas",
-      tekst: "Met telescoopsteel",
+      tekst: "Telewash met telescoopsteel",
       href: "/boeken/glazenwassen?type=telewash",
     },
   ];
