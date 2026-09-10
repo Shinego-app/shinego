@@ -3,7 +3,7 @@ export default function Home() {
     {
       icon: "🏡",
       titel: "Woning",
-      tekst: "Twee-onder-een-kap, rijtjeshuis, villa",
+      tekst: "Rijtjeshuis, twee-onder-een-kap, vrijstaande woning of villa",
       href: "/boeken/glazenwassen?type=woning",
     },
     {
