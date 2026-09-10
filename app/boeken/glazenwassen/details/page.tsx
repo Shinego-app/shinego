@@ -182,9 +182,15 @@ export default function DetailsPage() {
               </div>
             </div>
 
-            <aside className="relative hidden min-h-[650px] overflow-hidden bg-[#eef4fb] lg:block">
-              <img src="https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?auto=format&fit=crop&w=900&q=82" alt="Glazenwasser aan het werk" className="absolute inset-0 h-full w-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#eef4fb]/80 via-transparent to-white/20" />
+            <aside className="relative hidden min-h-[650px] overflow-hidden bg-gradient-to-br from-[#f3f8ff] via-[#e7f2ff] to-[#dcecff] lg:block">
+              <div className="absolute inset-10 rounded-[30px] border border-white/90 bg-white/55 p-5 shadow-[0_18px_45px_rgba(69,101,145,.12)] backdrop-blur-sm">
+                <div className="grid h-full grid-cols-2 gap-4">
+                  <div className="rounded-[22px] border border-white bg-gradient-to-b from-[#d8efff] to-white" />
+                  <div className="rounded-[22px] border border-white bg-gradient-to-b from-[#e7f5ff] to-white" />
+                  <div className="rounded-[22px] border border-white bg-gradient-to-b from-[#eef8ff] to-[#dfefff]" />
+                  <div className="rounded-[22px] border border-white bg-gradient-to-b from-[#dceeff] to-white" />
+                </div>
+              </div>
               <div className="absolute bottom-8 right-8 -rotate-6 text-right text-2xl font-medium italic text-[#667a96]">Schoon.<br />Veilig.<br />Professioneel.</div>
             </aside>
           </div>
