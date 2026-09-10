@@ -13,7 +13,7 @@ type Keuze = {
 };
 
 const keuzes: Keuze[] = [
-  { id: "woning", titel: "Woning", tekst: "Twee-onder-een-kap, rijtjeshuis, villa", icoon: "🏡", woningtype: "tussenwoning", type: "buiten", telescoop: false },
+  { id: "woning", titel: "Woning", tekst: "Rijtjeshuis, twee-onder-een-kap, vrijstaande woning of villa", icoon: "🏡", woningtype: "", type: "buiten", telescoop: false },
   { id: "appartement", titel: "Appartement / flat", tekst: "Ideaal voor appartementen", icoon: "🏢", woningtype: "appartement", type: "buiten", telescoop: false },
   { id: "bedrijf", titel: "Winkel / bedrijfspand", tekst: "Voor zakelijke panden", icoon: "🏬", woningtype: "bedrijfspand", type: "bedrijf", telescoop: false },
   { id: "hoog", titel: "Gevel / hoog glas", tekst: "Telewash met telescoopsteel", icoon: "🏙️", woningtype: "tussenwoning", type: "telewash", telescoop: true },
@@ -30,7 +30,7 @@ export default function GlazenwassenPage() {
       localStorage.setItem(
         "shinegoGlazenwassen",
         JSON.stringify({
-          woningtype: "tussenwoning",
+          woningtype: "",
           verdiepingen: ["1"],
           ramen: 0,
           glasOppervlak: "",
