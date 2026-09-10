@@ -4,6 +4,13 @@ import { useEffect, useState } from "react";
 
 type Gegevens = { woningtype: string; verdiepingen: string[]; ramen: number; glasOppervlak: string; telescoop: boolean; type: string; frequentie: string };
 
+const keuzes: Record<string, Gegevens> = {
+  woning: { woningtype: "", verdiepingen: ["1"], ramen: 0, glasOppervlak: "", telescoop: false, type: "buiten", frequentie: "eenmalig" },
+  appartement: { woningtype: "appartement", verdiepingen: [], ramen: 0, glasOppervlak: "", telescoop: false, type: "buiten", frequentie: "eenmalig" },
+  bedrijf: { woningtype: "bedrijfspand", verdiepingen: ["1"], ramen: 0, glasOppervlak: "", telescoop: false, type: "bedrijf", frequentie: "eenmalig" },
+  telewash: { woningtype: "tussenwoning", verdiepingen: ["1"], ramen: 0, glasOppervlak: "", telescoop: true, type: "telewash", frequentie: "eenmalig" },
+};
+
 export default function DetailsPage() {
   const [gegevens, setGegevens] = useState<Gegevens | null>(null);
   const [woningtype, setWoningtype] = useState("");
@@ -16,12 +23,25 @@ export default function DetailsPage() {
   const [frequentie, setFrequentie] = useState("eenmalig");
 
   useEffect(() => {
+    const type = new URLSearchParams(window.location.search).get("type") || "";
+    const keuze = keuzes[type];
     const opgeslagen = localStorage.getItem("shinegoGlazenwassen");
-    if (!opgeslagen) { window.location.href = "/boeken/glazenwassen"; return; }
-    const data: Gegevens = JSON.parse(opgeslagen);
-    setGegevens(data); setWoningtype(data.woningtype || ""); setRamen(data.ramen || 0);
+    const data: Gegevens | null = keuze || (opgeslagen ? JSON.parse(opgeslagen) : null);
+
+    if (!data) {
+      window.location.href = "/#diensten";
+      return;
+    }
+
+    if (keuze) localStorage.setItem("shinegoGlazenwassen", JSON.stringify(keuze));
+
+    setGegevens(data);
+    setWoningtype(data.woningtype || "");
+    setRamen(data.ramen || 0);
     setVerdiepingen(data.verdiepingen?.length ? data.verdiepingen : data.woningtype === "appartement" ? [] : ["1"]);
-    setGlasOppervlak(data.glasOppervlak || ""); setTelescoop(Boolean(data.telescoop)); setFrequentie(data.frequentie || "eenmalig");
+    setGlasOppervlak(data.glasOppervlak || "");
+    setTelescoop(Boolean(data.telescoop));
+    setFrequentie(data.frequentie || "eenmalig");
   }, []);
 
   const bedrijf = gegevens?.woningtype === "bedrijfspand";
@@ -57,7 +77,7 @@ export default function DetailsPage() {
           </div>
           <div className="mt-5 border-t border-[#dcecf8] pt-5"><div className="text-sm font-extrabold text-[#123c70]">Hoe vaak?</div><div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">{[["eenmalig","Eenmalig"],["4weken","4 weken"],["8weken","8 weken"],["12weken","12 weken"]].map(([id,label])=><button key={id} type="button" onClick={()=>setFrequentie(id)} className={`rounded-xl border px-3 py-2.5 text-xs font-bold transition ${frequentie===id?"border-[#1683f8] bg-[#eaf6ff] text-[#0f66b6]":"border-[#cfe3f4] bg-white text-[#5f7e9c]"}`}>{label}</button>)}</div></div>
         </>}
-        <div className="mt-7 flex items-center justify-between border-t border-[#dcecf8] pt-5"><a href="/boeken/glazenwassen" className="px-2 py-3 text-sm font-bold text-[#537797]">← Terug</a><button type="button" disabled={!kanVerder} onClick={gaVerder} className={`min-w-44 rounded-xl px-7 py-3.5 text-sm font-extrabold text-white ${kanVerder?"bg-[#1683f8] shadow-[0_8px_20px_rgba(22,131,248,.18)]":"cursor-not-allowed bg-[#bfd3e5]"}`}>Verder →</button></div>
+        <div className="mt-7 flex items-center justify-between border-t border-[#dcecf8] pt-5"><a href="/#diensten" className="px-2 py-3 text-sm font-bold text-[#537797]">← Terug</a><button type="button" disabled={!kanVerder} onClick={gaVerder} className={`min-w-44 rounded-xl px-7 py-3.5 text-sm font-extrabold text-white ${kanVerder?"bg-[#1683f8] shadow-[0_8px_20px_rgba(22,131,248,.18)]":"cursor-not-allowed bg-[#bfd3e5]"}`}>Verder →</button></div>
       </section>
     </div>
   </main>;
