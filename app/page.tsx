@@ -1,4 +1,11 @@
 export default function Home() {
+  const diensten = [
+    { icon: "🏠", titel: "Woning", tekst: "Van rijtjeshuis tot villa", href: "/boeken/glazenwassen?type=woning" },
+    { icon: "🏢", titel: "Appartement / flat", tekst: "Snel en vakkundig", href: "/boeken/glazenwassen?type=appartement" },
+    { icon: "🏬", titel: "Winkel / bedrijfspand", tekst: "Een verzorgde uitstraling", href: "/boeken/glazenwassen?type=bedrijf" },
+    { icon: "🏙️", titel: "Gevel / hoog glas", tekst: "Met telescoopsteel", href: "/boeken/glazenwassen?type=telewash" },
+  ];
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#eaf6ff] to-[#f8fcff] text-[#123c70]">
       <header className="border-b border-[#d7eaf8] bg-white/90 backdrop-blur-xl">
@@ -9,7 +16,7 @@ export default function Home() {
         </div>
       </header>
 
-      <section id="diensten" className="relative overflow-hidden px-3 pb-10 pt-5 sm:px-5 sm:pb-14 sm:pt-7">
+      <section className="relative overflow-hidden px-3 pb-10 pt-5 sm:px-5 sm:pb-14 sm:pt-7">
         <div className="pointer-events-none absolute -left-24 top-24 h-72 w-72 rounded-full bg-[#d9efff] blur-3xl" />
         <div className="pointer-events-none absolute -right-20 top-10 h-80 w-80 rounded-full bg-[#dceaff] blur-3xl" />
 
@@ -68,6 +75,32 @@ export default function Home() {
               />
               <div className="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-white/85 via-white/35 to-transparent sm:w-24 lg:w-28" />
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="diensten" className="px-4 pb-4 sm:px-6 sm:pb-8">
+        <div className="mx-auto max-w-[1480px]">
+          <div className="text-center">
+            <p className="text-xs font-extrabold uppercase tracking-[.18em] text-[#1683f8]">Kies wat bij jou past</p>
+            <h2 className="mt-2 text-2xl font-extrabold tracking-tight text-[#123c70] sm:text-3xl">Voor elke situatie een schone oplossing</h2>
+          </div>
+
+          <div className="mt-6 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            {diensten.map((dienst) => (
+              <a
+                key={dienst.titel}
+                href={dienst.href}
+                className="group flex min-h-[118px] items-center gap-4 rounded-[22px] border border-[#d5e9f8] bg-white/95 p-4 shadow-[0_10px_30px_rgba(46,79,119,.08)] transition hover:-translate-y-0.5 hover:border-[#8cc7f2] hover:shadow-[0_14px_34px_rgba(46,79,119,.12)]"
+              >
+                <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#eaf6ff] text-3xl shadow-inner">{dienst.icon}</span>
+                <div className="min-w-0 flex-1">
+                  <h3 className="text-base font-extrabold text-[#123c70]">{dienst.titel}</h3>
+                  <p className="mt-1 text-sm leading-5 text-[#6b86a0]">{dienst.tekst}</p>
+                </div>
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#1683f8] text-lg font-bold text-white transition group-hover:translate-x-1">→</span>
+              </a>
+            ))}
           </div>
         </div>
       </section>
