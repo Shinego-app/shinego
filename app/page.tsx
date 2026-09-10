@@ -55,16 +55,49 @@ export default function Home() {
                 <a href="/boeken/glazenwassen" className="rounded-xl bg-[#5578dc] px-7 py-4 text-center text-base font-extrabold text-white shadow-[0_10px_25px_rgba(73,103,190,.28)] transition hover:bg-[#466bd4]">Kies je glasbewassing →</a>
               </div>
             </div>
-            <div className="order-1 relative min-h-[300px] overflow-hidden bg-gradient-to-br from-[#f3f8ff] via-[#e8f3ff] to-[#dcecff] sm:min-h-[400px] lg:order-2 lg:min-h-[540px]">
-              <div className="absolute inset-7 rounded-[28px] border border-white/80 bg-white/55 p-5 shadow-[0_18px_45px_rgba(69,101,145,.12)] backdrop-blur-sm sm:inset-10">
-                <div className="grid h-full grid-cols-2 gap-4">
-                  <div className="rounded-[22px] border border-white bg-gradient-to-b from-[#d9efff] to-[#f8fcff] shadow-inner" />
-                  <div className="rounded-[22px] border border-white bg-gradient-to-b from-[#e3f4ff] to-[#ffffff] shadow-inner" />
-                  <div className="rounded-[22px] border border-white bg-gradient-to-b from-[#eef7ff] to-[#dceeff] shadow-inner" />
-                  <div className="rounded-[22px] border border-white bg-gradient-to-b from-[#d9ecff] to-[#f8fcff] shadow-inner" />
-                </div>
-                <div className="absolute inset-x-5 top-1/2 h-px bg-white/90" />
-              </div>
+            <div className="order-1 relative min-h-[300px] overflow-hidden bg-gradient-to-br from-[#dff1ff] via-[#eef8ff] to-[#d6eaff] sm:min-h-[400px] lg:order-2 lg:min-h-[540px]">
+              <svg viewBox="0 0 560 540" className="absolute inset-0 h-full w-full" role="img" aria-label="Schone moderne ramen">
+                <defs>
+                  <linearGradient id="sky" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stopColor="#cfeeff" />
+                    <stop offset="100%" stopColor="#f8fcff" />
+                  </linearGradient>
+                  <linearGradient id="glass" x1="0" y1="0" x2="0.9" y2="1">
+                    <stop offset="0%" stopColor="#8fc9ef" stopOpacity="0.9" />
+                    <stop offset="52%" stopColor="#dff4ff" stopOpacity="0.96" />
+                    <stop offset="100%" stopColor="#ffffff" stopOpacity="0.88" />
+                  </linearGradient>
+                  <linearGradient id="wall" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stopColor="#ffffff" />
+                    <stop offset="100%" stopColor="#e7f1fb" />
+                  </linearGradient>
+                  <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="0" dy="18" stdDeviation="18" floodColor="#4f7196" floodOpacity="0.18" />
+                  </filter>
+                </defs>
+                <rect width="560" height="540" fill="url(#sky)" />
+                <circle cx="475" cy="85" r="52" fill="#ffffff" opacity="0.68" />
+                <circle cx="72" cy="452" r="88" fill="#b7e6c3" opacity="0.55" />
+                <circle cx="128" cy="486" r="74" fill="#8fd3a4" opacity="0.38" />
+                <path d="M76 94 L414 32 L518 96 L169 154 Z" fill="#ffffff" opacity="0.98" filter="url(#shadow)" />
+                <path d="M137 150 L492 88 L505 456 L155 486 Z" fill="url(#wall)" filter="url(#shadow)" />
+                <path d="M176 173 L462 123 L470 407 L190 447 Z" fill="url(#glass)" stroke="#ffffff" strokeWidth="8" />
+                <path d="M320 148 L328 427" stroke="#ffffff" strokeWidth="10" />
+                <path d="M184 310 L467 269" stroke="#ffffff" strokeWidth="10" />
+                <path d="M206 193 L298 176" stroke="#ffffff" strokeWidth="7" strokeLinecap="round" opacity="0.62" />
+                <path d="M346 167 L438 150" stroke="#ffffff" strokeWidth="7" strokeLinecap="round" opacity="0.54" />
+                <path d="M218 331 L292 321" stroke="#ffffff" strokeWidth="7" strokeLinecap="round" opacity="0.48" />
+                <path d="M357 310 L441 298" stroke="#ffffff" strokeWidth="7" strokeLinecap="round" opacity="0.5" />
+                <g opacity="0.78">
+                  <circle cx="438" cy="430" r="34" fill="#79c48d" />
+                  <circle cx="472" cy="420" r="42" fill="#91d49f" />
+                  <circle cx="498" cy="449" r="30" fill="#6eb982" />
+                </g>
+                <path d="M444 195 C405 235 410 302 446 337" fill="none" stroke="#ffffff" strokeWidth="5" opacity="0.55" strokeLinecap="round" />
+                <circle cx="443" cy="188" r="7" fill="#ffffff" opacity="0.8" />
+                <circle cx="452" cy="351" r="5" fill="#ffffff" opacity="0.7" />
+              </svg>
+              <div className="absolute bottom-6 right-7 -rotate-6 rounded-2xl bg-white/78 px-5 py-3 text-right text-xl font-medium italic leading-6 text-[#5f7390] shadow-sm backdrop-blur-sm">Helder.<br />Fris.<br />ShineGo.</div>
             </div>
           </div>
         </div>
