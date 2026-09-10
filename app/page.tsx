@@ -14,7 +14,7 @@ export default function Home() {
         <div className="pointer-events-none absolute -right-20 top-10 h-80 w-80 rounded-full bg-[#dceaff] blur-3xl" />
 
         <div className="relative mx-auto max-w-[1480px] overflow-hidden rounded-[32px] border border-white bg-white shadow-[0_24px_70px_rgba(46,79,119,.14)]">
-          <div className="grid lg:grid-cols-[1.05fr_1.35fr]">
+          <div className="grid lg:grid-cols-[1.2fr_1.2fr]">
             <div className="relative z-20 order-2 px-6 pb-10 pt-9 sm:px-10 sm:py-12 lg:order-1 lg:flex lg:min-h-[650px] lg:flex-col lg:justify-center lg:px-14">
               <div className="inline-flex w-fit rounded-full bg-[#e7f4ff] px-4 py-2 text-xs font-bold text-[#1678d4] sm:text-sm">
                 Professionele glazenwassers, wanneer jij het nodig hebt
