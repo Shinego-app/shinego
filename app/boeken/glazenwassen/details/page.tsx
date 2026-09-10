@@ -144,9 +144,9 @@ export default function DetailsPage() {
             </div>
 
             <aside className="relative hidden min-h-[720px] overflow-hidden lg:block">
-              <img src="https://images.pexels.com/photos/33728684/pexels-photo-33728684/free-photo-of-window-cleaner-on-modern-glass-building-facade.jpeg?auto=compress&cs=tinysrgb&w=1400" alt="Professionele glazenwasser aan een moderne glazen gevel" className="absolute inset-0 h-full w-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#dff2ff]/45 via-transparent to-[#eaf6ff]/5" />
-              <div className="absolute bottom-8 right-7 rounded-2xl bg-white/85 px-5 py-4 text-right shadow-[0_8px_24px_rgba(28,78,120,.14)] backdrop-blur-sm">
+              <img src="/booking/details-worker.webp" alt="Professionele ShineGo glazenwasser met telescoopsteel" className="absolute inset-0 h-full w-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#dff2ff]/35 via-transparent to-[#eaf6ff]/5" />
+              <div className="absolute bottom-8 right-7 rounded-2xl bg-white/88 px-5 py-4 text-right shadow-[0_8px_24px_rgba(28,78,120,.14)] backdrop-blur-sm">
                 <div className="text-sm font-extrabold text-[#123c70]">Professioneel · Betrouwbaar</div>
                 <div className="mt-1 text-xs font-medium text-[#587995]">Streeploos resultaat</div>
               </div>
