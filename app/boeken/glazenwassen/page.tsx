@@ -13,8 +13,8 @@ type Keuze = {
 };
 
 const keuzes: Keuze[] = [
-  { id: "woning", titel: "Woning", tekst: "Tussen-, hoek- of vrijstaande woning", icoon: "🏡", woningtype: "tussenwoning", type: "buiten", telescoop: false },
-  { id: "appartement", titel: "Appartement / flat", tekst: "Appartement of flatgebouw", icoon: "🏢", woningtype: "appartement", type: "buiten", telescoop: false },
+  { id: "woning", titel: "Woning", tekst: "Twee-onder-een-kap, rijtjeshuis, villa", icoon: "🏡", woningtype: "tussenwoning", type: "buiten", telescoop: false },
+  { id: "appartement", titel: "Appartement / flat", tekst: "Ideaal voor appartementen", icoon: "🏢", woningtype: "appartement", type: "buiten", telescoop: false },
   { id: "bedrijf", titel: "Winkel / bedrijfspand", tekst: "Voor zakelijke panden", icoon: "🏬", woningtype: "bedrijfspand", type: "bedrijf", telescoop: false },
   { id: "hoog", titel: "Gevel / hoog glas", tekst: "Met telescoopsteel", icoon: "🏙️", woningtype: "tussenwoning", type: "telewash", telescoop: true },
 ];
@@ -101,8 +101,8 @@ export default function GlazenwassenPage() {
 
             <div className="mt-8 grid gap-4 border-t border-[#edf2f8] pt-7 sm:grid-cols-3">
               <div className="flex items-start gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#eef5ff] text-xl">🛡️</span><div><strong className="block text-sm text-[#29496f]">Vaste prijzen</strong><span className="text-xs text-[#8293a8]">Geen verrassingen</span></div></div>
-              <div className="flex items-start gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f0fbf3] text-xl">🍃</span><div><strong className="block text-sm text-[#29496f]">Betrouwbare professionals</strong><span className="text-xs text-[#8293a8]">Gecontroleerd via ShineGo</span></div></div>
-              <div className="flex items-start gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f4f6ff] text-xl">☆</span><div><strong className="block text-sm text-[#29496f]">Snel een afspraak</strong><span className="text-xs text-[#8293a8]">Binnen enkele minuten</span></div></div>
+              <div className="flex items-start gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f0fbf3] text-xl">🍃</span><div><strong className="block text-sm text-[#29496f]">Betrouwbare professionals</strong><span className="text-xs text-[#8293a8]">Geverifieerd door ShineGo</span></div></div>
+              <div className="flex items-start gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#f4f6ff] text-xl">☆</span><div><strong className="block text-sm text-[#29496f]">Snel een afspraak</strong><span className="text-xs text-[#8293a8]">Wanneer het jou uitkomt</span></div></div>
             </div>
           </div>
         </section>
