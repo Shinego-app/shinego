@@ -49,113 +49,94 @@ export default function GegevensPage() {
     haalAdresOp();
   }, [postcode, huisnummer]);
 
-  const kanVerder = voornaam.trim() !== "" && achternaam.trim() !== "" && email.trim() !== "" && telefoon.trim() !== "" && postcode.trim() !== "" && huisnummer.trim() !== "" && straat.trim() !== "" && plaats.trim() !== "" && gewensteDatum !== "" && gewensteTijd !== "" && thuisNodig !== "";
+  const kanVerder =
+    voornaam.trim() !== "" && achternaam.trim() !== "" && email.trim() !== "" && telefoon.trim() !== "" &&
+    postcode.trim() !== "" && huisnummer.trim() !== "" && straat.trim() !== "" && plaats.trim() !== "" &&
+    gewensteDatum !== "" && gewensteTijd !== "" && thuisNodig !== "";
 
   function gaVerder() {
     if (!kanVerder) return;
-    localStorage.setItem("shinegoKlantGegevens", JSON.stringify({ voornaam, achternaam, email, telefoon, postcode, huisnummer, straat, plaats, gewensteDatum, gewensteTijd, thuisNodig }));
+    localStorage.setItem("shinegoKlantGegevens", JSON.stringify({
+      voornaam, achternaam, email, telefoon, postcode, huisnummer, straat, plaats, gewensteDatum, gewensteTijd, thuisNodig,
+    }));
     window.location.href = "/boeken/glazenwassen/bevestigen";
   }
 
-  const inputClass = "w-full rounded-xl border border-sky-200 bg-white px-4 py-3 text-base text-[#0b2b5b] outline-none focus:border-[#1683f8]";
-  const stappen = ["Keuze", "Situatie", "Details", "Prijs", "Gegevens"];
+  const inputClass = "w-full border-0 border-b border-[#e2e8f1] bg-transparent px-0 py-2.5 text-sm font-semibold text-[#29496f] outline-none placeholder:text-[#a6b1bf] focus:border-[#6485df]";
+  const stappen = ["Keuze", "Details", "Prijs", "Gegevens", "Bevestigen"];
 
   return (
-    <main className="min-h-screen bg-[#eef8ff] text-[#0b2b5b]">
-      <header className="border-b border-sky-100 bg-white/90 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
-          <a href="/" className="text-2xl font-extrabold tracking-tight text-[#0b3d75]">Shine<span className="text-[#1683f8]">Go✦</span></a>
-          <a href="/boeken/glazenwassen/prijs" className="rounded-xl border border-sky-200 bg-white px-4 py-2 text-sm font-bold text-[#245d91]">← Terug</a>
-        </div>
-      </header>
+    <main className="min-h-screen bg-[#fbfdff] text-[#16355f]">
+      <div className="mx-auto max-w-5xl px-5 py-7 sm:px-8 sm:py-10">
+        <header className="flex items-center justify-between">
+          <a href="/" className="text-[28px] font-extrabold tracking-tight text-[#123c70]">Shine<span className="text-[#4d7ef0]">Go</span><span className="ml-1 text-[#6e96f5]">✦</span></a>
+          <a href="/" aria-label="Menu" className="flex h-10 w-10 items-center justify-center rounded-xl text-2xl text-[#6b83a2] hover:bg-[#f0f5ff]">≡</a>
+        </header>
 
-      <section className="mx-auto max-w-6xl px-4 py-7 sm:px-6 sm:py-10">
-        <div className="mb-7 rounded-3xl border border-sky-100 bg-white/75 px-4 py-4 shadow-sm sm:px-6">
-          <div className="grid grid-cols-5 gap-1 sm:gap-3">
-            {stappen.map((stap, index) => {
-              const nummer = index + 1;
-              const actief = nummer === 5;
-              const klaar = nummer < 5;
-              return (
-                <div key={stap} className="text-center">
-                  <div className="flex items-center">
-                    <div className={`h-px flex-1 ${index === 0 ? "bg-transparent" : "bg-[#9fd1ff]"}`} />
-                    <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-extrabold ${actief ? "bg-[#1683f8] text-white shadow-md" : klaar ? "bg-[#dff1ff] text-[#1177df]" : "border border-sky-200 bg-white text-[#66809a]"}`}>{nummer}</div>
-                    <div className={`h-px flex-1 ${index === stappen.length - 1 ? "bg-transparent" : klaar ? "bg-[#9fd1ff]" : "bg-sky-100"}`} />
-                  </div>
-                  <div className={`mt-2 text-[10px] font-semibold sm:text-xs ${actief ? "text-[#1177df]" : "text-[#66809a]"}`}>{stap}</div>
+        <div className="mt-4 grid grid-cols-5 gap-1">
+          {stappen.map((stap, index) => {
+            const actief = index === 3;
+            const klaar = index < 3;
+            return (
+              <div key={stap} className="text-center">
+                <div className="flex items-center">
+                  <span className={`h-px flex-1 ${index === 0 ? "bg-transparent" : klaar || actief ? "bg-[#b9c9ed]" : "bg-[#e2eaf6]"}`} />
+                  <span className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${actief ? "bg-[#4f78e8] text-white" : klaar ? "bg-[#e9efff] text-[#4f78e8]" : "text-[#7690ad]"}`}>{index + 1}</span>
+                  <span className={`h-px flex-1 ${index === 4 ? "bg-transparent" : klaar ? "bg-[#b9c9ed]" : "bg-[#e2eaf6]"}`} />
                 </div>
-              );
-            })}
-          </div>
+                <div className={`mt-1 text-[10px] sm:text-xs ${actief ? "font-bold text-[#4f78e8]" : "text-[#7c91aa]"}`}>{stap}</div>
+              </div>
+            );
+          })}
         </div>
 
-        <div className="relative overflow-hidden rounded-[2rem] border border-sky-100 bg-gradient-to-br from-white via-[#f8fcff] to-[#dff1ff] p-5 shadow-lg sm:p-8">
-          <div className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-[#bfe3ff]/45 blur-3xl" />
-          <div className="relative grid gap-7 lg:grid-cols-[1.2fr_.8fr] lg:gap-10">
+        <section className="mt-7 rounded-[30px] bg-white px-5 py-7 shadow-[0_18px_60px_rgba(45,77,120,0.10)] sm:px-9 sm:py-9">
+          <div className="grid gap-10 lg:grid-cols-[1.25fr_.75fr] lg:gap-14">
             <div>
-              <p className="text-sm font-extrabold uppercase tracking-[0.16em] text-[#1683f8]">Jouw gegevens</p>
-              <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">Bijna klaar</h1>
-              <p className="mt-3 text-base leading-7 text-[#5b7591]">Vul je contact-, adres- en planningsgegevens in. Daarna controleer je alles nog één keer.</p>
+              <h1 className="text-3xl font-extrabold tracking-tight text-[#18375f] sm:text-4xl">Jouw gegevens</h1>
+              <p className="mt-2 text-sm text-[#778ba4] sm:text-base">Vul je gegevens in om de boeking te bevestigen.</p>
 
-              <div className="mt-7 rounded-2xl border border-sky-100 bg-white/90 p-5 sm:p-6">
-                <h2 className="text-xl font-extrabold">Contactgegevens</h2>
-                <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                  <div><label className="mb-2 block text-sm font-bold text-[#466482]">Voornaam</label><input type="text" value={voornaam} onChange={(e) => setVoornaam(e.target.value)} placeholder="Voornaam" autoComplete="given-name" className={inputClass} /></div>
-                  <div><label className="mb-2 block text-sm font-bold text-[#466482]">Achternaam</label><input type="text" value={achternaam} onChange={(e) => setAchternaam(e.target.value)} placeholder="Achternaam" autoComplete="family-name" className={inputClass} /></div>
-                  <div><label className="mb-2 block text-sm font-bold text-[#466482]">E-mailadres</label><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="naam@email.nl" autoComplete="email" className={inputClass} /></div>
-                  <div><label className="mb-2 block text-sm font-bold text-[#466482]">Telefoonnummer</label><input type="tel" value={telefoon} onChange={(e) => setTelefoon(e.target.value)} placeholder="06 12345678" autoComplete="tel" className={inputClass} /></div>
-                </div>
+              <div className="mt-7 grid gap-x-8 gap-y-5 sm:grid-cols-2">
+                <div><label className="text-xs font-bold text-[#667b95]">Voornaam</label><input value={voornaam} onChange={(e) => setVoornaam(e.target.value)} className={inputClass} placeholder="Mohamed" autoComplete="given-name" /></div>
+                <div><label className="text-xs font-bold text-[#667b95]">Achternaam</label><input value={achternaam} onChange={(e) => setAchternaam(e.target.value)} className={inputClass} placeholder="Jansen" autoComplete="family-name" /></div>
+                <div><label className="text-xs font-bold text-[#667b95]">E-mailadres</label><input type="email" value={email} onChange={(e) => setEmail(e.target.value)} className={inputClass} placeholder="naam@email.nl" autoComplete="email" /></div>
+                <div><label className="text-xs font-bold text-[#667b95]">Telefoonnummer</label><input type="tel" value={telefoon} onChange={(e) => setTelefoon(e.target.value)} className={inputClass} placeholder="06 12345678" autoComplete="tel" /></div>
+                <div><label className="text-xs font-bold text-[#667b95]">Postcode</label><input value={postcode} onChange={(e) => setPostcode(e.target.value)} className={`${inputClass} uppercase`} placeholder="1234 AB" autoComplete="postal-code" /></div>
+                <div><label className="text-xs font-bold text-[#667b95]">Huisnummer</label><input value={huisnummer} onChange={(e) => setHuisnummer(e.target.value)} className={inputClass} placeholder="12" /></div>
+                <div><label className="text-xs font-bold text-[#667b95]">Straat</label><input value={straat} onChange={(e) => setStraat(e.target.value)} className={inputClass} placeholder="Straatnaam" autoComplete="address-line1" /></div>
+                <div><label className="text-xs font-bold text-[#667b95]">Plaats</label><input value={plaats} onChange={(e) => setPlaats(e.target.value)} className={inputClass} placeholder="Amsterdam" autoComplete="address-level2" /></div>
               </div>
 
-              <div className="mt-6 rounded-2xl border border-sky-100 bg-white/90 p-5 sm:p-6">
-                <h2 className="text-xl font-extrabold">Adres van de klus</h2>
-                <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                  <div><label className="mb-2 block text-sm font-bold text-[#466482]">Postcode</label><input type="text" value={postcode} onChange={(e) => setPostcode(e.target.value)} placeholder="1234 AB" autoComplete="postal-code" className={`${inputClass} uppercase`} /></div>
-                  <div><label className="mb-2 block text-sm font-bold text-[#466482]">Huisnummer</label><input type="text" value={huisnummer} onChange={(e) => setHuisnummer(e.target.value)} placeholder="12" className={inputClass} /></div>
-                  <div><label className="mb-2 block text-sm font-bold text-[#466482]">Straat</label><input type="text" value={straat} onChange={(e) => setStraat(e.target.value)} placeholder="Straatnaam" autoComplete="address-line1" className={inputClass} /></div>
-                  <div><label className="mb-2 block text-sm font-bold text-[#466482]">Plaats</label><input type="text" value={plaats} onChange={(e) => setPlaats(e.target.value)} placeholder="Amsterdam" autoComplete="address-level2" className={inputClass} /></div>
+              <div className="mt-7 border-t border-[#edf2f7] pt-6">
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <label className="rounded-2xl bg-[#f8fafc] p-4"><span className="block text-xs font-bold text-[#667b95]">Gewenste datum</span><input type="date" value={gewensteDatum} onChange={(e) => setGewenensteDatum(e.target.value)} className="mt-2 w-full bg-transparent text-sm font-semibold text-[#29496f] outline-none" /></label>
+                  <label className="rounded-2xl bg-[#f8fafc] p-4"><span className="block text-xs font-bold text-[#667b95]">Gewenste tijd</span><select value={gewensteTijd} onChange={(e) => setGewensteTijd(e.target.value)} className="mt-2 w-full bg-transparent text-sm font-semibold text-[#29496f] outline-none"><option value="">Kies tijdvak</option><option value="08:00-10:00">08:00 - 10:00</option><option value="10:00-12:00">10:00 - 12:00</option><option value="12:00-14:00">12:00 - 14:00</option><option value="14:00-16:00">14:00 - 16:00</option><option value="16:00-18:00">16:00 - 18:00</option></select></label>
                 </div>
-              </div>
 
-              <div className="mt-6 rounded-2xl border border-sky-100 bg-white/90 p-5 sm:p-6">
-                <h2 className="text-xl font-extrabold">Planning</h2>
-                <div className="mt-5 grid gap-4 sm:grid-cols-2">
-                  <div><label className="mb-2 block text-sm font-bold text-[#466482]">Gewenste datum</label><input type="date" value={gewensteDatum} onChange={(e) => setGewenensteDatum(e.target.value)} className={inputClass} /></div>
-                  <div><label className="mb-2 block text-sm font-bold text-[#466482]">Gewenste tijd</label><select value={gewensteTijd} onChange={(e) => setGewensteTijd(e.target.value)} className={inputClass}><option value="">Kies een tijdvak</option><option value="08:00-10:00">08:00 - 10:00</option><option value="10:00-12:00">10:00 - 12:00</option><option value="12:00-14:00">12:00 - 14:00</option><option value="14:00-16:00">14:00 - 16:00</option><option value="16:00-18:00">16:00 - 18:00</option></select></div>
+                <div className="mt-5">
+                  <div className="text-xs font-bold text-[#667b95]">Moet je thuis zijn?</div>
+                  <div className="mt-2 flex flex-wrap gap-4 text-sm text-[#536b86]">
+                    <label className="flex cursor-pointer items-center gap-2"><input type="radio" name="thuis" checked={thuisNodig === "ja"} onChange={() => setThuisNodig("ja")} /> Ja, ik ben aanwezig</label>
+                    <label className="flex cursor-pointer items-center gap-2"><input type="radio" name="thuis" checked={thuisNodig === "nee"} onChange={() => setThuisNodig("nee")} /> Nee, dat is niet nodig</label>
+                  </div>
                 </div>
-                <div className="mt-4"><label className="mb-2 block text-sm font-bold text-[#466482]">Moet je thuis zijn?</label><select value={thuisNodig} onChange={(e) => setThuisNodig(e.target.value)} className={inputClass}><option value="">Kies een optie</option><option value="ja">Ja, ik ben thuis</option><option value="nee">Nee, ik hoef niet thuis te zijn</option></select></div>
               </div>
             </div>
 
-            <aside className="lg:pt-12">
-              <div className="sticky top-24 space-y-4">
-                {prijs && (
-                  <div className="rounded-[1.75rem] border border-sky-100 bg-white/90 p-6 shadow-lg">
-                    <div className="text-sm font-extrabold uppercase tracking-[0.14em] text-[#1683f8]">Jouw prijs</div>
-                    <div className="mt-2 text-4xl font-extrabold">€{prijs.totaal.toFixed(2).replace(".", ",")}</div>
-                    <p className="mt-2 text-sm text-[#66809a]">De totaalprijs blijft zichtbaar terwijl je je gegevens invult.</p>
-                  </div>
-                )}
-                <div className="rounded-[1.75rem] border border-sky-100 bg-[#eaf5ff] p-6">
-                  <div className="flex gap-3"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-white">🔒</span><div><h2 className="font-extrabold">Veilig en vertrouwd</h2><p className="mt-1 text-sm leading-5 text-[#66809a]">Je gegevens worden alleen gebruikt om je ShineGo-opdracht te verwerken.</p></div></div>
-                </div>
-                <div className="rounded-[1.75rem] border border-sky-100 bg-white/90 p-6">
-                  <div className="space-y-4 text-sm">
-                    <div className="flex gap-3"><span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#eaf5ff]">✓</span><div><strong className="block">Duidelijke prijs</strong><span className="text-[#66809a]">Je weet vooraf wat je betaalt</span></div></div>
-                    <div className="flex gap-3"><span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#eaf5ff]">📅</span><div><strong className="block">Zelf plannen</strong><span className="text-[#66809a]">Kies een moment dat past</span></div></div>
-                  </div>
-                </div>
-              </div>
+            <aside className="space-y-6 pt-2">
+              <div className="flex gap-3"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#f0f4ff] text-xl">🔒</span><div><strong className="block text-sm text-[#375575]">Veilig en vertrouwd</strong><span className="text-xs leading-5 text-[#8998aa]">Je gegevens worden veilig verwerkt.</span></div></div>
+              <div className="flex gap-3"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#f1fbf4] text-xl">🍃</span><div><strong className="block text-sm text-[#375575]">Goed voor het milieu</strong><span className="text-xs leading-5 text-[#8998aa]">Professionele en bewuste werkwijze.</span></div></div>
+              <div className="flex gap-3"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#f4f6ff] text-xl">♡</span><div><strong className="block text-sm text-[#375575]">Klanttevredenheid</strong><span className="text-xs leading-5 text-[#8998aa]">Onze klanten beoordelen ons met vertrouwen.</span></div></div>
+              {prijs && <div className="rounded-2xl bg-[#f4f7ff] p-5"><div className="text-xs font-bold uppercase tracking-wider text-[#7287a0]">Totaalprijs</div><div className="mt-1 text-3xl font-extrabold text-[#29496f]">€ {prijs.totaal.toFixed(2).replace(".", ",")}</div></div>}
             </aside>
           </div>
 
-          <div className="relative mt-8 flex flex-col-reverse gap-3 border-t border-sky-100 pt-6 sm:flex-row sm:items-center sm:justify-between">
-            <a href="/boeken/glazenwassen/prijs" className="rounded-xl border border-sky-200 bg-white px-6 py-3.5 text-center font-bold text-[#245d91]">← Terug</a>
-            <button type="button" disabled={!kanVerder} onClick={gaVerder} className={`rounded-xl px-7 py-4 text-base font-extrabold transition ${kanVerder ? "bg-[#1683f8] text-white shadow-lg hover:bg-[#0d6fd8]" : "cursor-not-allowed bg-sky-100 text-[#9ab0c4]"}`}>Controleer boeking →</button>
+          <div className="mt-8 flex items-center justify-between border-t border-[#edf2f7] pt-5">
+            <a href="/boeken/glazenwassen/prijs" className="px-2 py-3 text-sm font-bold text-[#8090a3]">← Terug</a>
+            <button type="button" disabled={!kanVerder} onClick={gaVerder} className={`min-w-44 rounded-xl px-7 py-3.5 text-sm font-extrabold text-white transition ${kanVerder ? "bg-[#5578dc] shadow-[0_8px_20px_rgba(73,103,190,.24)] hover:bg-[#466bd4]" : "cursor-not-allowed bg-[#ccd7e9]"}`}>Verder →</button>
           </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </main>
   );
 }
