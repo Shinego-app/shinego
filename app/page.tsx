@@ -1,167 +1,153 @@
 export default function Home() {
+  const diensten = [
+    ["✨", "Ramen buiten wassen", "Buitenzijde van je ramen", "/boeken/glazenwassen?type=buiten"],
+    ["🧼", "Ramen binnen wassen", "Binnenzijde van je ramen", "/boeken/glazenwassen?type=binnen"],
+    ["🪟", "Telescoopsteel", "Voor ramen op hoogte", "/boeken/glazenwassen?type=telewash"],
+    ["🏢", "Winkel / bedrijfspand", "Glasbewassing voor bedrijven", "/boeken/glazenwassen?type=bedrijf"],
+  ];
+
   return (
-    <main className="min-h-screen bg-white text-slate-900">
-      <header className="sticky top-0 z-30 border-b border-blue-900/20 bg-slate-950 text-white shadow-lg shadow-slate-950/10">
+    <main className="min-h-screen bg-[#f4f9ff] text-[#0b2b5b]">
+      <header className="sticky top-0 z-30 border-b border-[#d7eaf9] bg-white/90 backdrop-blur-xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3 sm:px-6 sm:py-4">
-          <a href="/" className="shrink-0 text-2xl font-extrabold tracking-tight text-white">
-            Shine<span className="text-sky-400">Go</span>
+          <a href="/" className="shrink-0 text-2xl font-extrabold tracking-tight text-[#0b3d75]">
+            Shine<span className="text-[#1683f8]">Go</span><span className="ml-0.5 text-[#4ab5ff]">✦</span>
           </a>
 
-          <nav className="hidden items-center gap-8 md:flex">
-            <a href="#diensten" className="font-medium text-slate-300 transition hover:text-white">Diensten</a>
-            <a href="#hoe-het-werkt" className="font-medium text-slate-300 transition hover:text-white">Hoe het werkt</a>
-            <a href="#professional" className="font-medium text-slate-300 transition hover:text-white">Voor glazenwassers</a>
+          <nav className="hidden items-center gap-7 md:flex">
+            <a href="#diensten" className="font-medium text-[#466482] transition hover:text-[#1683f8]">Diensten</a>
+            <a href="#hoe-het-werkt" className="font-medium text-[#466482] transition hover:text-[#1683f8]">Hoe het werkt</a>
+            <a href="/prijzen" className="font-medium text-[#466482] transition hover:text-[#1683f8]">Prijzen</a>
+            <a href="/veelgestelde-vragen" className="font-medium text-[#466482] transition hover:text-[#1683f8]">Veelgestelde vragen</a>
           </nav>
 
-          <a href="/professional/login" className="shrink-0 rounded-xl border border-white/20 bg-white/10 px-4 py-2.5 text-sm font-semibold text-white backdrop-blur transition hover:bg-white/20 sm:px-5 sm:py-3 sm:text-base">
+          <a href="/professional/login" className="shrink-0 rounded-xl border border-[#b9dcf8] bg-white px-4 py-2.5 text-sm font-bold text-[#0b3d75] shadow-sm transition hover:border-[#1683f8] hover:text-[#1683f8] sm:px-5 sm:text-base">
             Inloggen
           </a>
         </div>
       </header>
 
-      <section className="relative overflow-hidden bg-gradient-to-br from-blue-700 via-blue-600 to-sky-500 text-white">
-        <div className="absolute -left-20 top-10 h-72 w-72 rounded-full bg-white/10 blur-3xl" />
-        <div className="absolute -right-24 bottom-0 h-96 w-96 rounded-full bg-cyan-300/20 blur-3xl" />
+      <section className="relative overflow-hidden border-b border-[#dcecf8] bg-gradient-to-br from-[#edf8ff] via-[#f7fbff] to-[#dff1ff]">
+        <div className="absolute -left-24 top-14 h-72 w-72 rounded-full bg-[#bfe4ff]/45 blur-3xl" />
+        <div className="absolute -right-20 bottom-0 h-96 w-96 rounded-full bg-[#cbeaff]/60 blur-3xl" />
 
-        <div className="relative mx-auto grid max-w-7xl gap-7 px-4 py-8 sm:gap-10 sm:px-6 sm:py-16 md:grid-cols-2 md:items-center md:gap-12 md:py-24">
+        <div className="relative mx-auto grid max-w-7xl gap-8 px-4 py-10 sm:px-6 sm:py-16 md:grid-cols-2 md:items-center md:gap-14 md:py-24">
           <div>
-            <div className="mb-4 inline-flex rounded-full border border-white/20 bg-white/10 px-3 py-1.5 text-sm font-semibold text-blue-50 backdrop-blur sm:mb-5 sm:px-4 sm:py-2">
-              Glazenwasser nodig? ShineGo regelt het.
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#c8e5fb] bg-white/80 px-4 py-2 text-sm font-semibold text-[#245d91] shadow-sm">
+              <span className="text-[#1683f8]">✦</span> Glazenwasser nodig? ShineGo regelt het.
             </div>
 
-            <h1 className="max-w-2xl text-4xl font-extrabold leading-[1.05] tracking-tight sm:text-5xl md:text-6xl">
+            <h1 className="max-w-2xl text-4xl font-extrabold leading-[1.04] tracking-tight text-[#0b2b5b] sm:text-5xl md:text-6xl">
               Schone ramen.
-              <span className="block text-cyan-100">Snel geregeld.</span>
+              <span className="block text-[#1683f8]">Snel geregeld.</span>
             </h1>
 
-            <p className="mt-4 max-w-xl text-base leading-7 text-blue-50 sm:mt-6 sm:text-lg sm:leading-8 md:text-xl">
+            <p className="mt-5 max-w-xl text-base leading-7 text-[#526f8c] sm:text-lg sm:leading-8 md:text-xl">
               Boek eenvoudig een glazenwasser, zie vooraf wat je betaalt en kies een moment dat jou uitkomt.
             </p>
 
-            <div className="mt-6 flex flex-col gap-3 sm:mt-8 sm:flex-row">
-              <a href="/boeken" className="rounded-xl bg-white px-6 py-3.5 text-center text-base font-extrabold text-blue-700 shadow-xl shadow-blue-950/20 transition hover:-translate-y-0.5 hover:bg-blue-50 sm:px-7 sm:py-4 sm:text-lg">
-                Boek een glazenwasser
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <a href="/boeken" className="rounded-xl bg-[#1683f8] px-6 py-3.5 text-center text-base font-extrabold text-white shadow-lg shadow-blue-200/70 transition hover:-translate-y-0.5 hover:bg-[#0d6fd8] sm:px-7 sm:py-4 sm:text-lg">
+                Boek een glazenwasser →
               </a>
-              <a href="/professional" className="rounded-xl border border-white/30 bg-white/10 px-6 py-3.5 text-center text-base font-semibold text-white backdrop-blur transition hover:bg-white/20 sm:px-7 sm:py-4 sm:text-lg">
-                Word glazenwasser
+              <a href="#hoe-het-werkt" className="rounded-xl border border-[#b9dcf8] bg-white/80 px-6 py-3.5 text-center text-base font-bold text-[#0b3d75] transition hover:border-[#1683f8] hover:bg-white sm:px-7 sm:py-4 sm:text-lg">
+                Hoe het werkt
               </a>
             </div>
 
-            <div className="mt-5 grid gap-2 text-sm font-semibold text-blue-50 sm:mt-8 sm:flex sm:flex-wrap sm:gap-x-6 sm:gap-y-3">
-              <span>✓ Vooraf vaste prijs</span>
-              <span>✓ Gecontroleerde glazenwassers</span>
-              <span>✓ Veilig betalen</span>
+            <div className="mt-7 grid gap-3 text-sm font-semibold text-[#365d83] sm:grid-cols-3">
+              <div className="rounded-2xl bg-white/70 px-4 py-3"><span className="mr-2 text-[#1683f8]">✓</span>Vaste prijs</div>
+              <div className="rounded-2xl bg-white/70 px-4 py-3"><span className="mr-2 text-[#1683f8]">✓</span>Veilig betalen</div>
+              <div className="rounded-2xl bg-white/70 px-4 py-3"><span className="mr-2 text-[#1683f8]">✓</span>Gecontroleerd</div>
             </div>
           </div>
 
-          <div className="rounded-[1.75rem] border border-white/30 bg-white p-5 text-slate-900 shadow-2xl shadow-blue-950/25 sm:rounded-[2rem] sm:p-7">
-            <div className="mb-1 text-sm font-extrabold uppercase tracking-[0.16em] text-blue-600">Snel boeken</div>
-            <h2 className="text-2xl font-extrabold tracking-tight text-slate-950 sm:text-3xl">Wat wil je laten reinigen?</h2>
-            <p className="mt-2 text-slate-500">Kies de glasbewassing die bij je past.</p>
+          <div className="rounded-[2rem] border border-[#cfe7f8] bg-white/90 p-5 shadow-xl shadow-blue-100/60 backdrop-blur sm:p-7">
+            <div className="mb-1 text-sm font-extrabold uppercase tracking-[0.16em] text-[#1683f8]">Snel boeken</div>
+            <h2 className="text-2xl font-extrabold tracking-tight text-[#0b2b5b] sm:text-3xl">Wat wil je laten reinigen?</h2>
+            <p className="mt-2 text-[#66809a]">Kies de glasbewassing die bij je past.</p>
 
-            <div className="mt-6 grid gap-3 sm:grid-cols-2 sm:gap-4">
-              <a href="/boeken/glazenwassen?type=buiten" className="group rounded-2xl border border-blue-100 bg-blue-50 p-5 transition hover:-translate-y-1 hover:border-blue-300 hover:bg-blue-100 hover:shadow-lg">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white text-2xl shadow-sm">✨</div>
-                <div className="mt-4 font-extrabold text-slate-900 group-hover:text-blue-700">Ramen buiten wassen</div>
-                <div className="mt-1 text-sm text-slate-600">Buitenzijde van je ramen</div>
-              </a>
-
-              <a href="/boeken/glazenwassen?type=binnen" className="group rounded-2xl border border-sky-100 bg-sky-50 p-5 transition hover:-translate-y-1 hover:border-sky-300 hover:bg-sky-100 hover:shadow-lg">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white text-2xl shadow-sm">🧼</div>
-                <div className="mt-4 font-extrabold text-slate-900 group-hover:text-sky-700">Ramen binnen wassen</div>
-                <div className="mt-1 text-sm text-slate-600">Binnenzijde van je ramen</div>
-              </a>
-
-              <a href="/boeken/glazenwassen?type=telewash" className="group rounded-2xl border border-cyan-100 bg-cyan-50 p-5 transition hover:-translate-y-1 hover:border-cyan-300 hover:bg-cyan-100 hover:shadow-lg">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white text-2xl shadow-sm">🪟</div>
-                <div className="mt-4 font-extrabold text-slate-900 group-hover:text-cyan-700">Telewash</div>
-                <div className="mt-1 text-sm text-slate-600">Voor ramen op hoogte</div>
-              </a>
-
-              <a href="/boeken/glazenwassen?type=bedrijf" className="group rounded-2xl border border-indigo-100 bg-indigo-50 p-5 transition hover:-translate-y-1 hover:border-indigo-300 hover:bg-indigo-100 hover:shadow-lg">
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white text-2xl shadow-sm">🏢</div>
-                <div className="mt-4 font-extrabold text-slate-900 group-hover:text-indigo-700">Winkel / bedrijfspand</div>
-                <div className="mt-1 text-sm text-slate-600">Glasbewassing voor bedrijven</div>
-              </a>
+            <div id="diensten" className="mt-6 grid gap-3 sm:grid-cols-2 sm:gap-4">
+              {diensten.map(([icon, titel, tekst, href]) => (
+                <a key={titel} href={href} className="group rounded-2xl border border-[#d7eaf9] bg-[#f8fcff] p-5 transition hover:-translate-y-1 hover:border-[#91cffa] hover:bg-[#eef8ff] hover:shadow-lg">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#e7f5ff] text-2xl">{icon}</div>
+                  <div className="mt-4 font-extrabold text-[#0b2b5b] group-hover:text-[#1683f8]">{titel}</div>
+                  <div className="mt-1 text-sm text-[#66809a]">{tekst}</div>
+                </a>
+              ))}
             </div>
           </div>
         </div>
       </section>
 
-      <section id="diensten" className="bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20">
+      <section className="bg-white/70">
+        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20">
           <div className="text-center">
-            <p className="font-extrabold uppercase tracking-[0.14em] text-blue-600">Eenvoudig en duidelijk</p>
-            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl">Glazenwasser eenvoudig geregeld</h2>
-            <p className="mx-auto mt-4 max-w-2xl text-lg text-slate-600">Van prijs tot planning: ShineGo maakt glasbewassing makkelijk.</p>
+            <p className="font-extrabold uppercase tracking-[0.14em] text-[#1683f8]">Eenvoudig en duidelijk</p>
+            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-[#0b2b5b] sm:text-4xl">Glazenwasser eenvoudig geregeld</h2>
+            <p className="mx-auto mt-4 max-w-2xl text-lg text-[#66809a]">Van prijs tot planning: ShineGo maakt glasbewassing rustig en overzichtelijk.</p>
           </div>
 
-          <div className="mt-10 grid gap-5 sm:mt-12 md:grid-cols-3 md:gap-6">
+          <div className="mt-10 grid gap-5 md:grid-cols-3">
             {[
-              ["💶", "Direct een prijs", "Geen eindeloze offertes. Vul je gegevens in en zie direct wat de glasbewassing kost."],
-              ["📅", "Zelf inplannen", "Kies eenvoudig een beschikbare datum en tijd die bij jouw planning past."],
-              ["✅", "Gecontroleerde glazenwassers", "Glazenwassers worden gecontroleerd voordat ze opdrachten via ShineGo kunnen uitvoeren."],
-            ].map(([icon, title, text], index) => (
-              <div key={title} className={`rounded-[1.75rem] p-6 shadow-lg transition hover:-translate-y-1 hover:shadow-xl sm:rounded-[2rem] sm:p-8 ${index === 0 ? "bg-blue-600 text-white" : index === 1 ? "bg-sky-100 text-slate-900" : "bg-slate-950 text-white"}`}>
-                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/90 text-3xl shadow-sm">{icon}</div>
-                <h3 className="mt-5 text-xl font-extrabold">{title}</h3>
-                <p className={`mt-3 leading-7 ${index === 1 ? "text-slate-600" : "text-white/80"}`}>{text}</p>
+              ["💶", "Direct een prijs", "Vul je gegevens in en zie vooraf wat de glasbewassing kost."],
+              ["📅", "Zelf inplannen", "Kies een datum en tijd die bij jouw planning past."],
+              ["✅", "Betrouwbare glazenwassers", "Glazenwassers worden gecontroleerd voordat ze opdrachten uitvoeren."],
+            ].map(([icon, title, text]) => (
+              <div key={title} className="rounded-[1.75rem] border border-[#d7eaf9] bg-[#f8fcff] p-6 shadow-sm sm:p-8">
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-[#e4f4ff] text-3xl">{icon}</div>
+                <h3 className="mt-5 text-xl font-extrabold text-[#0b2b5b]">{title}</h3>
+                <p className="mt-3 leading-7 text-[#66809a]">{text}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="hoe-het-werkt" className="bg-gradient-to-b from-sky-50 to-blue-50">
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20">
+      <section id="hoe-het-werkt" className="bg-gradient-to-b from-[#eef8ff] to-[#f8fcff]">
+        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20">
           <div className="text-center">
-            <p className="font-extrabold uppercase tracking-[0.14em] text-blue-600">In drie stappen</p>
-            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-slate-950 sm:text-4xl">Zo werkt ShineGo</h2>
+            <p className="font-extrabold uppercase tracking-[0.14em] text-[#1683f8]">In drie stappen</p>
+            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-[#0b2b5b] sm:text-4xl">Zo werkt ShineGo</h2>
           </div>
 
-          <div className="mt-10 grid gap-5 sm:mt-14 md:grid-cols-3 md:gap-6">
+          <div className="mt-10 grid gap-5 md:grid-cols-3">
             {[
               ["1", "Kies je glasbewassing", "Geef aan wat er gedaan moet worden."],
               ["2", "Bekijk je prijs", "ShineGo berekent vooraf de prijs van de opdracht."],
               ["3", "Wij regelen de rest", "Een beschikbare glazenwasser kan jouw opdracht uitvoeren."],
             ].map(([number, title, text]) => (
-              <div key={number} className="rounded-[1.75rem] border border-blue-100 bg-white p-6 text-center shadow-lg shadow-blue-100/50 sm:rounded-[2rem] sm:p-8">
-                <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-blue-600 to-sky-500 text-2xl font-extrabold text-white shadow-lg shadow-blue-500/20">{number}</div>
-                <h3 className="mt-5 text-xl font-extrabold text-slate-950">{title}</h3>
-                <p className="mt-2 text-slate-600">{text}</p>
+              <div key={number} className="rounded-[1.75rem] border border-[#d7eaf9] bg-white p-6 text-center shadow-sm sm:p-8">
+                <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#1683f8] text-xl font-extrabold text-white shadow-md shadow-blue-200">{number}</div>
+                <h3 className="mt-5 text-xl font-extrabold text-[#0b2b5b]">{title}</h3>
+                <p className="mt-2 text-[#66809a]">{text}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <section id="professional" className="bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-20">
-          <div className="relative overflow-hidden rounded-[1.75rem] bg-gradient-to-br from-slate-950 via-blue-950 to-blue-800 px-6 py-10 text-white shadow-2xl sm:rounded-[2.25rem] sm:px-8 sm:py-14 md:px-14 md:py-16">
-            <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-sky-400/20 blur-3xl" />
-            <div className="relative max-w-3xl">
-              <p className="font-extrabold uppercase tracking-[0.14em] text-sky-300">Voor zelfstandige glazenwassers</p>
-              <h2 className="mt-3 text-3xl font-extrabold tracking-tight sm:text-4xl md:text-5xl">Meer opdrachten. Jij bepaalt wanneer.</h2>
-              <p className="mt-5 max-w-2xl text-lg leading-8 text-slate-300">
-                Ontvang glasbewassingsopdrachten in jouw regio, kies zelf welke opdrachten je aanneemt en bepaal wanneer je werkt. Aanmelden bij ShineGo is gratis.
-              </p>
-              <a href="/professional" className="mt-8 inline-block w-full rounded-xl bg-sky-400 px-6 py-4 text-center font-extrabold text-slate-950 shadow-lg shadow-sky-950/20 transition hover:bg-sky-300 sm:w-auto sm:px-7">
-                Gratis aanmelden als glazenwasser
-              </a>
-            </div>
+      <section className="bg-white">
+        <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 sm:py-20">
+          <div className="rounded-[2rem] border border-[#cfe7f8] bg-gradient-to-br from-[#e9f6ff] to-[#dff1ff] px-6 py-10 sm:px-10 sm:py-14 md:px-14">
+            <p className="font-extrabold uppercase tracking-[0.14em] text-[#1683f8]">Voor zelfstandige glazenwassers</p>
+            <h2 className="mt-3 max-w-3xl text-3xl font-extrabold tracking-tight text-[#0b2b5b] sm:text-4xl">Meer opdrachten. Jij bepaalt wanneer.</h2>
+            <p className="mt-5 max-w-2xl text-lg leading-8 text-[#526f8c]">Ontvang opdrachten in jouw regio, kies zelf welke opdrachten je aanneemt en bepaal wanneer je werkt.</p>
+            <a href="/professional" className="mt-7 inline-block w-full rounded-xl bg-white px-6 py-4 text-center font-extrabold text-[#0b3d75] shadow-sm transition hover:text-[#1683f8] sm:w-auto">Gratis aanmelden als glazenwasser</a>
           </div>
         </div>
       </section>
 
-      <footer className="border-t border-slate-800 bg-slate-950 text-slate-400">
-        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-10 text-sm sm:px-6 md:flex-row md:items-center md:justify-between">
-          <div><span className="font-extrabold text-white">Shine<span className="text-sky-400">Go</span></span> © 2026</div>
+      <footer className="border-t border-[#d7eaf9] bg-[#eaf5ff] text-[#5d7893]">
+        <div className="mx-auto flex max-w-7xl flex-col gap-5 px-4 py-9 text-sm sm:px-6 md:flex-row md:items-center md:justify-between">
+          <div><span className="font-extrabold text-[#0b3d75]">Shine<span className="text-[#1683f8]">Go</span></span> © 2026</div>
           <div className="flex flex-wrap gap-x-5 gap-y-3 sm:gap-6">
-            <a href="/veelgestelde-vragen" className="transition hover:text-white">Veelgestelde vragen</a>
-            <a href="/privacy" className="transition hover:text-white">Privacy</a>
-            <a href="/cookies" className="transition hover:text-white">Cookies</a>
-            <a href="/voorwaarden" className="transition hover:text-white">Voorwaarden</a>
-            <a href="/contact" className="transition hover:text-white">Contact</a>
+            <a href="/prijzen" className="transition hover:text-[#1683f8]">Prijzen</a>
+            <a href="/veelgestelde-vragen" className="transition hover:text-[#1683f8]">Veelgestelde vragen</a>
+            <a href="/privacy" className="transition hover:text-[#1683f8]">Privacy</a>
+            <a href="/cookies" className="transition hover:text-[#1683f8]">Cookies</a>
+            <a href="/voorwaarden" className="transition hover:text-[#1683f8]">Voorwaarden</a>
+            <a href="/contact" className="transition hover:text-[#1683f8]">Contact</a>
           </div>
         </div>
       </footer>
