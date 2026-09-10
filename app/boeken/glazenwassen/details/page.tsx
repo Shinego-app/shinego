@@ -14,6 +14,7 @@ type Gegevens = {
 
 export default function DetailsPage() {
   const [gegevens, setGegevens] = useState<Gegevens | null>(null);
+  const [woningtype, setWoningtype] = useState("");
   const [ramen, setRamen] = useState(0);
   const [verdiepingen, setVerdiepingen] = useState<string[]>(["1"]);
   const [glasOppervlak, setGlasOppervlak] = useState("");
@@ -30,6 +31,7 @@ export default function DetailsPage() {
     }
     const data: Gegevens = JSON.parse(opgeslagen);
     setGegevens(data);
+    setWoningtype(data.woningtype || "");
     setRamen(data.ramen || 0);
     setVerdiepingen(data.verdiepingen?.length ? data.verdiepingen : data.woningtype === "appartement" ? [] : ["1"]);
     setGlasOppervlak(data.glasOppervlak || "");
@@ -38,7 +40,8 @@ export default function DetailsPage() {
   }, []);
 
   const bedrijf = gegevens?.woningtype === "bedrijfspand";
-  const kanVerder = Boolean(gegevens) && (bedrijf ? glasOppervlak !== "" : ramen > 0);
+  const woning = gegevens?.type === "buiten" && gegevens?.woningtype !== "appartement";
+  const kanVerder = Boolean(gegevens) && (!woning || woningtype !== "") && (bedrijf ? glasOppervlak !== "" : ramen > 0);
 
   function toggleVerdieping(verdieping: string) {
     setVerdiepingen((vorige) =>
@@ -51,6 +54,7 @@ export default function DetailsPage() {
 
     const bijgewerkt: Gegevens = {
       ...gegevens,
+      woningtype: woning ? woningtype : gegevens.woningtype,
       ramen,
       verdiepingen,
       glasOppervlak,
@@ -123,7 +127,23 @@ export default function DetailsPage() {
                     </div>
                   ) : (
                     <>
-                      <div className="mt-8 flex items-center justify-between border-b border-[#edf2f7] pb-5">
+                      {woning && (
+                        <div className="mt-8 border-b border-[#edf2f7] pb-5">
+                          <div className="text-sm font-bold text-[#385575]">Type woning</div>
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            {[
+                              ["Rijtjeshuis", "Rijtjeshuis"],
+                              ["Twee-onder-een-kap", "Twee-onder-een-kap"],
+                              ["Vrijstaande woning", "Vrijstaande woning"],
+                              ["Villa", "Villa"],
+                            ].map(([waarde, label]) => (
+                              <button key={waarde} type="button" onClick={() => setWoningtype(waarde)} className={`rounded-xl border px-4 py-2.5 text-sm font-semibold ${woningtype === waarde ? "border-[#6287ef] bg-[#eef3ff] text-[#3f66cb]" : "border-[#dde6f1] bg-white text-[#708399]"}`}>{label}</button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="mt-5 flex items-center justify-between border-b border-[#edf2f7] pb-5">
                         <div><div className="text-sm font-bold text-[#385575]">Aantal ramen</div><div className="mt-1 text-xs text-[#8998aa]">Buitenzijde van de ramen</div></div>
                         <div className="flex items-center gap-5">
                           <button type="button" onClick={() => setRamen(Math.max(0, ramen - 1))} className="h-9 w-9 rounded-full text-xl text-[#7b91aa] hover:bg-[#f2f6fb]">−</button>
