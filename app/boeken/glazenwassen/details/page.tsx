@@ -143,10 +143,13 @@ export default function DetailsPage() {
               <div className="mt-6 flex items-center justify-between border-t border-[#dcecf8] pt-4"><a href="/boeken/glazenwassen" className="px-2 py-3 text-sm font-bold text-[#537797]">← Terug</a><button type="button" disabled={!kanVerder} onClick={gaVerder} className={`min-w-44 rounded-xl px-7 py-3.5 text-sm font-extrabold text-white ${kanVerder ? "bg-[#1683f8] shadow-[0_8px_20px_rgba(22,131,248,.24)]" : "cursor-not-allowed bg-[#bfd3e5]"}`}>Verder →</button></div>
             </div>
 
-            <aside className="relative hidden min-h-[620px] overflow-hidden lg:block">
-              <img src="https://images.pexels.com/photos/37440103/pexels-photo-37440103.jpeg?auto=compress&cs=tinysrgb&w=1200" alt="Glazenwasser met telescoopsteel aan een glazen gevel" className="absolute inset-0 h-full w-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#dff2ff]/55 via-transparent to-[#eaf6ff]/10" />
-              <div className="absolute bottom-8 right-7 -rotate-6 rounded-2xl bg-white/78 px-4 py-3 text-right text-xl font-medium italic leading-6 text-[#4f6f8d] shadow-sm backdrop-blur-sm">Schoon.<br />Veilig.<br />Professioneel.</div>
+            <aside className="relative hidden min-h-[720px] overflow-hidden lg:block">
+              <img src="https://images.pexels.com/photos/33728684/pexels-photo-33728684/free-photo-of-window-cleaner-on-modern-glass-building-facade.jpeg?auto=compress&cs=tinysrgb&w=1400" alt="Professionele glazenwasser aan een moderne glazen gevel" className="absolute inset-0 h-full w-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#dff2ff]/45 via-transparent to-[#eaf6ff]/5" />
+              <div className="absolute bottom-8 right-7 rounded-2xl bg-white/85 px-5 py-4 text-right shadow-[0_8px_24px_rgba(28,78,120,.14)] backdrop-blur-sm">
+                <div className="text-sm font-extrabold text-[#123c70]">Professioneel · Betrouwbaar</div>
+                <div className="mt-1 text-xs font-medium text-[#587995]">Streeploos resultaat</div>
+              </div>
             </aside>
           </div>
         </section>
