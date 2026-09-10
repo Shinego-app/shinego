@@ -1,81 +1,50 @@
 export default function PrijzenPage() {
+  const onderdelen = [
+    ["🏠", "1. Basisprijs", "De basisprijs is afhankelijk van het type woning en de gekozen glasbewassing."],
+    ["📊", "2. Hoogtetoeslag", "Voor hogere verdiepingen rekenen we vooraf een duidelijke toeslag."],
+    ["▦", "3. Kozijnen", "Wil je ook de kozijnen laten schoonmaken? Dan tonen we de extra kosten vooraf."],
+    ["🧹", "4. Telescoopsteel", "Voor hoog of lastig bereikbaar glas kan een telescoopsteel nodig zijn."],
+    ["%", "5. Abonnementskorting", "Kies periodiek en ontvang automatisch korting op je opdracht."],
+  ];
+
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900">
-      <header className="border-b border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
-          <a href="/" className="text-2xl font-extrabold tracking-tight text-slate-950">
-            Shine<span className="text-sky-500">Go</span>
-          </a>
-          <a href="/boeken" className="rounded-xl bg-blue-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-blue-700 sm:px-5 sm:text-base">
-            Boek een glazenwasser
-          </a>
-        </div>
-      </header>
+    <main className="min-h-screen bg-[#fbfdff] text-[#16355f]">
+      <div className="mx-auto max-w-5xl px-5 py-7 sm:px-8 sm:py-10">
+        <header className="flex items-center justify-between">
+          <a href="/" className="text-[28px] font-extrabold tracking-tight text-[#123c70]">Shine<span className="text-[#4d7ef0]">Go</span><span className="ml-1 text-[#6e96f5]">✦</span></a>
+          <a href="/" aria-label="Menu" className="flex h-10 w-10 items-center justify-center rounded-xl text-2xl text-[#6b83a2] hover:bg-[#f0f5ff]">≡</a>
+        </header>
 
-      <section className="bg-gradient-to-br from-blue-700 via-blue-600 to-sky-500 text-white">
-        <div className="mx-auto max-w-5xl px-4 py-14 text-center sm:px-6 sm:py-20">
-          <p className="font-bold uppercase tracking-[0.14em] text-blue-100">Duidelijk vooraf</p>
-          <h1 className="mt-3 text-4xl font-extrabold tracking-tight sm:text-5xl">Hoe onze prijzen werken</h1>
-          <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-blue-50">
-            Bij ShineGo zie je vóór het betalen hoe je prijs is opgebouwd. Zo weet je waar je aan toe bent en kom je niet voor verrassingen te staan.
-          </p>
-        </div>
-      </section>
+        <section className="relative mt-7 overflow-hidden rounded-[30px] bg-white px-5 py-7 shadow-[0_18px_60px_rgba(45,77,120,0.10)] sm:px-9 sm:py-9">
+          <div className="grid gap-8 lg:grid-cols-[1.15fr_.85fr] lg:gap-12">
+            <div>
+              <h1 className="text-3xl font-extrabold tracking-tight text-[#18375f] sm:text-4xl">Hoe onze prijzen werken</h1>
+              <p className="mt-2 text-sm text-[#778ba4] sm:text-base">Eenvoudig, transparant en eerlijk.</p>
 
-      <section className="mx-auto max-w-5xl px-4 py-12 sm:px-6 sm:py-16">
-        <div className="grid gap-5 md:grid-cols-2">
-          {[
-            ["1", "Basisprijs", "De basisprijs hangt af van het type glasbewassing dat je kiest, bijvoorbeeld buitenramen, binnenramen of telescoopsteel."],
-            ["2", "Aantal ramen", "Voor woningen en appartementen telt het aantal ramen mee in de prijs. Je ziet dit bedrag apart terug in de prijsopbouw."],
-            ["3", "Hoogte", "Voor hogere verdiepingen kan een toeslag gelden. Bij 2 verdiepingen is de toeslag €15 en bij 3 verdiepingen €22,50."],
-            ["4", "Extra opties", "Kozijnen schoonmaken en moeilijk bereikbare ramen kunnen extra werk betekenen. Eventuele toeslagen worden vooraf zichtbaar gemaakt."],
-          ].map(([nummer, titel, tekst]) => (
-            <div key={titel} className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm sm:p-7">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-600 text-lg font-extrabold text-white">{nummer}</div>
-              <h2 className="mt-5 text-xl font-extrabold">{titel}</h2>
-              <p className="mt-3 leading-7 text-slate-600">{tekst}</p>
+              <div className="mt-7 space-y-5">
+                {onderdelen.map(([icoon, titel, tekst]) => (
+                  <div key={titel} className="flex gap-4">
+                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#f2f5ff] text-xl text-[#5578dc]">{icoon}</span>
+                    <div><h2 className="text-sm font-extrabold text-[#375575]">{titel}</h2><p className="mt-1 text-xs leading-5 text-[#8392a5]">{tekst}</p></div>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-7 rounded-2xl bg-[#f5f8ff] px-5 py-4 text-xs leading-5 text-[#6d8097]">
+                Periodieke korting: <strong>12%</strong> bij elke 4 weken, <strong>10%</strong> bij elke 8 weken en <strong>7%</strong> bij elke 12 weken.
+              </div>
+
+              <a href="/boeken/glazenwassen" className="mt-7 inline-flex rounded-xl border border-[#dde5f0] bg-white px-6 py-3 text-sm font-bold text-[#637993] shadow-sm">Bekijk alle prijzen →</a>
             </div>
-          ))}
-        </div>
 
-        <div className="mt-6 rounded-3xl bg-slate-950 p-6 text-white sm:p-8">
-          <h2 className="text-2xl font-extrabold">Regelmatig laten schoonmaken?</h2>
-          <p className="mt-3 max-w-3xl leading-7 text-slate-300">
-            Kies je voor een terugkerende opdracht, dan wordt de abonnementskorting automatisch in je prijs verwerkt: 12% bij elke 4 weken, 10% bij elke 8 weken en 7% bij elke 12 weken.
-          </p>
-        </div>
-
-        <div className="mt-6 rounded-3xl border border-blue-100 bg-blue-50 p-6 sm:p-8">
-          <h2 className="text-2xl font-extrabold text-blue-950">Winkel of bedrijfspand</h2>
-          <p className="mt-3 leading-7 text-blue-900">
-            Zakelijke opdrachten worden geprijsd op basis van het glasoppervlak en of een telescoopsteel nodig is. Vanaf 500 m² maken we een offerte op maat, zodat grotere opdrachten eerlijk kunnen worden beoordeeld.
-          </p>
-        </div>
-
-        <div className="mt-6 rounded-3xl border border-slate-200 bg-white p-6 sm:p-8">
-          <h2 className="text-2xl font-extrabold">Geen onverwachte extra kosten</h2>
-          <p className="mt-3 leading-7 text-slate-600">
-            Je krijgt vóór het boeken een duidelijke totaalprijs. Verandert de opdracht ter plaatse, dan worden extra werkzaamheden niet zomaar toegevoegd zonder jouw akkoord.
-          </p>
-        </div>
-
-        <div className="mt-10 text-center">
-          <a href="/boeken" className="inline-block w-full rounded-xl bg-blue-600 px-7 py-4 text-lg font-extrabold text-white shadow-lg transition hover:bg-blue-700 sm:w-auto">
-            Bekijk jouw prijs →
-          </a>
-          <p className="mt-4 text-sm text-slate-500">Je ziet de volledige prijsopbouw voordat je betaalt.</p>
-        </div>
-      </section>
-
-      <footer className="border-t border-slate-200 bg-white">
-        <div className="mx-auto flex max-w-5xl flex-wrap gap-x-5 gap-y-3 px-4 py-8 text-sm text-slate-500 sm:px-6">
-          <a href="/" className="hover:text-slate-900">Home</a>
-          <a href="/veelgestelde-vragen" className="hover:text-slate-900">Veelgestelde vragen</a>
-          <a href="/voorwaarden" className="hover:text-slate-900">Voorwaarden</a>
-          <a href="/privacy" className="hover:text-slate-900">Privacy</a>
-          <a href="/contact" className="hover:text-slate-900">Contact</a>
-        </div>
-      </footer>
+            <aside className="relative min-h-[420px] overflow-hidden rounded-[26px] bg-[#eef4fb]">
+              <img src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=900&q=82" alt="Moderne woning met grote ramen" className="absolute inset-0 h-full w-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#eef4fb]/65 via-transparent to-transparent" />
+              <div className="absolute bottom-8 right-7 -rotate-6 text-right text-2xl font-medium italic text-[#697a90]">Heldere<br />prijzen.<br />Blije klanten. 🙂</div>
+            </aside>
+          </div>
+        </section>
+      </div>
     </main>
   );
 }
