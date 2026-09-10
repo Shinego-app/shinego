@@ -111,6 +111,17 @@ main button[class*="bg-blue-600"]:hover, main a[class*="bg-blue-600"]:hover {
 }
 main button[class*="bg-red"], main a[class*="bg-red"] { box-shadow: 0 10px 22px rgb(220 38 38 / 0.14); }
 
+/* Jouw situatie: echte glazenwasserfoto zoals het ontwerp */
+aside:has(> svg[aria-label="Glazenwasser met telescoopsteel"]) {
+  background:
+    linear-gradient(180deg, rgb(225 243 255 / .06), rgb(223 241 255 / .16)),
+    url("https://images.pexels.com/photos/37440103/pexels-photo-37440103.jpeg?auto=compress&cs=tinysrgb&w=1200") center / cover no-repeat !important;
+}
+
+aside:has(> svg[aria-label="Glazenwasser met telescoopsteel"]) > svg[aria-label="Glazenwasser met telescoopsteel"] {
+  display: none;
+}
+
 @media (max-width: 640px) {
   body { min-width: 320px; }
   main h1 { font-size: clamp(2rem, 10vw, 2.6rem); line-height: 1.08; }
