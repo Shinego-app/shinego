@@ -38,8 +38,8 @@ export default function PrijzenPage() {
             </div>
 
             <aside className="relative min-h-[420px] overflow-hidden rounded-[26px] bg-[#eef4fb]">
-              <img src="https://images.unsplash.com/photo-1600607687920-4e2a09cf159d?auto=format&fit=crop&w=900&q=82" alt="Moderne woning met grote ramen" className="absolute inset-0 h-full w-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#eef4fb]/65 via-transparent to-transparent" />
+              <img src="https://egel.fi/assets/img/team/ikkunoidenpesu.jpg" alt="Glazenwasser met telescoopsteel aan een glazen gevel" className="absolute inset-0 h-full w-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#eef4fb]/70 via-transparent to-transparent" />
               <div className="absolute bottom-8 right-7 -rotate-6 text-right text-2xl font-medium italic text-[#697a90]">Heldere<br />prijzen.<br />Blije klanten. 🙂</div>
             </aside>
           </div>
