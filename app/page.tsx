@@ -64,9 +64,9 @@ export default function Home() {
               <img
                 src="/shinego-hero.png"
                 alt="ShineGo glazenwasser met telescoopsteel"
-                className="absolute inset-0 h-full w-full object-cover object-[72%_center]"
+                className="absolute left-[4%] top-[4%] h-[92%] w-[96%] rounded-l-[26px] object-contain object-right"
               />
-              <div className="pointer-events-none absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-white/70 to-transparent sm:w-28 lg:w-36" />
+              <div className="pointer-events-none absolute inset-y-0 left-0 w-14 bg-gradient-to-r from-white/80 via-white/35 to-transparent sm:w-20 lg:w-24" />
             </div>
           </div>
         </div>
