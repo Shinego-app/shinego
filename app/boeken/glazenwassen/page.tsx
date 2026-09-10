@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type Keuze = {
   id: string;
@@ -21,6 +21,26 @@ const keuzes: Keuze[] = [
 
 export default function GlazenwassenPage() {
   const [gekozen, setGekozen] = useState("");
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("type") !== "woning") return;
+
+    localStorage.setItem(
+      "shinegoGlazenwassen",
+      JSON.stringify({
+        woningtype: "tussenwoning",
+        verdiepingen: ["1"],
+        ramen: 0,
+        glasOppervlak: "",
+        telescoop: false,
+        type: "buiten",
+        frequentie: "eenmalig",
+      })
+    );
+
+    window.location.replace("/boeken/glazenwassen/details");
+  }, []);
 
   function kies(optie: Keuze) {
     setGekozen(optie.id);
