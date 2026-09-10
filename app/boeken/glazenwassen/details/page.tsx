@@ -14,132 +14,182 @@ type Gegevens = {
 
 export default function DetailsPage() {
   const [gegevens, setGegevens] = useState<Gegevens | null>(null);
-  const [bereikbaar, setBereikbaar] = useState("");
+  const [ramen, setRamen] = useState(0);
+  const [verdiepingen, setVerdiepingen] = useState<string[]>(["1"]);
+  const [glasOppervlak, setGlasOppervlak] = useState("");
+  const [telescoop, setTelescoop] = useState(false);
   const [kozijnen, setKozijnen] = useState(false);
-  const [opmerking, setOpmerking] = useState("");
+  const [bereikbaar, setBereikbaar] = useState("ja");
+  const [frequentie, setFrequentie] = useState("eenmalig");
 
   useEffect(() => {
     const opgeslagen = localStorage.getItem("shinegoGlazenwassen");
-    if (!opgeslagen) return;
-    const opgeslagenGegevens: Gegevens = JSON.parse(opgeslagen);
-    if (opgeslagenGegevens.woningtype === "bedrijfspand" && opgeslagenGegevens.glasOppervlak === "500+") {
+    if (!opgeslagen) {
+      window.location.href = "/boeken/glazenwassen";
+      return;
+    }
+    const data: Gegevens = JSON.parse(opgeslagen);
+    setGegevens(data);
+    setRamen(data.ramen || 0);
+    setVerdiepingen(data.verdiepingen?.length ? data.verdiepingen : data.woningtype === "appartement" ? [] : ["1"]);
+    setGlasOppervlak(data.glasOppervlak || "");
+    setTelescoop(Boolean(data.telescoop));
+    setFrequentie(data.frequentie || "eenmalig");
+  }, []);
+
+  const bedrijf = gegevens?.woningtype === "bedrijfspand";
+  const kanVerder = Boolean(gegevens) && (bedrijf ? glasOppervlak !== "" : ramen > 0);
+
+  function toggleVerdieping(verdieping: string) {
+    setVerdiepingen((vorige) =>
+      vorige.includes(verdieping) ? vorige.filter((v) => v !== verdieping) : [...vorige, verdieping]
+    );
+  }
+
+  function gaVerder() {
+    if (!gegevens || !kanVerder) return;
+
+    const bijgewerkt: Gegevens = {
+      ...gegevens,
+      ramen,
+      verdiepingen,
+      glasOppervlak,
+      telescoop,
+      frequentie,
+    };
+
+    localStorage.setItem("shinegoGlazenwassen", JSON.stringify(bijgewerkt));
+    localStorage.setItem(
+      "shinegoGlazenwassenDetails",
+      JSON.stringify({ bereikbaar, kozijnen, opmerking: "" })
+    );
+
+    if (bedrijf && glasOppervlak === "500+") {
       window.location.href = "/contact?offerte=500plus";
       return;
     }
-    setGegevens(opgeslagenGegevens);
-  }, []);
 
-  const kanVerder = bereikbaar !== "";
-
-  function gaVerder() {
-    if (!kanVerder) return;
-    localStorage.setItem("shinegoGlazenwassenDetails", JSON.stringify({ bereikbaar, kozijnen, opmerking }));
     window.location.href = "/boeken/glazenwassen/prijs";
   }
 
-  const stappen = ["Keuze", "Situatie", "Details", "Prijs", "Gegevens"];
+  const stappen = ["Keuze", "Details", "Prijs", "Gegevens", "Bevestigen"];
 
   return (
-    <main className="min-h-screen bg-[#eef8ff] text-[#0b2b5b]">
-      <header className="border-b border-sky-100 bg-white/90 backdrop-blur">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4 sm:px-6">
-          <a href="/" className="text-2xl font-extrabold tracking-tight text-[#0b3d75]">Shine<span className="text-[#1683f8]">Go✦</span></a>
-          <a href="/boeken/glazenwassen" className="rounded-xl border border-sky-200 bg-white px-4 py-2 text-sm font-bold text-[#245d91]">← Terug</a>
-        </div>
-      </header>
+    <main className="min-h-screen bg-[#fbfdff] text-[#16355f]">
+      <div className="mx-auto max-w-5xl px-5 py-7 sm:px-8 sm:py-10">
+        <header className="flex items-center justify-between">
+          <a href="/" className="text-[28px] font-extrabold tracking-tight text-[#123c70]">Shine<span className="text-[#4d7ef0]">Go</span><span className="ml-1 text-[#6e96f5]">✦</span></a>
+          <a href="/" aria-label="Menu" className="flex h-10 w-10 items-center justify-center rounded-xl text-2xl text-[#6b83a2] hover:bg-[#f0f5ff]">≡</a>
+        </header>
 
-      <section className="mx-auto max-w-6xl px-4 py-7 sm:px-6 sm:py-10">
-        <div className="mb-7 rounded-3xl border border-sky-100 bg-white/75 px-4 py-4 shadow-sm sm:px-6">
-          <div className="grid grid-cols-5 gap-1 sm:gap-3">
-            {stappen.map((stap, index) => {
-              const nummer = index + 1;
-              const actief = nummer === 3;
-              const klaar = nummer < 3;
-              return (
-                <div key={stap} className="text-center">
-                  <div className="flex items-center">
-                    <div className={`h-px flex-1 ${index === 0 ? "bg-transparent" : klaar || actief ? "bg-[#9fd1ff]" : "bg-sky-100"}`} />
-                    <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-sm font-extrabold ${actief ? "bg-[#1683f8] text-white shadow-md" : klaar ? "bg-[#dff1ff] text-[#1177df]" : "border border-sky-200 bg-white text-[#66809a]"}`}>{nummer}</div>
-                    <div className={`h-px flex-1 ${index === stappen.length - 1 ? "bg-transparent" : klaar ? "bg-[#9fd1ff]" : "bg-sky-100"}`} />
+        <div className="mt-4 grid grid-cols-5 gap-1">
+          {stappen.map((stap, index) => {
+            const actief = index === 1;
+            const klaar = index < 1;
+            return (
+              <div key={stap} className="text-center">
+                <div className="flex items-center">
+                  <span className={`h-px flex-1 ${index === 0 ? "bg-transparent" : klaar || actief ? "bg-[#b9c9ed]" : "bg-[#e2eaf6]"}`} />
+                  <span className={`flex h-7 w-7 items-center justify-center rounded-full text-xs font-bold ${actief ? "bg-[#4f78e8] text-white" : klaar ? "bg-[#e9efff] text-[#4f78e8]" : "text-[#7690ad]"}`}>{index + 1}</span>
+                  <span className={`h-px flex-1 ${index === 4 ? "bg-transparent" : klaar ? "bg-[#b9c9ed]" : "bg-[#e2eaf6]"}`} />
+                </div>
+                <div className={`mt-1 text-[10px] sm:text-xs ${actief ? "font-bold text-[#4f78e8]" : "text-[#7c91aa]"}`}>{stap}</div>
+              </div>
+            );
+          })}
+        </div>
+
+        <section className="mt-7 overflow-hidden rounded-[30px] bg-white shadow-[0_18px_60px_rgba(45,77,120,0.10)]">
+          <div className="grid lg:grid-cols-[1.18fr_.82fr]">
+            <div className="px-5 py-7 sm:px-9 sm:py-9">
+              <h1 className="text-3xl font-extrabold tracking-tight text-[#18375f] sm:text-4xl">Jouw situatie</h1>
+              <p className="mt-2 text-sm text-[#778ba4] sm:text-base">Geef aan wat van toepassing is.</p>
+
+              {!gegevens ? (
+                <p className="mt-8 text-[#7c91aa]">Gegevens laden...</p>
+              ) : (
+                <>
+                  {bedrijf ? (
+                    <div className="mt-8">
+                      <label className="text-sm font-bold text-[#385575]">Hoeveel m² glas?</label>
+                      <div className="mt-3 grid gap-2 sm:grid-cols-2">
+                        {[
+                          ["0-15", "Tot 15 m²"], ["16-30", "16 - 30 m²"], ["31-50", "31 - 50 m²"],
+                          ["51-100", "51 - 100 m²"], ["101-200", "101 - 200 m²"], ["201-500", "201 - 500 m²"], ["500+", "Meer dan 500 m²"],
+                        ].map(([waarde, label]) => (
+                          <button key={waarde} type="button" onClick={() => setGlasOppervlak(waarde)} className={`rounded-xl border px-4 py-3 text-left text-sm font-semibold ${glasOppervlak === waarde ? "border-[#5c82e8] bg-[#f0f4ff] text-[#264b8a]" : "border-[#dde6f1] bg-white text-[#536c87]"}`}>{label}</button>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="mt-8 flex items-center justify-between border-b border-[#edf2f7] pb-5">
+                        <div><div className="text-sm font-bold text-[#385575]">Aantal ramen</div><div className="mt-1 text-xs text-[#8998aa]">Buitenzijde van de ramen</div></div>
+                        <div className="flex items-center gap-5">
+                          <button type="button" onClick={() => setRamen(Math.max(0, ramen - 1))} className="h-9 w-9 rounded-full text-xl text-[#7b91aa] hover:bg-[#f2f6fb]">−</button>
+                          <div className="min-w-8 text-center text-2xl font-extrabold text-[#294b75]">{ramen}</div>
+                          <button type="button" onClick={() => setRamen(ramen + 1)} className="h-9 w-9 rounded-full text-xl font-bold text-[#5880e7] hover:bg-[#eef3ff]">+</button>
+                        </div>
+                      </div>
+
+                      <div className="border-b border-[#edf2f7] py-5">
+                        <div className="text-sm font-bold text-[#385575]">Verdiepingen</div>
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {["1", "2", "3"].map((v) => (
+                            <button key={v} type="button" onClick={() => toggleVerdieping(v)} className={`min-w-24 rounded-xl border px-4 py-2.5 text-sm font-semibold ${verdiepingen.includes(v) ? "border-[#6287ef] bg-[#eef3ff] text-[#3f66cb]" : "border-[#dde6f1] bg-white text-[#708399]"}`}>{v === "1" ? "Begane grond" : `${v}e verdieping`}</button>
+                          ))}
+                        </div>
+                      </div>
+                    </>
+                  )}
+
+                  <div className="mt-5 rounded-2xl bg-[#f5f8ff] px-4 py-3.5 text-sm text-[#617696]">
+                    <span className="mr-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#5f84e8] text-xs font-bold text-white">i</span>
+                    <strong>{verdiepingen.includes("3") ? "3e verdieping geselecteerd." : "Hoogte wordt vooraf meegenomen."}</strong> We gebruiken alleen veilige werkmethodes.
                   </div>
-                  <div className={`mt-2 text-[10px] font-semibold sm:text-xs ${actief ? "text-[#1177df]" : "text-[#66809a]"}`}>{stap}</div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
 
-        <div className="relative overflow-hidden rounded-[2rem] border border-sky-100 bg-gradient-to-br from-white via-[#f8fcff] to-[#dff1ff] p-5 shadow-lg sm:p-8">
-          <div className="pointer-events-none absolute -right-16 top-0 h-64 w-64 rounded-full bg-[#bfe3ff]/45 blur-3xl" />
-          <div className="relative grid gap-7 lg:grid-cols-[1.15fr_.85fr] lg:gap-10">
-            <div>
-              <p className="text-sm font-extrabold uppercase tracking-[0.16em] text-[#1683f8]">Details</p>
-              <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">Nog een paar details</h1>
-              <p className="mt-3 max-w-2xl text-base leading-7 text-[#5b7591]">Hiermee kunnen we de opdracht en prijs beter bepalen.</p>
+                  <div className="mt-6 space-y-1">
+                    <button type="button" onClick={() => setTelescoop(!telescoop)} className="flex w-full items-center justify-between py-3 text-left">
+                      <div><div className="text-sm font-bold text-[#385575]">Telescoopsteel nodig?</div><div className="text-xs text-[#8998aa]">Voor moeilijk bereikbare ramen</div></div>
+                      <span className={`relative h-7 w-12 rounded-full transition ${telescoop ? "bg-[#5a79da]" : "bg-[#dfe6ef]"}`}><span className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition ${telescoop ? "left-6" : "left-1"}`} /></span>
+                    </button>
+                    <button type="button" onClick={() => setKozijnen(!kozijnen)} className="flex w-full items-center justify-between py-3 text-left">
+                      <div><div className="text-sm font-bold text-[#385575]">Kozijnen schoonmaken?</div><div className="text-xs text-[#8998aa]">Rondom de ramen meenemen</div></div>
+                      <span className={`relative h-7 w-12 rounded-full transition ${kozijnen ? "bg-[#5a79da]" : "bg-[#dfe6ef]"}`}><span className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition ${kozijnen ? "left-6" : "left-1"}`} /></span>
+                    </button>
+                    <button type="button" onClick={() => setBereikbaar(bereikbaar === "ja" ? "nee" : "ja")} className="flex w-full items-center justify-between py-3 text-left">
+                      <div><div className="text-sm font-bold text-[#385575]">Extra lastig bereikbaar?</div><div className="text-xs text-[#8998aa]">Bijvoorbeeld boven een serre of schuin dak</div></div>
+                      <span className={`relative h-7 w-12 rounded-full transition ${bereikbaar === "nee" ? "bg-[#5a79da]" : "bg-[#dfe6ef]"}`}><span className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition ${bereikbaar === "nee" ? "left-6" : "left-1"}`} /></span>
+                    </button>
+                  </div>
 
-              {gegevens && (
-                <div className="mt-7 grid gap-3 rounded-2xl border border-sky-100 bg-[#eaf5ff] p-5 sm:grid-cols-3">
-                  <div><div className="text-xs font-bold uppercase tracking-wide text-[#66809a]">Woningtype</div><div className="mt-1 font-extrabold">{gegevens.woningtype}</div></div>
-                  <div><div className="text-xs font-bold uppercase tracking-wide text-[#66809a]">Verdiepingen</div><div className="mt-1 font-extrabold">{gegevens.verdiepingen.length ? gegevens.verdiepingen.join(", ") : "-"}</div></div>
-                  <div><div className="text-xs font-bold uppercase tracking-wide text-[#66809a]">Aantal ramen</div><div className="mt-1 font-extrabold">{gegevens.ramen}</div></div>
-                </div>
+                  <div className="mt-6 border-t border-[#edf2f7] pt-5">
+                    <div className="text-sm font-bold text-[#385575]">Hoe vaak?</div>
+                    <div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">
+                      {[
+                        ["eenmalig", "Eenmalig"], ["4weken", "4 weken"], ["8weken", "8 weken"], ["12weken", "12 weken"],
+                      ].map(([id, label]) => (
+                        <button key={id} type="button" onClick={() => setFrequentie(id)} className={`rounded-xl border px-3 py-2.5 text-xs font-bold ${frequentie === id ? "border-[#6287ef] bg-[#eef3ff] text-[#3f66cb]" : "border-[#dde6f1] text-[#708399]"}`}>{label}</button>
+                      ))}
+                    </div>
+                  </div>
+                </>
               )}
 
-              <div className="mt-6 rounded-2xl border border-sky-100 bg-white/90 p-5">
-                <h2 className="text-xl font-extrabold">1. Zijn alle ramen goed bereikbaar?</h2>
-                <p className="mt-2 text-sm leading-6 text-[#66809a]">De verdieping heb je al gekozen. Hier gaat het alleen om obstakels zoals een serre, uitbouw of schuin dak.</p>
-                <div className="mt-5 grid gap-3 sm:grid-cols-2">
-                  <button type="button" onClick={() => setBereikbaar("ja")} className={`rounded-2xl border-2 p-5 text-left transition ${bereikbaar === "ja" ? "border-[#1683f8] bg-[#eaf5ff] shadow-md" : "border-sky-100 bg-[#f8fcff] hover:border-sky-300"}`}>
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-xl shadow-sm">✓</div>
-                    <h3 className="mt-4 font-extrabold">Goed bereikbaar</h3>
-                    <p className="mt-1 text-sm leading-5 text-[#66809a]">Normaal bereikbaar vanaf de grond, balkon of een veilige werkplek.</p>
-                  </button>
-                  <button type="button" onClick={() => setBereikbaar("nee")} className={`rounded-2xl border-2 p-5 text-left transition ${bereikbaar === "nee" ? "border-[#1683f8] bg-[#eaf5ff] shadow-md" : "border-sky-100 bg-[#f8fcff] hover:border-sky-300"}`}>
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-xl shadow-sm">🪜</div>
-                    <h3 className="mt-4 font-extrabold">Extra lastig bereikbaar</h3>
-                    <p className="mt-1 text-sm leading-5 text-[#66809a]">Bijvoorbeeld boven een serre, uitbouw, obstakel of schuin dak.</p>
-                  </button>
-                </div>
-              </div>
-
-              <div className="mt-6 rounded-2xl border border-sky-100 bg-white/90 p-5">
-                <h2 className="text-xl font-extrabold">2. Kozijnen schoonmaken?</h2>
-                <button type="button" onClick={() => setKozijnen(!kozijnen)} className={`mt-4 w-full rounded-2xl border-2 p-5 text-left transition ${kozijnen ? "border-[#1683f8] bg-[#eaf5ff]" : "border-sky-100 bg-[#f8fcff] hover:border-sky-300"}`}>
-                  <div className="flex items-center justify-between gap-4">
-                    <div><div className="font-extrabold">Kozijnen meenemen</div><div className="mt-1 text-sm text-[#66809a]">Ook de kozijnen rondom de ramen schoonmaken.</div></div>
-                    <div className={`relative h-7 w-12 shrink-0 rounded-full ${kozijnen ? "bg-[#1683f8]" : "bg-sky-100"}`}><div className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition ${kozijnen ? "left-6" : "left-1"}`} /></div>
-                  </div>
-                </button>
-              </div>
-
-              <div className="mt-6 rounded-2xl border border-sky-100 bg-white/90 p-5">
-                <h2 className="text-xl font-extrabold">3. Wil je nog iets doorgeven?</h2>
-                <p className="mt-1 text-sm text-[#66809a]">Niet verplicht.</p>
-                <textarea value={opmerking} onChange={(e) => setOpmerking(e.target.value)} placeholder="Bijvoorbeeld: achterzijde bereikbaar via de tuin..." rows={4} className="mt-4 w-full resize-none rounded-2xl border border-sky-200 bg-white p-4 text-[#0b2b5b] outline-none" />
+              <div className="mt-8 flex items-center justify-between border-t border-[#edf2f7] pt-5">
+                <a href="/boeken/glazenwassen" className="px-2 py-3 text-sm font-bold text-[#8090a3]">← Terug</a>
+                <button type="button" disabled={!kanVerder} onClick={gaVerder} className={`min-w-44 rounded-xl px-7 py-3.5 text-sm font-extrabold text-white transition ${kanVerder ? "bg-[#5578dc] shadow-[0_8px_20px_rgba(73,103,190,.24)] hover:bg-[#466bd4]" : "cursor-not-allowed bg-[#ccd7e9]"}`}>Verder&nbsp; →</button>
               </div>
             </div>
 
-            <aside className="lg:pt-12">
-              <div className="sticky top-24 overflow-hidden rounded-[1.75rem] border border-sky-100 bg-white/90 shadow-lg">
-                <div className="bg-gradient-to-br from-[#dff1ff] via-[#eef8ff] to-white p-6">
-                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white text-3xl shadow-sm">✨</div>
-                  <h2 className="mt-5 text-2xl font-extrabold">Veilig en duidelijk</h2>
-                  <p className="mt-2 leading-6 text-[#66809a]">We rekenen bereikbaarheid vooraf mee, zodat je straks niet voor verrassingen staat.</p>
-                </div>
-                <div className="space-y-4 p-6 text-sm">
-                  <div className="flex gap-3"><span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#eaf5ff]">🛡️</span><div><strong className="block">Veilig werken</strong><span className="text-[#66809a]">Geen onnodige risico's op hoogte</span></div></div>
-                  <div className="flex gap-3"><span className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#eaf5ff]">💶</span><div><strong className="block">Prijs vooraf</strong><span className="text-[#66809a]">Toeslagen worden vooraf getoond</span></div></div>
-                </div>
-              </div>
+            <aside className="relative hidden min-h-[650px] overflow-hidden bg-[#eef4fb] lg:block">
+              <img src="https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?auto=format&fit=crop&w=900&q=82" alt="Glazenwasser aan het werk" className="absolute inset-0 h-full w-full object-cover" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#eef4fb]/80 via-transparent to-white/20" />
+              <div className="absolute bottom-8 right-8 -rotate-6 text-right text-2xl font-medium italic text-[#667a96]">Schoon.<br />Veilig.<br />Professioneel.</div>
             </aside>
           </div>
-
-          <div className="relative mt-8 flex flex-col-reverse gap-3 border-t border-sky-100 pt-6 sm:flex-row sm:items-center sm:justify-between">
-            <a href="/boeken/glazenwassen" className="rounded-xl border border-sky-200 bg-white px-6 py-3.5 text-center font-bold text-[#245d91]">← Terug</a>
-            <button type="button" disabled={!kanVerder} onClick={gaVerder} className={`rounded-xl px-7 py-4 text-base font-extrabold transition ${kanVerder ? "bg-[#1683f8] text-white shadow-lg hover:bg-[#0d6fd8]" : "cursor-not-allowed bg-sky-100 text-[#9ab0c4]"}`}>Bekijk prijs →</button>
-          </div>
-        </div>
-      </section>
+        </section>
+      </div>
     </main>
   );
 }
