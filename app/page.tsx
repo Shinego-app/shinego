@@ -3,25 +3,25 @@ export default function Home() {
     {
       icon: "🏡",
       titel: "Woning",
-      tekst: "Voor rijtjeshuizen, hoekwoningen en vrijstaande woningen.",
+      tekst: "Twee-onder-een-kap, rijtjeshuis, villa",
       href: "/boeken/glazenwassen?type=buiten",
     },
     {
       icon: "🏢",
       titel: "Appartement / flat",
-      tekst: "Glasbewassing voor appartementen en flats.",
+      tekst: "Ideaal voor appartementen",
       href: "/boeken/glazenwassen?type=buiten",
     },
     {
       icon: "🏬",
       titel: "Winkel / bedrijfspand",
-      tekst: "Heldere ramen voor winkels en zakelijke panden.",
+      tekst: "Voor zakelijke panden",
       href: "/boeken/glazenwassen?type=bedrijf",
     },
     {
       icon: "🪟",
       titel: "Gevel / hoog glas",
-      tekst: "Voor hoger en moeilijk bereikbaar glas met telescoopsteel.",
+      tekst: "Met telescoopsteel",
       href: "/boeken/glazenwassen?type=telewash",
     },
   ];
@@ -57,18 +57,12 @@ export default function Home() {
         <div className="relative mx-auto max-w-6xl overflow-hidden rounded-[32px] border border-white bg-white shadow-[0_24px_70px_rgba(46,79,119,0.15)]">
           <div className="grid lg:grid-cols-[1.03fr_.97fr]">
             <div className="order-2 px-6 pb-9 pt-8 sm:px-10 sm:pb-12 lg:order-1 lg:flex lg:flex-col lg:justify-center lg:px-12 lg:py-16">
-              <div className="inline-flex w-fit items-center gap-2 rounded-full border border-[#dce8f5] bg-[#f8fbff] px-4 py-2 text-xs font-bold text-[#698099] sm:text-sm">
-                <span className="text-[#4d7ef0]">✦</span>
-                Glazenwasser nodig? ShineGo regelt het.
-              </div>
-
-              <h1 className="mt-5 max-w-xl text-[42px] font-extrabold leading-[0.98] tracking-[-0.045em] text-[#17375f] sm:text-6xl">
-                Schone ramen.
-                <span className="mt-2 block text-[#4d7ef0]">Snel geregeld.</span>
+              <h1 className="max-w-xl text-[42px] font-extrabold leading-[0.98] tracking-[-0.045em] text-[#17375f] sm:text-6xl">
+                Kies je glasbewassing
               </h1>
 
               <p className="mt-5 max-w-lg text-[15px] leading-7 text-[#71859d] sm:text-lg sm:leading-8">
-                Kies je glasbewassing, bekijk vooraf je prijs en plan direct een moment dat jou uitkomt.
+                Wat kunnen we voor je doen?
               </p>
 
               <div className="mt-7 flex flex-col gap-3 sm:flex-row">
@@ -76,29 +70,8 @@ export default function Home() {
                   href="/boeken/glazenwassen"
                   className="rounded-xl bg-[#5578dc] px-7 py-4 text-center text-base font-extrabold text-white shadow-[0_10px_25px_rgba(73,103,190,.28)] transition hover:bg-[#466bd4]"
                 >
-                  Boek een glazenwasser →
+                  Kies je glasbewassing →
                 </a>
-                <a
-                  href="#hoe-het-werkt"
-                  className="rounded-xl border border-[#dbe5f0] bg-white px-7 py-4 text-center text-base font-bold text-[#49637f] transition hover:border-[#9bb6f6]"
-                >
-                  Hoe het werkt
-                </a>
-              </div>
-
-              <div className="mt-7 grid grid-cols-3 gap-2 border-t border-[#edf2f7] pt-5">
-                <div className="text-center sm:text-left">
-                  <div className="text-lg font-extrabold text-[#29496f]">Vast</div>
-                  <div className="mt-1 text-[11px] leading-4 text-[#8a99aa]">Vooraf je prijs</div>
-                </div>
-                <div className="border-x border-[#edf2f7] px-2 text-center sm:text-left">
-                  <div className="text-lg font-extrabold text-[#29496f]">Veilig</div>
-                  <div className="mt-1 text-[11px] leading-4 text-[#8a99aa]">Betalen via Stripe</div>
-                </div>
-                <div className="text-center sm:text-left">
-                  <div className="text-lg font-extrabold text-[#29496f]">Snel</div>
-                  <div className="mt-1 text-[11px] leading-4 text-[#8a99aa]">In enkele stappen</div>
-                </div>
               </div>
             </div>
 
@@ -111,10 +84,6 @@ export default function Home() {
                   <div className="rounded-[22px] border border-white bg-gradient-to-b from-[#d9ecff] to-[#f8fcff] shadow-inner" />
                 </div>
                 <div className="absolute inset-x-5 top-1/2 h-px bg-white/90" />
-                <div className="absolute bottom-6 right-6 rounded-2xl border border-white/80 bg-white/95 px-4 py-3 shadow-lg">
-                  <div className="text-xs font-extrabold uppercase tracking-[0.14em] text-[#4d7ef0]">ShineGo</div>
-                  <div className="mt-1 text-sm font-extrabold text-[#29496f]">Helder resultaat, zonder gedoe.</div>
-                </div>
               </div>
             </div>
           </div>
@@ -123,11 +92,11 @@ export default function Home() {
         <div className="relative mx-auto mt-4 grid max-w-6xl gap-3 sm:grid-cols-3">
           <div className="flex items-center gap-3 rounded-2xl border border-white bg-white/90 p-4 shadow-[0_9px_28px_rgba(68,99,135,.07)]">
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#eef5ff] text-xl">🛡️</span>
-            <div><strong className="block text-sm text-[#29496f]">Vaste prijzen</strong><span className="text-xs text-[#8293a8]">Geen verrassingen achteraf</span></div>
+            <div><strong className="block text-sm text-[#29496f]">Vaste prijzen</strong><span className="text-xs text-[#8293a8]">Geen verrassingen</span></div>
           </div>
           <div className="flex items-center gap-3 rounded-2xl border border-white bg-white/90 p-4 shadow-[0_9px_28px_rgba(68,99,135,.07)]">
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#eefaf3] text-xl">✓</span>
-            <div><strong className="block text-sm text-[#29496f]">Betrouwbare professionals</strong><span className="text-xs text-[#8293a8]">Gecontroleerd via ShineGo</span></div>
+            <div><strong className="block text-sm text-[#29496f]">Betrouwbare professionals</strong><span className="text-xs text-[#8293a8]">Geverifieerd door ShineGo</span></div>
           </div>
           <div className="flex items-center gap-3 rounded-2xl border border-white bg-white/90 p-4 shadow-[0_9px_28px_rgba(68,99,135,.07)]">
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-[#f2f5ff] text-xl">☆</span>
@@ -139,8 +108,7 @@ export default function Home() {
       <section id="diensten" className="bg-white px-4 py-14 sm:px-6 sm:py-20">
         <div className="mx-auto max-w-6xl">
           <div className="max-w-2xl">
-            <div className="text-sm font-extrabold uppercase tracking-[0.14em] text-[#4d7ef0]">Onze diensten</div>
-            <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-[#18375f] sm:text-4xl">Kies je glasbewassing</h2>
+            <h2 className="text-3xl font-extrabold tracking-tight text-[#18375f] sm:text-4xl">Kies je glasbewassing</h2>
             <p className="mt-3 text-base text-[#778ba4]">Wat kunnen we voor je doen?</p>
           </div>
 
@@ -156,7 +124,6 @@ export default function Home() {
                   <div>
                     <h3 className="text-lg font-extrabold text-[#1c3d69]">{dienst.titel}</h3>
                     <p className="mt-1 text-sm leading-5 text-[#7a8da5]">{dienst.tekst}</p>
-                    <span className="mt-3 inline-block text-sm font-extrabold text-[#5578dc]">Kies deze →</span>
                   </div>
                   <span className="ml-auto text-xl text-[#708bc2] transition group-hover:translate-x-1">›</span>
                 </div>
