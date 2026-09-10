@@ -5,28 +5,24 @@ export default function Home() {
       titel: "Woning",
       tekst: "Voor rijtjeshuizen, hoekwoningen en vrijstaande woningen.",
       href: "/boeken/glazenwassen?type=buiten",
-      foto: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=700&q=86",
     },
     {
       icon: "🏢",
       titel: "Appartement / flat",
       tekst: "Glasbewassing voor appartementen en flats.",
       href: "/boeken/glazenwassen?type=buiten",
-      foto: "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=700&q=86",
     },
     {
       icon: "🏬",
       titel: "Winkel / bedrijfspand",
       tekst: "Heldere ramen voor winkels en zakelijke panden.",
       href: "/boeken/glazenwassen?type=bedrijf",
-      foto: "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=700&q=86",
     },
     {
       icon: "🪟",
       titel: "Gevel / hoog glas",
       tekst: "Voor hoger en moeilijk bereikbaar glas met telescoopsteel.",
       href: "/boeken/glazenwassen?type=telewash",
-      foto: "https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?auto=format&fit=crop&w=700&q=86",
     },
   ];
 
@@ -106,20 +102,18 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="order-1 relative min-h-[310px] overflow-hidden bg-[#eaf3fb] sm:min-h-[430px] lg:order-2 lg:min-h-[590px]">
-              <img
-                src="https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?auto=format&fit=crop&w=1200&q=90"
-                alt="Moderne woning met grote schone ramen"
-                className="absolute inset-0 h-full w-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#17375f]/20 via-transparent to-white/10" />
-              <div className="absolute bottom-5 left-5 right-5 rounded-[22px] border border-white/80 bg-white/94 p-4 shadow-xl backdrop-blur sm:bottom-7 sm:left-auto sm:right-7 sm:w-72 sm:p-5">
-                <div className="flex items-center gap-3">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#eef4ff] text-lg">✓</span>
-                  <div>
-                    <div className="text-xs font-extrabold uppercase tracking-[0.14em] text-[#4d7ef0]">ShineGo</div>
-                    <div className="mt-1 text-[15px] font-extrabold leading-5 text-[#29496f]">Helder resultaat, zonder gedoe.</div>
-                  </div>
+            <div className="order-1 relative min-h-[300px] overflow-hidden bg-gradient-to-br from-[#f3f8ff] via-[#e8f3ff] to-[#dcecff] sm:min-h-[400px] lg:order-2 lg:min-h-[540px]">
+              <div className="absolute inset-7 rounded-[28px] border border-white/80 bg-white/55 p-5 shadow-[0_18px_45px_rgba(69,101,145,.12)] backdrop-blur-sm sm:inset-10">
+                <div className="grid h-full grid-cols-2 gap-4">
+                  <div className="rounded-[22px] border border-white bg-gradient-to-b from-[#d9efff] to-[#f8fcff] shadow-inner" />
+                  <div className="rounded-[22px] border border-white bg-gradient-to-b from-[#e3f4ff] to-[#ffffff] shadow-inner" />
+                  <div className="rounded-[22px] border border-white bg-gradient-to-b from-[#eef7ff] to-[#dceeff] shadow-inner" />
+                  <div className="rounded-[22px] border border-white bg-gradient-to-b from-[#d9ecff] to-[#f8fcff] shadow-inner" />
+                </div>
+                <div className="absolute inset-x-5 top-1/2 h-px bg-white/90" />
+                <div className="absolute bottom-6 right-6 rounded-2xl border border-white/80 bg-white/95 px-4 py-3 shadow-lg">
+                  <div className="text-xs font-extrabold uppercase tracking-[0.14em] text-[#4d7ef0]">ShineGo</div>
+                  <div className="mt-1 text-sm font-extrabold text-[#29496f]">Helder resultaat, zonder gedoe.</div>
                 </div>
               </div>
             </div>
@@ -155,20 +149,16 @@ export default function Home() {
               <a
                 key={dienst.titel}
                 href={dienst.href}
-                className="group relative min-h-[150px] overflow-hidden rounded-[24px] border border-[#dbe5f2] bg-white shadow-[0_10px_30px_rgba(51,80,112,.06)] transition hover:-translate-y-0.5 hover:border-[#a9bff3] hover:shadow-md"
+                className="group min-h-[150px] rounded-[24px] border border-[#dbe5f2] bg-white p-5 shadow-[0_10px_30px_rgba(51,80,112,.06)] transition hover:-translate-y-0.5 hover:border-[#a9bff3] hover:shadow-md sm:p-6"
               >
-                <div className="absolute bottom-0 right-0 top-0 w-[38%] overflow-hidden">
-                  <img src={dienst.foto} alt="" className="h-full w-full object-cover opacity-90 transition duration-300 group-hover:scale-105" />
-                  <div className="absolute inset-0 bg-gradient-to-r from-white via-white/45 to-transparent" />
-                </div>
-
-                <div className="relative z-10 flex h-full max-w-[72%] items-center gap-4 p-5 sm:p-6">
+                <div className="flex h-full items-center gap-4">
                   <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-2xl bg-[#f2f6fb] text-3xl">{dienst.icon}</span>
                   <div>
                     <h3 className="text-lg font-extrabold text-[#1c3d69]">{dienst.titel}</h3>
                     <p className="mt-1 text-sm leading-5 text-[#7a8da5]">{dienst.tekst}</p>
                     <span className="mt-3 inline-block text-sm font-extrabold text-[#5578dc]">Kies deze →</span>
                   </div>
+                  <span className="ml-auto text-xl text-[#708bc2] transition group-hover:translate-x-1">›</span>
                 </div>
               </a>
             ))}
@@ -208,9 +198,14 @@ export default function Home() {
               <p className="mt-4 max-w-xl text-base leading-7 text-[#6f839b]">Ontvang opdrachten in jouw regio en kies zelf welke opdrachten je aanneemt.</p>
               <a href="/professional" className="mt-7 inline-block rounded-xl bg-[#5578dc] px-6 py-4 font-extrabold text-white shadow-[0_8px_20px_rgba(73,103,190,.24)] transition hover:bg-[#466bd4]">Gratis aanmelden als glazenwasser →</a>
             </div>
-            <div className="relative hidden min-h-[330px] md:block">
-              <img src="https://images.unsplash.com/photo-1527515637462-cff94eecc1ac?auto=format&fit=crop&w=900&q=88" alt="Professional aan het werk" className="absolute inset-0 h-full w-full object-cover" />
-              <div className="absolute inset-0 bg-gradient-to-r from-[#eef6ff] via-transparent to-transparent" />
+            <div className="hidden min-h-[330px] p-8 md:block">
+              <div className="relative h-full overflow-hidden rounded-[26px] border border-white bg-gradient-to-br from-[#edf7ff] to-[#dcecff] shadow-inner">
+                <div className="absolute left-8 right-8 top-8 h-20 rounded-2xl border border-white/90 bg-white/65" />
+                <div className="absolute bottom-8 left-8 right-8 top-32 grid grid-cols-2 gap-4">
+                  <div className="rounded-2xl border border-white bg-white/55" />
+                  <div className="rounded-2xl border border-white bg-white/70" />
+                </div>
+              </div>
             </div>
           </div>
         </div>
