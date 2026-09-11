@@ -19,6 +19,7 @@ export default function ProfessionalPage() {
   const [toevoeging, setToevoeging] = useState("");
   const [kvkNummer, setKvkNummer] = useState("");
   const [btwNummer, setBtwNummer] = useState("");
+  const [iban, setIban] = useState("");
   const [werkgebiedKm, setWerkgebiedKm] = useState("25");
   const [voorwaarden, setVoorwaarden] = useState(false);
 
@@ -43,7 +44,8 @@ export default function ProfessionalPage() {
       !woonplaats.trim() ||
       !straat.trim() ||
       !huisnummer.trim() ||
-      !kvkNummer.trim()
+      !kvkNummer.trim() ||
+      !iban.trim()
     ) {
       setMelding("Vul alle verplichte gegevens in.");
       return;
@@ -64,6 +66,12 @@ export default function ProfessionalPage() {
     const schoonBtw = btwNummer.replace(/[\s.\-]/g, "").toUpperCase();
     if (schoonBtw && !/^NL\d{9}B\d{2}$/.test(schoonBtw)) {
       setMelding("Vul een geldig Nederlands BTW-id in, bijvoorbeeld NL123456789B01.");
+      return;
+    }
+
+    const schoonIban = iban.replace(/\s/g, "").toUpperCase();
+    if (!/^NL\d{2}[A-Z]{4}\d{10}$/.test(schoonIban)) {
+      setMelding("Vul een geldig Nederlands IBAN in, bijvoorbeeld NL00BANK0123456789.");
       return;
     }
 
@@ -107,6 +115,7 @@ export default function ProfessionalPage() {
           toevoeging: toevoeging.trim() || null,
           kvk_nummer: schoonKvk,
           btw_nummer: schoonBtw,
+          iban: schoonIban,
           diensten: ["glazenwasser"],
           werkgebied_km: Number(werkgebiedKm),
         },
@@ -136,6 +145,7 @@ export default function ProfessionalPage() {
     setWoonplaats("");
     setKvkNummer("");
     setBtwNummer("");
+    setIban("");
     setWerkgebiedKm("25");
     setVoorwaarden(false);
   }
@@ -234,6 +244,24 @@ export default function ProfessionalPage() {
                     className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
                   />
                 </div>
+              </div>
+            </div>
+
+            <div className="border-t pt-7">
+              <h3 className="mb-4 text-lg font-bold text-gray-900">Uitbetalingen</h3>
+              <div>
+                <label className="mb-2 block font-medium text-gray-800">Bankrekening (IBAN) *</label>
+                <input
+                  type="text"
+                  value={iban}
+                  onChange={(e) => setIban(e.target.value.toUpperCase())}
+                  placeholder="NL00 BANK 0123 4567 89"
+                  autoComplete="off"
+                  className="w-full rounded-xl border border-gray-300 px-4 py-3 uppercase outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                />
+                <p className="mt-2 text-sm text-gray-500">
+                  Deze rekening wordt gebruikt voor je uitbetalingen via ShineGo.
+                </p>
               </div>
             </div>
 
