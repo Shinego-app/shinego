@@ -6,17 +6,17 @@ const vragen = [
   {
     vraag: "Wat is een telescoopsteel?",
     antwoord:
-      "Een telescoopsteel is een professioneel wassysteem met een uitschuifbare steel. Hiermee kunnen ramen op hoogte veilig vanaf de grond worden gereinigd, zonder dat daarvoor op grote hoogte met een ladder gewerkt hoeft te worden.",
+      "Een telescoopsteel is een uitschuifbaar hulpmiddel dat een professional kan gebruiken om ramen op hoogte vanaf de grond te reinigen. De professional bepaalt zelf welke werkmethode en hulpmiddelen voor de opdracht geschikt zijn.",
   },
   {
     vraag: "Wanneer heb ik een telescoopsteel nodig?",
     antwoord:
-      "Kies een telescoopsteel wanneer ramen niet normaal en veilig bereikbaar zijn, bijvoorbeeld bij hogere verdiepingen of ramen boven een aanbouw. Bij ramen op de 3e verdieping is een telescoopsteel verplicht.",
+      "Tijdens het boeken kun je aangeven dat ramen hoog of lastig bereikbaar zijn. Bij ramen op de 3e verdieping houdt de boekingsflow rekening met een telescoopsteel. De professional bepaalt ter plaatse zelfstandig welke werkmethode en hulpmiddelen geschikt zijn.",
   },
   {
-    vraag: "Tot welke hoogte kan een glazenwasser werken?",
+    vraag: "Tot welke hoogte kan ik via ShineGo boeken?",
     antwoord:
-      "Via de standaard boekingsflow kun je ramen tot en met de 3e verdieping boeken. Bij de 3e verdieping gebruiken we een telescoopsteel. De professional beoordeelt altijd of de werkzaamheden veilig uitgevoerd kunnen worden.",
+      "Via de standaard boekingsflow kun je ramen tot en met de 3e verdieping boeken. De professional beoordeelt de situatie ter plaatse en bepaalt zelfstandig of en op welke wijze de opdracht kan worden uitgevoerd.",
   },
   {
     vraag: "Worden de kozijnen ook schoongemaakt?",
@@ -26,7 +26,7 @@ const vragen = [
   {
     vraag: "Moet ik thuis zijn?",
     antwoord:
-      "Niet altijd. Als de professional de ramen veilig kan bereiken zonder dat toegang tot de woning nodig is, hoef je niet thuis te zijn. Tijdens het boeken kun je aangeven of aanwezigheid noodzakelijk is.",
+      "Niet altijd. Als voor de opdracht geen toegang tot de woning nodig is, hoef je niet thuis te zijn. Tijdens het boeken kun je aangeven of aanwezigheid noodzakelijk is.",
   },
   {
     vraag: "Kan ik ook een winkel of bedrijfspand laten reinigen?",
@@ -36,7 +36,7 @@ const vragen = [
   {
     vraag: "Wanneer betaal ik?",
     antwoord:
-      "Je betaalt vooraf veilig via ShineGo. De betaling wordt verwerkt via onze betaalpartner. De professional ontvangt zijn vergoeding pas nadat de opdracht volgens de afgesproken procedure is afgerond.",
+      "Je betaalt vooraf via ShineGo. De betaling wordt verwerkt via onze betaalpartner. De professional ontvangt zijn vergoeding pas nadat de opdracht volgens de afgesproken procedure is afgerond.",
   },
   {
     vraag: "Kan ik mijn boeking annuleren?",
@@ -44,9 +44,9 @@ const vragen = [
       "Ja. Een boeking kan worden geannuleerd. Afhankelijk van het moment van annuleren kunnen annuleringskosten gelden. Bij annulering door de professional kan de opdracht opnieuw beschikbaar worden gesteld.",
   },
   {
-    vraag: "Wat gebeurt er als de glazenwasser niet veilig kan werken?",
+    vraag: "Wie bepaalt hoe de werkzaamheden worden uitgevoerd?",
     antwoord:
-      "De professional hoeft werkzaamheden die niet veilig uitgevoerd kunnen worden niet uit te voeren. Veiligheid gaat altijd voor. ShineGo kan vervolgens beoordelen wat voor de betreffende boeking de passende vervolgstap is.",
+      "De professional voert de opdracht als zelfstandig ondernemer uit en bepaalt zelf de werkmethode en de benodigde hulpmiddelen. De professional is verantwoordelijk voor naleving van de voor zijn werkzaamheden geldende wet- en regelgeving. ShineGo faciliteert de boeking en de administratieve afhandeling en schrijft geen concrete werkmethode voor.",
   },
 ];
 
@@ -66,8 +66,8 @@ export default function VeelgesteldeVragenPage() {
           </h1>
 
           <p className="mx-auto mt-4 max-w-2xl text-slate-600">
-            Alles wat je wilt weten over boeken, telescoopsteel, veiligheid,
-            betalingen en het laten reinigen van je ramen via ShineGo.
+            Alles wat je wilt weten over boeken, telescoopsteel, betalingen en
+            het laten reinigen van je ramen via ShineGo.
           </p>
         </div>
 
