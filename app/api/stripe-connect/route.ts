@@ -95,10 +95,7 @@ export async function POST(request: Request) {
               "Content-Type": "application/json",
               "Stripe-Version": STRIPE_API_VERSION,
             },
-            body: JSON.stringify({
-              ...accountPrefill,
-              dashboard: "none",
-            }),
+            body: JSON.stringify(accountPrefill),
           }
         );
 
