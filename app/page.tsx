@@ -1,9 +1,9 @@
 export default function Home() {
   const diensten = [
-    { icon: "🏠", titel: "Woning", tekst: "Van rijtjeshuis tot villa", href: "/boeken/glazenwassen?type=woning" },
-    { icon: "🏢", titel: "Appartement / flat", tekst: "Snel en vakkundig", href: "/boeken/glazenwassen?type=appartement" },
-    { icon: "🏬", titel: "Winkel / bedrijfspand", tekst: "Een verzorgde uitstraling", href: "/boeken/glazenwassen?type=bedrijf" },
-    { icon: "🏙️", titel: "Gevel / hoog glas", tekst: "Met telescoopsteel", href: "/boeken/glazenwassen?type=telewash" },
+    { icon: "🏠", titel: "Woning", tekst: "Van rijtjeshuis tot villa", href: "/boeken/glazenwassen/details?type=woning" },
+    { icon: "🏢", titel: "Appartement / flat", tekst: "Snel en vakkundig", href: "/boeken/glazenwassen/details?type=appartement" },
+    { icon: "🏬", titel: "Winkel / bedrijfspand", tekst: "Een verzorgde uitstraling", href: "/boeken/glazenwassen/details?type=bedrijf" },
+    { icon: "🏙️", titel: "Gevel / hoog glas", tekst: "Met telescoopsteel", href: "/boeken/glazenwassen/details?type=telewash" },
   ];
 
   return (
@@ -80,7 +80,7 @@ export default function Home() {
       <footer className="border-t border-[#d5e9f8] bg-white/90 px-5 py-8">
         <div className="mx-auto flex max-w-[1180px] flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
           <div><div className="text-xl font-extrabold tracking-tight text-[#0d3f79]">Shine<span className="text-[#1683f8]">Go</span><span className="ml-1 text-[#1683f8]">✦</span></div><p className="mt-1 text-sm text-[#7790a8]">Scherp in glaswerk</p></div>
-          <nav className="flex flex-wrap gap-x-5 gap-y-3 text-sm font-semibold text-[#52779b]"><a href="/privacy">Privacy</a><a href="/algemene-voorwaarden">Algemene voorwaarden</a><a href="/cookies">Cookies</a><a href="/contact">Contact</a></nav>
+          <nav className="flex flex-wrap gap-x-5 gap-y-3 text-sm font-semibold text-[#52779b]"><a href="/privacy">Privacy</a><a href="/voorwaarden">Algemene voorwaarden</a><a href="/cookies">Cookies</a><a href="/contact">Contact</a></nav>
           <p className="text-xs text-[#8aa0b5]">© 2026 ShineGo</p>
         </div>
       </footer>
