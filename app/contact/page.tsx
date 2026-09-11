@@ -61,7 +61,7 @@ export default function ContactPage() {
           `Situatie: Winkel / bedrijfspand`,
           `Glasoppervlak: ${offerteGegevens?.glasOppervlak ?? "500+"} m²`,
           `Verdiepingen: ${offerteGegevens?.verdiepingen?.join(", ") || "Niet opgegeven"}`,
-          `Steel telescopic: ${offerteGegevens?.telescoop ? "Ja" : "Nee"}`,
+          `Telescoopsteel: ${offerteGegevens?.telescoop ? "Ja" : "Nee"}`,
           `Frequentie: ${frequentieLabel(offerteGegevens?.frequentie)}`,
         ].join("\n")
       : "";
@@ -109,7 +109,7 @@ export default function ContactPage() {
     <main className="min-h-screen bg-slate-50 text-slate-900">
       <div className="mx-auto max-w-4xl px-6 py-12 sm:py-16">
         <a
-          href={offerte500Plus ? "/boeken/glazenwassen" : "/"}
+          href={offerte500Plus ? "/#diensten" : "/"}
           className="mb-8 inline-block font-semibold text-blue-600 hover:text-blue-700"
         >
           {offerte500Plus ? "← Terug naar glazenwassen" : "← Terug naar ShineGo"}
@@ -147,7 +147,7 @@ export default function ContactPage() {
                   <strong>{offerteGegevens?.verdiepingen?.join(", ") || "Niet opgegeven"}</strong>
                 </div>
                 <div className="flex justify-between gap-4">
-                  <span className="text-blue-700">Steel telescopic</span>
+                  <span className="text-blue-700">Telescoopsteel</span>
                   <strong>{offerteGegevens?.telescoop ? "Ja" : "Nee"}</strong>
                 </div>
                 <div className="flex justify-between gap-4 sm:col-span-2">
