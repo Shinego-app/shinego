@@ -45,7 +45,6 @@ export async function POST(request: Request) {
         account_onboarding: {
           enabled: true,
           features: {
-            disable_stripe_user_authentication: true,
             external_account_collection: true,
           },
         },
