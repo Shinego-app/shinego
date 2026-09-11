@@ -4,19 +4,19 @@ import { useState } from "react";
 
 const vragen = [
   {
-    vraag: "Wat is Telewash?",
+    vraag: "Wat is een telescoopsteel?",
     antwoord:
-      "Telewash is een professioneel wassysteem met een uitschuifbare telescoopsteel. Hiermee kunnen ramen op hoogte veilig vanaf de grond worden gereinigd, zonder dat daarvoor op grote hoogte met een ladder gewerkt hoeft te worden.",
+      "Een telescoopsteel is een professioneel wassysteem met een uitschuifbare steel. Hiermee kunnen ramen op hoogte veilig vanaf de grond worden gereinigd, zonder dat daarvoor op grote hoogte met een ladder gewerkt hoeft te worden.",
   },
   {
-    vraag: "Wanneer heb ik Telewash nodig?",
+    vraag: "Wanneer heb ik een telescoopsteel nodig?",
     antwoord:
-      "Kies Telewash wanneer ramen niet normaal en veilig bereikbaar zijn, bijvoorbeeld bij hogere verdiepingen of ramen boven een aanbouw. Tijdens het boeken kun je aangeven dat Telewash nodig is.",
+      "Kies een telescoopsteel wanneer ramen niet normaal en veilig bereikbaar zijn, bijvoorbeeld bij hogere verdiepingen of ramen boven een aanbouw. Bij ramen op de 3e verdieping is een telescoopsteel verplicht.",
   },
   {
     vraag: "Tot welke hoogte kan een glazenwasser werken?",
     antwoord:
-      "Veiligheid staat voorop. Ramen die niet veilig bereikbaar zijn met normale werkmethodes worden met Telewash gereinigd wanneer dit technisch mogelijk is. De professional beoordeelt ter plaatse altijd of de werkzaamheden veilig uitgevoerd kunnen worden.",
+      "Via de standaard boekingsflow kun je ramen tot en met de 3e verdieping boeken. Bij de 3e verdieping gebruiken we een telescoopsteel. De professional beoordeelt altijd of de werkzaamheden veilig uitgevoerd kunnen worden.",
   },
   {
     vraag: "Worden de kozijnen ook schoongemaakt?",
@@ -66,7 +66,7 @@ export default function VeelgesteldeVragenPage() {
           </h1>
 
           <p className="mx-auto mt-4 max-w-2xl text-slate-600">
-            Alles wat je wilt weten over boeken, Telewash, veiligheid,
+            Alles wat je wilt weten over boeken, telescoopsteel, veiligheid,
             betalingen en het laten reinigen van je ramen via ShineGo.
           </p>
         </div>
@@ -111,7 +111,7 @@ export default function VeelgesteldeVragenPage() {
           </p>
 
           <a
-            href="/boeken/glazenwassen"
+            href="/#diensten"
             className="mt-5 inline-flex rounded-xl bg-white px-6 py-3 font-semibold text-slate-900 transition hover:bg-slate-100"
           >
             Bekijk je prijs
