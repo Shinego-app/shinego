@@ -16,33 +16,54 @@ export default function WachtwoordResettenPage() {
     let actief = true;
 
     async function controleerHerstelSessie() {
-      const url = new URL(window.location.href);
-      const code = url.searchParams.get("code");
+      try {
+        const url = new URL(window.location.href);
+        const code = url.searchParams.get("code");
+        const hash = new URLSearchParams(url.hash.replace(/^#/, ""));
+        const accessToken = hash.get("access_token");
+        const refreshToken = hash.get("refresh_token");
 
-      if (code) {
-        const { error } = await supabase.auth.exchangeCodeForSession(code);
-        if (error) {
-          console.error("Recovery code error:", error);
+        if (code) {
+          const { error } = await supabase.auth.exchangeCodeForSession(code);
+          if (error) throw error;
+        } else if (accessToken && refreshToken) {
+          const { error } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
+          if (error) throw error;
         }
-      }
 
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+        const {
+          data: { session },
+          error: sessionError,
+        } = await supabase.auth.getSession();
 
-      if (!actief) return;
+        if (sessionError) throw sessionError;
+        if (!actief) return;
 
-      if (session) {
-        setSessieKlaar(true);
-        setMelding("");
-      } else {
+        if (session) {
+          setSessieKlaar(true);
+          setMelding("");
+          window.history.replaceState(
+            {},
+            "",
+            "/professional/wachtwoord-resetten"
+          );
+        } else {
+          setMelding(
+            "Deze herstellink is ongeldig of verlopen. Vraag een nieuwe herstelmail aan."
+          );
+        }
+      } catch (error) {
+        console.error("Password recovery session error:", error);
+        if (!actief) return;
+        setSessieKlaar(false);
         setMelding(
           "Deze herstellink is ongeldig of verlopen. Vraag een nieuwe herstelmail aan."
         );
       }
     }
-
-    controleerHerstelSessie();
 
     const {
       data: { subscription },
@@ -53,6 +74,8 @@ export default function WachtwoordResettenPage() {
         setMelding("");
       }
     });
+
+    controleerHerstelSessie();
 
     return () => {
       actief = false;
