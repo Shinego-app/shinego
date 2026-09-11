@@ -79,6 +79,10 @@ export async function POST(request: Request) {
           doing_business_as: professional.bedrijfsnaam,
           product_description: "Glazenwasservice via ShineGo",
         },
+        responsibilities: {
+          fees_collector: "application",
+          losses_collector: "application",
+        },
       },
     };
 
