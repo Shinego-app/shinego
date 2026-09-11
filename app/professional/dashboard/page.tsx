@@ -148,12 +148,12 @@ export default function ProfessionalDashboardPage() {
     });
 
     const stripeData = await stripeResponse.json();
-    if (!stripeResponse.ok || !stripeData.account_id) {
+    if (!stripeResponse.ok || !stripeData.account_id || !stripeData.url) {
       alert(stripeData.error || "Stripe Connect fout");
       return;
     }
 
-    router.push("/professional/dashboard/uitbetalingen");
+    window.location.href = stripeData.url;
   }
 
   if (laden) return <main style={{ padding: "24px" }}>Dashboard laden...</main>;
