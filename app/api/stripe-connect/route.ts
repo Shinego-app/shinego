@@ -103,7 +103,7 @@ export async function POST(request: Request) {
         },
         body: JSON.stringify({
           ...accountPrefill,
-          dashboard: "none",
+          dashboard: "express",
           identity: {
             country: "nl",
             entity_type: "company",
