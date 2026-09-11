@@ -23,9 +23,7 @@ export async function POST(request: Request) {
 
     const { data: professional, error: professionalError } = await supabaseAdmin
       .from("professionals")
-      .select(
-        "id, email, stripe_account_id, uitbetalingen_actief, bedrijfsnaam, voornaam, achternaam, telefoon, postcode, woonplaats, straat, huisnummer, toevoeging, kvk_nummer, btw_nummer"
-      )
+      .select("id, email, stripe_account_id, uitbetalingen_actief, bedrijfsnaam, voornaam, achternaam, telefoon, postcode, woonplaats, straat, huisnummer, toevoeging, kvk_nummer, btw_nummer")
       .eq("user_id", user.id)
       .single();
 
@@ -38,19 +36,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "E-mailadres ontbreekt." }, { status: 400 });
     }
 
-    const adresRegel = [
-      professional.straat,
-      professional.huisnummer,
-      professional.toevoeging,
-    ]
+    const adresRegel = [professional.straat, professional.huisnummer, professional.toevoeging]
       .filter(Boolean)
       .join(" ")
       .trim();
 
     const kvkNummer = professional.kvk_nummer?.replace(/\D/g, "");
-    const btwNummer = professional.btw_nummer
-      ?.replace(/[\s.\-]/g, "")
-      .toUpperCase();
+    const btwNummer = professional.btw_nummer?.replace(/[\s.\-]/g, "").toUpperCase();
 
     const idNumbers = [
       ...(kvkNummer ? [{ type: "nl_kvk", value: kvkNummer }] : []),
@@ -86,25 +78,19 @@ export async function POST(request: Request) {
 
     if (accountId) {
       if (!professional.uitbetalingen_actief) {
-        const updateResponse = await fetch(
-          `https://api.stripe.com/v2/core/accounts/${accountId}`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
-              "Content-Type": "application/json",
-              "Stripe-Version": STRIPE_API_VERSION,
-            },
-            body: JSON.stringify(accountPrefill),
-          }
-        );
+        const updateResponse = await fetch(`https://api.stripe.com/v2/core/accounts/${accountId}`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
+            "Content-Type": "application/json",
+            "Stripe-Version": STRIPE_API_VERSION,
+          },
+          body: JSON.stringify(accountPrefill),
+        });
 
         const updatedAccount = await updateResponse.json();
         if (!updateResponse.ok) {
-          throw new Error(
-            updatedAccount?.error?.message ||
-              "Bestaande Stripe-account kon niet worden bijgewerkt."
-          );
+          throw new Error(updatedAccount?.error?.message || "Bestaande Stripe-account kon niet worden bijgewerkt.");
         }
       }
     } else {
@@ -117,7 +103,7 @@ export async function POST(request: Request) {
         },
         body: JSON.stringify({
           ...accountPrefill,
-          dashboard: "express",
+          dashboard: "none",
           identity: {
             country: "nl",
             entity_type: "company",
@@ -125,6 +111,7 @@ export async function POST(request: Request) {
           },
           defaults: {
             ...accountPrefill.defaults,
+            locales: ["nl-NL"],
             responsibilities: {
               fees_collector: "application",
               losses_collector: "application",
@@ -146,11 +133,8 @@ export async function POST(request: Request) {
       });
 
       const account = await accountResponse.json();
-
       if (!accountResponse.ok) {
-        throw new Error(
-          account?.error?.message || "Stripe account kon niet worden gemaakt."
-        );
+        throw new Error(account?.error?.message || "Stripe account kon niet worden gemaakt.");
       }
 
       accountId = account.id;
@@ -163,42 +147,10 @@ export async function POST(request: Request) {
       if (updateError) throw updateError;
     }
 
-    const origin = new URL(request.url).origin;
-    const accountLinkResponse = await fetch("https://api.stripe.com/v2/core/account_links", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
-        "Content-Type": "application/json",
-        "Stripe-Version": STRIPE_API_VERSION,
-      },
-      body: JSON.stringify({
-        account: accountId,
-        use_case: {
-          type: "account_onboarding",
-          account_onboarding: {
-            configurations: ["merchant", "recipient"],
-            refresh_url: `${origin}/professional/dashboard`,
-            return_url: `${origin}/professional/dashboard?stripe=return`,
-          },
-        },
-      }),
-    });
-
-    const accountLink = await accountLinkResponse.json();
-
-    if (!accountLinkResponse.ok || !accountLink?.url) {
-      throw new Error(
-        accountLink?.error?.message || "Stripe onboarding-link kon niet worden gemaakt."
-      );
-    }
-
-    return NextResponse.json({ account_id: accountId, url: accountLink.url });
+    return NextResponse.json({ account_id: accountId });
   } catch (error) {
     console.error("Stripe Connect fout:", error);
-    const message =
-      error instanceof Error
-        ? error.message
-        : "Stripe Connect kon niet worden gestart.";
+    const message = error instanceof Error ? error.message : "Stripe Connect kon niet worden gestart.";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
