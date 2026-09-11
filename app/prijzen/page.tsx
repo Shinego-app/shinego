@@ -19,7 +19,7 @@ export default function PrijzenPage() {
               {onderdelen.map(([nummer,titel,tekst]) => <div key={titel} className="flex gap-3"><span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#eaf6ff] text-sm font-extrabold text-[#1683f8]">{nummer}</span><div><h2 className="text-sm font-extrabold text-[#123c70]">{titel}</h2><p className="mt-1 text-xs leading-5 text-[#5f7e9c]">{tekst}</p></div></div>)}
             </div>
             <div className="mt-6 rounded-2xl bg-[#eef8ff] px-4 py-3 text-xs leading-5 text-[#4f708f]">Periodieke korting: <strong>12%</strong> bij elke 4 weken, <strong>10%</strong> bij elke 8 weken en <strong>7%</strong> bij elke 12 weken.</div>
-            <a href="/boeken/glazenwassen" className="mt-5 inline-flex rounded-xl border border-[#cfe3f4] bg-white px-6 py-3 text-sm font-bold text-[#3971a4]">Bekijk alle prijzen →</a>
+            <a href="/#diensten" className="mt-5 inline-flex rounded-xl border border-[#cfe3f4] bg-white px-6 py-3 text-sm font-bold text-[#3971a4]">Bekijk alle prijzen →</a>
           </div>
         </section>
       </div>
