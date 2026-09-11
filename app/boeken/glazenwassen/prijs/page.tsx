@@ -27,6 +27,7 @@ export default function PrijsPage() {
     let verdiepingToeslag = 0;
     if (gegevens.verdiepingen.includes("2")) verdiepingToeslag += 15;
     if (gegevens.verdiepingen.includes("3")) verdiepingToeslag += 22.5;
+    if (gegevens.verdiepingen.includes("4")) verdiepingToeslag += 30;
     const bereikToeslag = details.bereikbaar === "nee" ? 15 : 0;
     const kozijnenToeslag = details.kozijnen ? 9.95 + Math.max(0, gegevens.ramen - 10) : 0;
     const subtotaal = totaalVoorKorting + verdiepingToeslag + bereikToeslag + kozijnenToeslag;
