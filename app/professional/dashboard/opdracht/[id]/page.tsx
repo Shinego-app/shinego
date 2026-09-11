@@ -52,16 +52,26 @@ export default function OpdrachtPage() {
   }
 
   async function afrondOpdracht() {
-    const response = await fetch("/api/opdracht-afronden", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ booking_id:opdrachtId }) });
-    const resultaat = await response.json();
-    if (!response.ok) { console.error("Afronden mislukt:", resultaat); return; }
-    setOpdracht({ ...opdracht, status:"afgerond" });
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) { alert("Je sessie is verlopen. Log opnieuw in."); return; }
+      const response = await fetch("/api/opdracht-afronden", { method:"POST", headers:{"Content-Type":"application/json",Authorization:`Bearer ${session.access_token}`}, body:JSON.stringify({ booking_id:opdrachtId }) });
+      const resultaat = await response.json();
+      if (!response.ok) { alert(resultaat.error || "Afronden mislukt."); return; }
+      setOpdracht({ ...opdracht, status:"afgerond" });
+      alert("Opdracht afgerond. De klantfactuur is verzonden.");
+    } catch (error) {
+      console.error("Afronden mislukt:", error);
+      alert("Afronden mislukt.");
+    }
   }
 
   async function voerUitbetalingUit() {
     if (uitbetalenBezig) return; setUitbetalenBezig(true);
     try {
-      const response = await fetch("/api/stripe-payout", { method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify({ booking_id:opdrachtId }) });
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) { alert("Je sessie is verlopen. Log opnieuw in."); return; }
+      const response = await fetch("/api/stripe-payout", { method:"POST", headers:{"Content-Type":"application/json",Authorization:`Bearer ${session.access_token}`}, body:JSON.stringify({ booking_id:opdrachtId }) });
       const resultaat = await response.json();
       if (!response.ok) { alert(resultaat.error || "Uitbetaling mislukt."); return; }
       alert("Uitbetaling geslaagd."); setOpdracht({ ...opdracht, uitbetaald:true });
