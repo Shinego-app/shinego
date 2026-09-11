@@ -117,7 +117,7 @@ export async function POST(request: Request) {
         },
         body: JSON.stringify({
           ...accountPrefill,
-          dashboard: "none",
+          dashboard: "express",
           identity: {
             country: "nl",
             entity_type: "company",
@@ -125,7 +125,6 @@ export async function POST(request: Request) {
           },
           defaults: {
             ...accountPrefill.defaults,
-            locales: ["nl-NL"],
             responsibilities: {
               fees_collector: "application",
               losses_collector: "application",
@@ -164,7 +163,36 @@ export async function POST(request: Request) {
       if (updateError) throw updateError;
     }
 
-    return NextResponse.json({ account_id: accountId });
+    const origin = new URL(request.url).origin;
+    const accountLinkResponse = await fetch("https://api.stripe.com/v2/core/account_links", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
+        "Content-Type": "application/json",
+        "Stripe-Version": STRIPE_API_VERSION,
+      },
+      body: JSON.stringify({
+        account: accountId,
+        use_case: {
+          type: "account_onboarding",
+          account_onboarding: {
+            configurations: ["merchant", "recipient"],
+            refresh_url: `${origin}/professional/dashboard`,
+            return_url: `${origin}/professional/dashboard?stripe=return`,
+          },
+        },
+      }),
+    });
+
+    const accountLink = await accountLinkResponse.json();
+
+    if (!accountLinkResponse.ok || !accountLink?.url) {
+      throw new Error(
+        accountLink?.error?.message || "Stripe onboarding-link kon niet worden gemaakt."
+      );
+    }
+
+    return NextResponse.json({ account_id: accountId, url: accountLink.url });
   } catch (error) {
     console.error("Stripe Connect fout:", error);
     const message =
