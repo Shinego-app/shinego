@@ -24,7 +24,7 @@ export default function Home() {
           <div className="grid lg:grid-cols-[1.2fr_1.2fr]">
             <div className="relative z-20 order-2 px-6 pb-10 pt-9 sm:px-10 sm:py-12 lg:order-1 lg:flex lg:min-h-[650px] lg:flex-col lg:justify-center lg:px-14">
               <div className="inline-flex w-fit rounded-full bg-[#e7f4ff] px-4 py-2 text-xs font-bold text-[#1678d4] sm:text-sm">Professionele glazenwassers, wanneer jij het nodig hebt</div>
-              <h1 className="mt-5 max-w-2xl text-[44px] font-extrabold leading-[.96] tracking-[-.045em] text-[#112f58] sm:text-[68px]">Schone ramen,<br />een helderder<br /><span className="text-[#1683f8]">Nederland</span></h1>
+              <h1 className="mt-5 max-w-2xl text-[44px] font-extrabold leading-[.96] tracking-[-.045em] text-[#112f58] sm:text-[68px]">Een glazenwasser,<br /><span className="text-[#1683f8]">zo geregeld.</span></h1>
               <p className="mt-6 max-w-xl text-[16px] leading-7 text-[#607b98] sm:text-[20px] sm:leading-8">Boek eenvoudig en snel een professionele glazenwasser bij jou in de buurt. Vaste prijzen en betrouwbare vakmensen.</p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <a href="#diensten" className="rounded-xl bg-[#1683f8] px-8 py-4 text-center text-base font-extrabold text-white shadow-[0_10px_25px_rgba(22,131,248,.25)] transition hover:bg-[#0874df]">Direct boeken →</a>
