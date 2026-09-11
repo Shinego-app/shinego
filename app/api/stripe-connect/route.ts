@@ -126,6 +126,10 @@ export async function POST(request: Request) {
           defaults: {
             ...accountPrefill.defaults,
             locales: ["nl-NL"],
+            responsibilities: {
+              fees_collector: "application",
+              losses_collector: "application",
+            },
           },
           configuration: {
             recipient: {
