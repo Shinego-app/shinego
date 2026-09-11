@@ -10,6 +10,24 @@ const resend = new Resend(process.env.RESEND_API_KEY!);
 
 export async function POST(request: Request) {
   try {
+    const authorization = request.headers.get("authorization");
+    const token = authorization?.startsWith("Bearer ")
+      ? authorization.slice(7)
+      : null;
+
+    if (!token) {
+      return NextResponse.json({ error: "Niet ingelogd." }, { status: 401 });
+    }
+
+    const {
+      data: { user },
+      error: userError,
+    } = await supabaseAdmin.auth.getUser(token);
+
+    if (userError || !user) {
+      return NextResponse.json({ error: "Ongeldige sessie." }, { status: 401 });
+    }
+
     const body = await request.json();
     const { booking_id } = body;
 
@@ -20,15 +38,31 @@ export async function POST(request: Request) {
       );
     }
 
+    const { data: professional, error: professionalError } = await supabaseAdmin
+      .from("professionals")
+      .select(
+        "id, stripe_account_id, uitbetalingen_actief, user_id, bedrijfsnaam, kvk_nummer, btw_nummer"
+      )
+      .eq("user_id", user.id)
+      .single();
+
+    if (professionalError || !professional) {
+      return NextResponse.json(
+        { error: "Professional niet gevonden." },
+        { status: 404 }
+      );
+    }
+
     const { data: booking, error: bookingError } = await supabaseAdmin
       .from("boekingen")
       .select("*")
       .eq("id", booking_id)
+      .eq("professional_id", professional.id)
       .single();
 
     if (bookingError || !booking) {
       return NextResponse.json(
-        { error: "Boeking niet gevonden." },
+        { error: "Boeking niet gevonden of niet aan jou toegewezen." },
         { status: 404 }
       );
     }
@@ -40,33 +74,10 @@ export async function POST(request: Request) {
       );
     }
 
-    if (!booking.professional_id) {
-      return NextResponse.json(
-        { error: "Geen professional gekoppeld." },
-        { status: 400 }
-      );
-    }
-
     if (booking.uitbetaald === true) {
       return NextResponse.json(
         { error: "Boeking is al uitbetaald." },
         { status: 400 }
-      );
-    }
-
-    const { data: professional, error: professionalError } =
-      await supabaseAdmin
-        .from("professionals")
-        .select(
-          "stripe_account_id, uitbetalingen_actief, user_id, bedrijfsnaam, kvk_nummer, btw_nummer"
-        )
-        .eq("id", booking.professional_id)
-        .single();
-
-    if (professionalError || !professional) {
-      return NextResponse.json(
-        { error: "Professional niet gevonden." },
-        { status: 404 }
       );
     }
 
@@ -109,7 +120,7 @@ export async function POST(request: Request) {
     const { error: statusUpdateError } = await supabaseAdmin
       .from("professionals")
       .update({ uitbetalingen_actief: payoutsActive })
-      .eq("id", booking.professional_id);
+      .eq("id", professional.id);
 
     if (statusUpdateError) {
       throw statusUpdateError;
@@ -182,7 +193,9 @@ export async function POST(request: Request) {
         stripe_transfer_id: transfer.id,
         factuurnummer,
       })
-      .eq("id", booking.id);
+      .eq("id", booking.id)
+      .eq("professional_id", professional.id)
+      .eq("uitbetaald", false);
 
     if (updateError) {
       throw updateError;
@@ -191,58 +204,51 @@ export async function POST(request: Request) {
     let afrekeningVerzonden = false;
 
     try {
-      if (professional.user_id) {
-        const { data: authUserData, error: authUserError } =
-          await supabaseAdmin.auth.admin.getUserById(professional.user_id);
+      const professionalEmail = user.email;
 
-        const professionalEmail = authUserData.user?.email;
+      if (professionalEmail) {
+        const klantbedrag = Number(booking.totaalprijs ?? 0);
+        const professionalBedrag = Number(booking.professional_bedrag ?? 0);
+        const platformCommissie = Number(
+          booking.platform_commissie ??
+            Math.max(0, klantbedrag - professionalBedrag)
+        );
 
-        if (!authUserError && professionalEmail) {
-          const klantbedrag = Number(booking.totaalprijs ?? 0);
-          const professionalBedrag = Number(booking.professional_bedrag ?? 0);
-          const platformCommissie = Number(
-            booking.platform_commissie ??
-              Math.max(0, klantbedrag - professionalBedrag)
-          );
+        const pdfBytes = await maakProfessionalAfrekeningPdf({
+          factuurnummer,
+          datum: new Date().toLocaleDateString("nl-NL"),
+          professionalBedrijfsnaam: professional.bedrijfsnaam,
+          professionalKvK: professional.kvk_nummer,
+          professionalBtwNummer: professional.btw_nummer,
+          bookingId: booking.id,
+          klantbedrag,
+          platformCommissie,
+          professionalBedrag,
+          stripeTransferId: transfer.id,
+        });
 
-          const pdfBytes = await maakProfessionalAfrekeningPdf({
-            factuurnummer,
-            datum: new Date().toLocaleDateString("nl-NL"),
-            professionalBedrijfsnaam: professional.bedrijfsnaam,
-            professionalKvK: professional.kvk_nummer,
-            professionalBtwNummer: professional.btw_nummer,
-            bookingId: booking.id,
-            klantbedrag,
-            platformCommissie,
-            professionalBedrag,
-            stripeTransferId: transfer.id,
-          });
+        const { error: emailError } = await resend.emails.send({
+          from: "ShineGo <noreply@shinego.nl>",
+          to: professionalEmail,
+          subject: `Uitbetalingsafrekening ${factuurnummer} - ShineGo`,
+          html: `
+            <p>Beste ${professional.bedrijfsnaam},</p>
+            <p>De uitbetaling voor opdracht ${booking.id} is uitgevoerd.</p>
+            <p>In de bijlage vind je de uitbetalingsafrekening.</p>
+            <p>Met vriendelijke groet,<br />ShineGo</p>
+          `,
+          attachments: [
+            {
+              filename: `afrekening-${factuurnummer}.pdf`,
+              content: Buffer.from(pdfBytes),
+            },
+          ],
+        });
 
-          const { error: emailError } = await resend.emails.send({
-            from: "ShineGo <noreply@shinego.nl>",
-            to: professionalEmail,
-            subject: `Uitbetalingsafrekening ${factuurnummer} - ShineGo`,
-            html: `
-              <p>Beste ${professional.bedrijfsnaam},</p>
-              <p>De uitbetaling voor opdracht ${booking.id} is uitgevoerd.</p>
-              <p>In de bijlage vind je de uitbetalingsafrekening.</p>
-              <p>Met vriendelijke groet,<br />ShineGo</p>
-            `,
-            attachments: [
-              {
-                filename: `afrekening-${factuurnummer}.pdf`,
-                content: Buffer.from(pdfBytes),
-              },
-            ],
-          });
-
-          if (!emailError) {
-            afrekeningVerzonden = true;
-          } else {
-            console.error("Afrekening e-mail fout:", emailError);
-          }
-        } else if (authUserError) {
-          console.error("Professional e-mail ophalen fout:", authUserError);
+        if (!emailError) {
+          afrekeningVerzonden = true;
+        } else {
+          console.error("Afrekening e-mail fout:", emailError);
         }
       }
     } catch (emailError) {
