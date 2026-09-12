@@ -15,7 +15,19 @@ function normaliseerTelefoon(telefoon?: string | null) {
   return `+31${opgeschoond}`;
 }
 
-async function zorgVoorVertegenwoordiger(accountId: string, professional: any, email: string) {
+function parseGeboortedatum(value?: string | null) {
+  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
+  const [year, month, day] = value.split("-").map(Number);
+  if (!year || !month || !day) return null;
+  return { year, month, day };
+}
+
+async function zorgVoorVertegenwoordiger(
+  accountId: string,
+  professional: any,
+  email: string,
+  userMetadata: Record<string, any>
+) {
   const listResponse = await fetch(
     `https://api.stripe.com/v1/accounts/${encodeURIComponent(accountId)}/persons?limit=100`,
     {
@@ -47,6 +59,54 @@ async function zorgVoorVertegenwoordiger(accountId: string, professional: any, e
   if (telefoon) params.set("phone", telefoon);
 
   params.set("relationship[representative]", "true");
+
+  if (userMetadata?.stripe_eigenaar_bevestigd === true) {
+    params.set("relationship[owner]", "true");
+    params.set("relationship[executive]", "true");
+    params.set("relationship[title]", "Eigenaar / vennoot");
+  }
+
+  const geboortedatum = parseGeboortedatum(userMetadata?.stripe_geboortedatum);
+  if (geboortedatum) {
+    params.set("dob[day]", String(geboortedatum.day));
+    params.set("dob[month]", String(geboortedatum.month));
+    params.set("dob[year]", String(geboortedatum.year));
+  }
+
+  const priveAdresZelfde = userMetadata?.stripe_priveadres_zelfde === true;
+  if (priveAdresZelfde) {
+    const adresRegel = [
+      professional.straat,
+      professional.huisnummer,
+      professional.toevoeging,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .trim();
+
+    if (adresRegel) params.set("address[line1]", adresRegel);
+    if (professional.woonplaats) params.set("address[city]", professional.woonplaats.trim());
+    if (professional.postcode) params.set("address[postal_code]", professional.postcode.trim().toUpperCase());
+    params.set("address[country]", "NL");
+  } else {
+    const priveStraat = userMetadata?.stripe_prive_straat;
+    const priveHuisnummer = userMetadata?.stripe_prive_huisnummer;
+    const priveToevoeging = userMetadata?.stripe_prive_toevoeging;
+    const privePostcode = userMetadata?.stripe_prive_postcode;
+    const priveWoonplaats = userMetadata?.stripe_prive_woonplaats;
+
+    const priveAdresRegel = [priveStraat, priveHuisnummer, priveToevoeging]
+      .filter(Boolean)
+      .join(" ")
+      .trim();
+
+    if (priveAdresRegel) params.set("address[line1]", priveAdresRegel);
+    if (priveWoonplaats) params.set("address[city]", String(priveWoonplaats).trim());
+    if (privePostcode) params.set("address[postal_code]", String(privePostcode).trim().toUpperCase());
+    if (priveAdresRegel || priveWoonplaats || privePostcode) {
+      params.set("address[country]", "NL");
+    }
+  }
 
   const personUrl = bestaandeVertegenwoordiger?.id
     ? `https://api.stripe.com/v1/accounts/${encodeURIComponent(accountId)}/persons/${encodeURIComponent(bestaandeVertegenwoordiger.id)}`
@@ -233,7 +293,12 @@ export async function POST(request: Request) {
       throw new Error("Stripe-account ontbreekt.");
     }
 
-    await zorgVoorVertegenwoordiger(accountId, professional, email);
+    await zorgVoorVertegenwoordiger(
+      accountId,
+      professional,
+      email,
+      (user.user_metadata || {}) as Record<string, any>
+    );
 
     return NextResponse.json({ account_id: accountId });
   } catch (error) {
