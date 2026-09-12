@@ -40,7 +40,7 @@ export async function POST(request: Request) {
   if (
     eventType ===
       "v2.core.account[configuration.recipient].capability_status_updated" ||
-    eventType === "v2.core.account[configuration.merchant].updated"
+    eventType === "v2.core.account[configuration.recipient].updated"
   ) {
     const account = await event.fetchRelatedObject();
     const accountId = account.id;
