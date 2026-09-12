@@ -23,7 +23,9 @@ export async function POST(request: Request) {
 
     const { data: professional, error: professionalError } = await supabaseAdmin
       .from("professionals")
-      .select("id, email, stripe_account_id, bedrijfsnaam, telefoon")
+      .select(
+        "id, email, stripe_account_id, uitbetalingen_actief, bedrijfsnaam, voornaam, achternaam, telefoon, postcode, woonplaats, straat, huisnummer, toevoeging, kvk_nummer, btw_nummer"
+      )
       .eq("user_id", user.id)
       .single();
 
@@ -36,9 +38,78 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "E-mailadres ontbreekt." }, { status: 400 });
     }
 
+    const adresRegel = [professional.straat, professional.huisnummer, professional.toevoeging]
+      .filter(Boolean)
+      .join(" ")
+      .trim();
+
+    const kvkNummer = professional.kvk_nummer?.replace(/\D/g, "");
+    const btwNummer = professional.btw_nummer?.replace(/[\s.\-]/g, "").toUpperCase();
+
+    const idNumbers = [
+      ...(kvkNummer ? [{ type: "nl_kvk", value: kvkNummer }] : []),
+      ...(btwNummer ? [{ type: "nl_vat", value: btwNummer }] : []),
+    ];
+
+    const accountPrefill = {
+      contact_email: email,
+      display_name: professional.bedrijfsnaam,
+      contact_phone: professional.telefoon,
+      identity: {
+        business_details: {
+          registered_name: professional.bedrijfsnaam,
+          phone: professional.telefoon,
+          ...(idNumbers.length > 0 ? { id_numbers: idNumbers } : {}),
+          ...(adresRegel || professional.postcode || professional.woonplaats
+            ? {
+                address: {
+                  country: "nl",
+                  ...(adresRegel ? { line1: adresRegel } : {}),
+                  ...(professional.postcode
+                    ? { postal_code: professional.postcode.trim().toUpperCase() }
+                    : {}),
+                  ...(professional.woonplaats
+                    ? { city: professional.woonplaats.trim() }
+                    : {}),
+                },
+              }
+            : {}),
+        },
+      },
+      defaults: {
+        profile: {
+          doing_business_as: professional.bedrijfsnaam,
+          product_description: "Glazenwasservice via ShineGo",
+        },
+      },
+    };
+
     let accountId: string | null = professional.stripe_account_id;
 
-    if (!accountId) {
+    if (accountId) {
+      if (!professional.uitbetalingen_actief) {
+        const updateResponse = await fetch(
+          `https://api.stripe.com/v2/core/accounts/${encodeURIComponent(accountId)}`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
+              "Content-Type": "application/json",
+              "Stripe-Version": STRIPE_API_VERSION,
+            },
+            body: JSON.stringify(accountPrefill),
+          }
+        );
+
+        const updatedAccount = await updateResponse.json();
+        if (!updateResponse.ok) {
+          throw new Error(
+            updatedAccount?.error?.message ||
+              "Bestaande Stripe-account kon niet worden bijgewerkt."
+          );
+        }
+      }
+    } else {
       const accountResponse = await fetch("https://api.stripe.com/v2/core/accounts", {
         method: "POST",
         headers: {
@@ -47,12 +118,16 @@ export async function POST(request: Request) {
           "Stripe-Version": STRIPE_API_VERSION,
         },
         body: JSON.stringify({
-          contact_email: email,
-          display_name: professional.bedrijfsnaam,
-          contact_phone: professional.telefoon,
+          ...accountPrefill,
           dashboard: "express",
-          identity: { country: "nl" },
+          identity: {
+            country: "nl",
+            entity_type: "company",
+            ...accountPrefill.identity,
+          },
           defaults: {
+            ...accountPrefill.defaults,
+            locales: ["nl-NL"],
             responsibilities: {
               fees_collector: "application",
               losses_collector: "application",
@@ -87,64 +162,7 @@ export async function POST(request: Request) {
       throw new Error("Stripe account ontbreekt.");
     }
 
-    const finalAccountId = accountId;
-
-    const accountStatusResponse = await fetch(
-      `https://api.stripe.com/v2/core/accounts/${encodeURIComponent(
-        finalAccountId
-      )}?include[0]=configuration.recipient&include[1]=configuration.merchant`,
-      {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
-          "Stripe-Version": STRIPE_API_VERSION,
-        },
-        cache: "no-store",
-      }
-    );
-
-    const stripeAccount = await accountStatusResponse.json();
-    if (!accountStatusResponse.ok) {
-      throw new Error(
-        stripeAccount?.error?.message || "Stripe accountconfiguratie kon niet worden opgehaald."
-      );
-    }
-
-    const configurations: string[] = [];
-    if (stripeAccount.configuration?.merchant) configurations.push("merchant");
-    if (stripeAccount.configuration?.recipient) configurations.push("recipient");
-
-    if (configurations.length === 0) {
-      configurations.push("recipient");
-    }
-
-    const origin = new URL(request.url).origin;
-    const accountLinkResponse = await fetch("https://api.stripe.com/v2/core/account_links", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
-        "Content-Type": "application/json",
-        "Stripe-Version": STRIPE_API_VERSION,
-      },
-      body: JSON.stringify({
-        account: finalAccountId,
-        use_case: {
-          type: "account_onboarding",
-          account_onboarding: {
-            configurations,
-            refresh_url: `${origin}/professional/dashboard`,
-            return_url: `${origin}/professional/dashboard?stripe=return`,
-          },
-        },
-      }),
-    });
-
-    const accountLink = await accountLinkResponse.json();
-    if (!accountLinkResponse.ok || !accountLink?.url) {
-      throw new Error(accountLink?.error?.message || "Stripe onboarding-link kon niet worden gemaakt.");
-    }
-
-    return NextResponse.json({ account_id: finalAccountId, url: accountLink.url });
+    return NextResponse.json({ account_id: accountId });
   } catch (error) {
     console.error("Stripe Connect fout:", error);
     const message = error instanceof Error ? error.message : "Stripe Connect kon niet worden gestart.";
