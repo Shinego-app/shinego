@@ -22,6 +22,23 @@ function parseGeboortedatum(value?: string | null) {
   return { year, month, day };
 }
 
+async function heeftMerchantConfiguratie(accountId: string) {
+  const response = await fetch(
+    `https://api.stripe.com/v2/core/accounts/${encodeURIComponent(accountId)}?include[0]=configuration.merchant`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
+        "Stripe-Version": STRIPE_API_VERSION,
+      },
+      cache: "no-store",
+    }
+  );
+
+  const account = await response.json();
+  return response.ok && Boolean(account?.configuration?.merchant);
+}
+
 async function zorgVoorVertegenwoordiger(
   accountId: string,
   professional: any,
@@ -73,40 +90,32 @@ async function zorgVoorVertegenwoordiger(
     params.set("dob[year]", String(geboortedatum.year));
   }
 
-  const priveAdresZelfde = userMetadata?.stripe_priveadres_zelfde === true;
-  if (priveAdresZelfde) {
-    const adresRegel = [
-      professional.straat,
-      professional.huisnummer,
-      professional.toevoeging,
-    ]
-      .filter(Boolean)
-      .join(" ")
-      .trim();
+  const priveAdresZelfde = userMetadata?.stripe_priveadres_zelfde !== false;
+  const straat = priveAdresZelfde
+    ? professional.straat
+    : userMetadata?.stripe_prive_straat;
+  const huisnummer = priveAdresZelfde
+    ? professional.huisnummer
+    : userMetadata?.stripe_prive_huisnummer;
+  const toevoeging = priveAdresZelfde
+    ? professional.toevoeging
+    : userMetadata?.stripe_prive_toevoeging;
+  const postcode = priveAdresZelfde
+    ? professional.postcode
+    : userMetadata?.stripe_prive_postcode;
+  const woonplaats = priveAdresZelfde
+    ? professional.woonplaats
+    : userMetadata?.stripe_prive_woonplaats;
 
-    if (adresRegel) params.set("address[line1]", adresRegel);
-    if (professional.woonplaats) params.set("address[city]", professional.woonplaats.trim());
-    if (professional.postcode) params.set("address[postal_code]", professional.postcode.trim().toUpperCase());
-    params.set("address[country]", "NL");
-  } else {
-    const priveStraat = userMetadata?.stripe_prive_straat;
-    const priveHuisnummer = userMetadata?.stripe_prive_huisnummer;
-    const priveToevoeging = userMetadata?.stripe_prive_toevoeging;
-    const privePostcode = userMetadata?.stripe_prive_postcode;
-    const priveWoonplaats = userMetadata?.stripe_prive_woonplaats;
+  const adresRegel = [straat, huisnummer, toevoeging]
+    .filter(Boolean)
+    .join(" ")
+    .trim();
 
-    const priveAdresRegel = [priveStraat, priveHuisnummer, priveToevoeging]
-      .filter(Boolean)
-      .join(" ")
-      .trim();
-
-    if (priveAdresRegel) params.set("address[line1]", priveAdresRegel);
-    if (priveWoonplaats) params.set("address[city]", String(priveWoonplaats).trim());
-    if (privePostcode) params.set("address[postal_code]", String(privePostcode).trim().toUpperCase());
-    if (priveAdresRegel || priveWoonplaats || privePostcode) {
-      params.set("address[country]", "NL");
-    }
-  }
+  if (adresRegel) params.set("address[line1]", adresRegel);
+  if (woonplaats) params.set("address[city]", String(woonplaats).trim());
+  if (postcode) params.set("address[postal_code]", String(postcode).trim().toUpperCase());
+  params.set("address[country]", "NL");
 
   const personUrl = bestaandeVertegenwoordiger?.id
     ? `https://api.stripe.com/v1/accounts/${encodeURIComponent(accountId)}/persons/${encodeURIComponent(bestaandeVertegenwoordiger.id)}`
@@ -147,6 +156,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Sessie ongeldig. Log opnieuw in." }, { status: 401 });
     }
 
+    const userMetadata = (user.user_metadata || {}) as Record<string, any>;
+
     const { data: professional, error: professionalError } = await supabaseAdmin
       .from("professionals")
       .select(
@@ -185,7 +196,7 @@ export async function POST(request: Request) {
       ...(btwNummer ? [{ type: "nl_vat", value: btwNummer }] : []),
     ];
 
-    const accountPrefill = {
+    const accountPrefill: Record<string, any> = {
       contact_email: email,
       display_name: professional.bedrijfsnaam,
       ...(telefoon ? { contact_phone: telefoon } : {}),
@@ -206,6 +217,7 @@ export async function POST(request: Request) {
         profile: {
           doing_business_as: professional.bedrijfsnaam,
           product_description: "Glazenwasservice via ShineGo",
+          business_url: "https://www.shinego.nl",
         },
       },
     };
@@ -214,6 +226,14 @@ export async function POST(request: Request) {
 
     if (accountId) {
       if (!professional.uitbetalingen_actief) {
+        if (await heeftMerchantConfiguratie(accountId)) {
+          accountPrefill.configuration = {
+            merchant: {
+              mcc: "7349",
+            },
+          };
+        }
+
         const updateResponse = await fetch(
           `https://api.stripe.com/v2/core/accounts/${accountId}`,
           {
@@ -297,7 +317,7 @@ export async function POST(request: Request) {
       accountId,
       professional,
       email,
-      (user.user_metadata || {}) as Record<string, any>
+      userMetadata
     );
 
     return NextResponse.json({ account_id: accountId });
