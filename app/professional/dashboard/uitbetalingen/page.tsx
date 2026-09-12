@@ -99,9 +99,6 @@ export default function UitbetalingenPage() {
         onboarding.setCollectionOptions?.({
           fields: "currently_due",
           futureRequirements: "omit",
-          requirements: {
-            only: ["external_account"],
-          },
         });
 
         onboarding.setOnExit?.(() => {
@@ -139,9 +136,9 @@ export default function UitbetalingenPage() {
         </button>
 
         <section className="rounded-2xl bg-white p-5 shadow-sm sm:p-7">
-          <h1 className="text-2xl font-bold text-gray-900">Bankrekening verifiëren</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Stripe-verificatie afronden</h1>
           <p className="mt-2 text-gray-600">
-            ShineGo heeft je bedrijfsgegevens al aangeleverd. Stripe wordt hier alleen gebruikt om je uitbetalingsrekening veilig te koppelen en, wanneer Stripe dat vereist, je toegang te bevestigen.
+            Je bankrekening is gekoppeld. Stripe vraagt alleen nog de gegevens die op dit moment verplicht zijn om uitbetalingen vrij te geven. Gegevens die ShineGo al heeft aangeleverd hoef je niet opnieuw in te vullen als Stripe ze al heeft geaccepteerd.
           </p>
 
           {fout ? (
@@ -150,7 +147,7 @@ export default function UitbetalingenPage() {
             </div>
           ) : (
             <div className="mt-6">
-              {!scriptKlaar && <p className="text-gray-600">Bankverificatie laden...</p>}
+              {!scriptKlaar && <p className="text-gray-600">Stripe-verificatie laden...</p>}
               <div ref={containerRef} />
             </div>
           )}
