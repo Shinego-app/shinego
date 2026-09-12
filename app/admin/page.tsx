@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 type Boeking = {
   id: string | number;
@@ -456,12 +457,19 @@ export default function AdminPage() {
                                     type="button"
                                     onClick={async () => {
                                       try {
+                                        const { data: sessionData } = await supabase.auth.getSession();
+                                        const token = sessionData.session?.access_token;
+                                        if (!token) {
+                                          throw new Error("Niet ingelogd als professional.");
+                                        }
+
                                         const response = await fetch(
                                           "/api/stripe-payout",
                                           {
                                             method: "POST",
                                             headers: {
                                               "Content-Type": "application/json",
+                                              Authorization: `Bearer ${token}`,
                                             },
                                             body: JSON.stringify({
                                               booking_id: boeking.id,
