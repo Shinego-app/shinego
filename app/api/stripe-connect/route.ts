@@ -3,6 +3,18 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 const STRIPE_API_VERSION = "2026-08-26.preview";
 
+function normaliseerTelefoon(telefoon?: string | null) {
+  if (!telefoon) return undefined;
+
+  const opgeschoond = telefoon.replace(/[^\d+]/g, "");
+
+  if (opgeschoond.startsWith("+")) return opgeschoond;
+  if (opgeschoond.startsWith("0031")) return `+31${opgeschoond.slice(4)}`;
+  if (opgeschoond.startsWith("0")) return `+31${opgeschoond.slice(1)}`;
+
+  return `+31${opgeschoond}`;
+}
+
 async function zorgVoorVertegenwoordiger(accountId: string, professional: any, email: string) {
   const listResponse = await fetch(
     `https://api.stripe.com/v1/accounts/${encodeURIComponent(accountId)}/persons?limit=100`,
@@ -30,7 +42,10 @@ async function zorgVoorVertegenwoordiger(accountId: string, professional: any, e
   params.set("first_name", professional.voornaam || "");
   params.set("last_name", professional.achternaam || "");
   params.set("email", email);
-  if (professional.telefoon) params.set("phone", professional.telefoon);
+
+  const telefoon = normaliseerTelefoon(professional.telefoon);
+  if (telefoon) params.set("phone", telefoon);
+
   params.set("relationship[representative]", "true");
 
   const personUrl = bestaandeVertegenwoordiger?.id
@@ -89,6 +104,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "E-mailadres ontbreekt." }, { status: 400 });
     }
 
+    const telefoon = normaliseerTelefoon(professional.telefoon);
+
     const adresRegel = [
       professional.straat,
       professional.huisnummer,
@@ -111,11 +128,11 @@ export async function POST(request: Request) {
     const accountPrefill = {
       contact_email: email,
       display_name: professional.bedrijfsnaam,
-      contact_phone: professional.telefoon,
+      ...(telefoon ? { contact_phone: telefoon } : {}),
       identity: {
         business_details: {
           registered_name: professional.bedrijfsnaam,
-          phone: professional.telefoon,
+          ...(telefoon ? { phone: telefoon } : {}),
           ...(idNumbers.length > 0 ? { id_numbers: idNumbers } : {}),
           address: {
             country: "nl",
