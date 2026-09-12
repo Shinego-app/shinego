@@ -12,8 +12,6 @@ export default function ProfessionalDashboardPage() {
   const [profielBewerken, setProfielBewerken] = useState(false);
   const [profielBezig, setProfielBezig] = useState(false);
   const [profielMelding, setProfielMelding] = useState("");
-  const [stripeStatus, setStripeStatus] = useState("");
-  const [stripeRequirements, setStripeRequirements] = useState<string[]>([]);
   const [profielForm, setProfielForm] = useState({
     bedrijfsnaam: "",
     voornaam: "",
@@ -74,25 +72,7 @@ export default function ProfessionalDashboardPage() {
 
         if (statusResponse.ok) {
           const status = await statusResponse.json();
-          setStripeStatus(status.status || "onbekend");
           data = { ...data, uitbetalingen_actief: status.uitbetalingen_actief };
-        }
-
-        if (!data?.uitbetalingen_actief) {
-          const requirementsResponse = await fetch("/api/stripe-connect/requirements", {
-            method: "GET",
-            headers: { Authorization: `Bearer ${token}` },
-          });
-
-          if (requirementsResponse.ok) {
-            const requirementsData = await requirementsResponse.json();
-            const omschrijvingen = Array.isArray(requirementsData.requirements)
-              ? requirementsData.requirements
-                  .map((item: any) => item?.description)
-                  .filter((item: any) => typeof item === "string")
-              : [];
-            setStripeRequirements(omschrijvingen);
-          }
         }
       }
 
@@ -253,18 +233,13 @@ export default function ProfessionalDashboardPage() {
 
         <section className="mt-8 rounded-2xl bg-white p-5 shadow-sm sm:p-6">
           <h2 className="text-xl font-bold text-gray-900">Verdiensten</h2>
-          <p className="mt-2 text-gray-600">{professional?.uitbetalingen_actief ? "Uitbetalingen via Stripe zijn actief." : "Je ShineGo-gegevens worden automatisch gebruikt voor de Stripe-verificatie."}</p>
-          {!professional?.uitbetalingen_actief && stripeStatus && (
-            <p className="mt-2 text-sm font-medium text-gray-700">Stripe-status: {stripeStatus}</p>
-          )}
-          {!professional?.uitbetalingen_actief && stripeRequirements.length > 0 && (
-            <div className="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
-              <p className="font-semibold">Stripe heeft nog nodig:</p>
-              <ul className="mt-2 list-disc space-y-1 pl-5">
-                {stripeRequirements.map((item) => <li key={item}>{item}</li>)}
-              </ul>
-            </div>
-          )}
+          <p className="mt-2 text-gray-600">
+            {professional?.uitbetalingen_actief
+              ? "Uitbetalingen via Stripe zijn actief."
+              : professional?.stripe_account_id
+                ? "Je bankrekening is gekoppeld. Stripe controleert de uitbetalingsstatus."
+                : "Stel je uitbetalingen in om je vergoeding te kunnen ontvangen."}
+          </p>
           <button className="mt-4 w-full rounded-xl bg-blue-600 px-4 py-3 font-semibold text-white hover:bg-blue-700 disabled:opacity-50 sm:w-auto" onClick={startStripeConnect}>{professional?.uitbetalingen_actief ? "Stripe-gegevens beheren" : "Uitbetalingen instellen"}</button>
         </section>
       </div>
