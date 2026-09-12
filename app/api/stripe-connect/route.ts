@@ -3,6 +3,57 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 const STRIPE_API_VERSION = "2026-08-26.preview";
 
+async function zorgVoorVertegenwoordiger(accountId: string, professional: any, email: string) {
+  const listResponse = await fetch(
+    `https://api.stripe.com/v1/accounts/${encodeURIComponent(accountId)}/persons?limit=100`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
+      },
+      cache: "no-store",
+    }
+  );
+
+  const listData = await listResponse.json();
+  if (!listResponse.ok) {
+    throw new Error(
+      listData?.error?.message || "Stripe-vertegenwoordiger kon niet worden opgehaald."
+    );
+  }
+
+  const bestaandeVertegenwoordiger = Array.isArray(listData?.data)
+    ? listData.data.find((person: any) => person?.relationship?.representative === true)
+    : null;
+
+  const params = new URLSearchParams();
+  params.set("first_name", professional.voornaam || "");
+  params.set("last_name", professional.achternaam || "");
+  params.set("email", email);
+  if (professional.telefoon) params.set("phone", professional.telefoon);
+  params.set("relationship[representative]", "true");
+
+  const personUrl = bestaandeVertegenwoordiger?.id
+    ? `https://api.stripe.com/v1/accounts/${encodeURIComponent(accountId)}/persons/${encodeURIComponent(bestaandeVertegenwoordiger.id)}`
+    : `https://api.stripe.com/v1/accounts/${encodeURIComponent(accountId)}/persons`;
+
+  const personResponse = await fetch(personUrl, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+    body: params.toString(),
+  });
+
+  const personData = await personResponse.json();
+  if (!personResponse.ok) {
+    throw new Error(
+      personData?.error?.message || "Stripe-vertegenwoordiger kon niet worden bijgewerkt."
+    );
+  }
+}
+
 export async function POST(request: Request) {
   try {
     const authHeader = request.headers.get("authorization");
@@ -160,6 +211,12 @@ export async function POST(request: Request) {
 
       if (updateError) throw updateError;
     }
+
+    if (!accountId) {
+      throw new Error("Stripe-account ontbreekt.");
+    }
+
+    await zorgVoorVertegenwoordiger(accountId, professional, email);
 
     return NextResponse.json({ account_id: accountId });
   } catch (error) {
