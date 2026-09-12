@@ -134,6 +134,11 @@ export async function POST(request: Request) {
             },
           },
           configuration: {
+            merchant: {
+              capabilities: {
+                card_payments: { requested: true },
+              },
+            },
             recipient: {
               capabilities: {
                 stripe_balance: { stripe_transfers: { requested: true } },
