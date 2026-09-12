@@ -36,7 +36,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "E-mailadres ontbreekt." }, { status: 400 });
     }
 
-    let accountId = professional.stripe_account_id as string | null;
+    let accountId: string | null = professional.stripe_account_id;
 
     if (!accountId) {
       const accountResponse = await fetch("https://api.stripe.com/v2/core/accounts", {
@@ -69,11 +69,11 @@ export async function POST(request: Request) {
       });
 
       const account = await accountResponse.json();
-      if (!accountResponse.ok) {
+      if (!accountResponse.ok || !account?.id) {
         throw new Error(account?.error?.message || "Stripe account kon niet worden gemaakt.");
       }
 
-      accountId = account.id;
+      accountId = String(account.id);
 
       const { error: updateError } = await supabaseAdmin
         .from("professionals")
@@ -83,9 +83,15 @@ export async function POST(request: Request) {
       if (updateError) throw updateError;
     }
 
+    if (!accountId) {
+      throw new Error("Stripe account ontbreekt.");
+    }
+
+    const finalAccountId = accountId;
+
     const accountStatusResponse = await fetch(
       `https://api.stripe.com/v2/core/accounts/${encodeURIComponent(
-        accountId
+        finalAccountId
       )}?include[0]=configuration.recipient&include[1]=configuration.merchant`,
       {
         method: "GET",
@@ -121,7 +127,7 @@ export async function POST(request: Request) {
         "Stripe-Version": STRIPE_API_VERSION,
       },
       body: JSON.stringify({
-        account: accountId,
+        account: finalAccountId,
         use_case: {
           type: "account_onboarding",
           account_onboarding: {
@@ -138,7 +144,7 @@ export async function POST(request: Request) {
       throw new Error(accountLink?.error?.message || "Stripe onboarding-link kon niet worden gemaakt.");
     }
 
-    return NextResponse.json({ account_id: accountId, url: accountLink.url });
+    return NextResponse.json({ account_id: finalAccountId, url: accountLink.url });
   } catch (error) {
     console.error("Stripe Connect fout:", error);
     const message = error instanceof Error ? error.message : "Stripe Connect kon niet worden gestart.";
