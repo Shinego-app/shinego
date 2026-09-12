@@ -83,6 +83,35 @@ export async function POST(request: Request) {
       if (updateError) throw updateError;
     }
 
+    const accountStatusResponse = await fetch(
+      `https://api.stripe.com/v2/core/accounts/${encodeURIComponent(
+        accountId
+      )}?include[0]=configuration.recipient&include[1]=configuration.merchant`,
+      {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
+          "Stripe-Version": STRIPE_API_VERSION,
+        },
+        cache: "no-store",
+      }
+    );
+
+    const stripeAccount = await accountStatusResponse.json();
+    if (!accountStatusResponse.ok) {
+      throw new Error(
+        stripeAccount?.error?.message || "Stripe accountconfiguratie kon niet worden opgehaald."
+      );
+    }
+
+    const configurations: string[] = [];
+    if (stripeAccount.configuration?.merchant) configurations.push("merchant");
+    if (stripeAccount.configuration?.recipient) configurations.push("recipient");
+
+    if (configurations.length === 0) {
+      configurations.push("recipient");
+    }
+
     const origin = new URL(request.url).origin;
     const accountLinkResponse = await fetch("https://api.stripe.com/v2/core/account_links", {
       method: "POST",
@@ -96,7 +125,7 @@ export async function POST(request: Request) {
         use_case: {
           type: "account_onboarding",
           account_onboarding: {
-            configurations: ["recipient"],
+            configurations,
             refresh_url: `${origin}/professional/dashboard`,
             return_url: `${origin}/professional/dashboard?stripe=return`,
           },
