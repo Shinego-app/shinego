@@ -12,6 +12,14 @@ export default function ProfessionalPage() {
   const [email, setEmail] = useState("");
   const [wachtwoord, setWachtwoord] = useState("");
   const [telefoon, setTelefoon] = useState("");
+  const [geboortedatum, setGeboortedatum] = useState("");
+  const [eigenaarBevestigd, setEigenaarBevestigd] = useState(false);
+  const [priveAdresZelfde, setPriveAdresZelfde] = useState(true);
+  const [priveStraat, setPriveStraat] = useState("");
+  const [priveHuisnummer, setPriveHuisnummer] = useState("");
+  const [priveToevoeging, setPriveToevoeging] = useState("");
+  const [privePostcode, setPrivePostcode] = useState("");
+  const [priveWoonplaats, setPriveWoonplaats] = useState("");
   const [postcode, setPostcode] = useState("");
   const [woonplaats, setWoonplaats] = useState("");
   const [straat, setStraat] = useState("");
@@ -26,6 +34,22 @@ export default function ProfessionalPage() {
   const [melding, setMelding] = useState("");
   const [succes, setSucces] = useState(false);
 
+  function normaliseerGeboortedatum(value: string) {
+    const match = value.trim().match(/^(\d{2})-(\d{2})-(\d{4})$/);
+    if (!match) return null;
+    const [, dag, maand, jaar] = match;
+    const datum = new Date(`${jaar}-${maand}-${dag}T00:00:00`);
+    if (
+      Number.isNaN(datum.getTime()) ||
+      datum.getUTCFullYear() !== Number(jaar) ||
+      datum.getUTCMonth() + 1 !== Number(maand) ||
+      datum.getUTCDate() !== Number(dag)
+    ) {
+      return null;
+    }
+    return `${jaar}-${maand}-${dag}`;
+  }
+
   async function aanmelden(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
@@ -39,6 +63,7 @@ export default function ProfessionalPage() {
       !email.trim() ||
       !wachtwoord ||
       !telefoon.trim() ||
+      !geboortedatum.trim() ||
       !postcode.trim() ||
       !woonplaats.trim() ||
       !straat.trim() ||
@@ -79,6 +104,35 @@ export default function ProfessionalPage() {
       return;
     }
 
+    const stripeGeboortedatum = normaliseerGeboortedatum(geboortedatum);
+    if (!stripeGeboortedatum) {
+      setMelding("Vul je geboortedatum in als DD-MM-JJJJ.");
+      return;
+    }
+
+    if (!eigenaarBevestigd) {
+      setMelding("Bevestig dat je eigenaar/vennoot en bevoegd vertegenwoordiger bent.");
+      return;
+    }
+
+    let schoonPrivePostcode = "";
+    if (!priveAdresZelfde) {
+      if (
+        !priveStraat.trim() ||
+        !priveHuisnummer.trim() ||
+        !privePostcode.trim() ||
+        !priveWoonplaats.trim()
+      ) {
+        setMelding("Vul je volledige woonadres in.");
+        return;
+      }
+      schoonPrivePostcode = privePostcode.replace(/\s/g, "").toUpperCase();
+      if (!/^[1-9][0-9]{3}[A-Z]{2}$/.test(schoonPrivePostcode)) {
+        setMelding("Vul een geldige postcode voor je woonadres in.");
+        return;
+      }
+    }
+
     if (wachtwoord.length < 8) {
       setMelding("Het wachtwoord moet minimaal 8 tekens bevatten.");
       return;
@@ -109,6 +163,16 @@ export default function ProfessionalPage() {
           btw_nummer: schoonBtw,
           diensten: ["glazenwasser"],
           werkgebied_km: Number(werkgebiedKm),
+          stripe_geboortedatum: stripeGeboortedatum,
+          stripe_eigenaar_bevestigd: true,
+          stripe_priveadres_zelfde: priveAdresZelfde,
+          stripe_prive_straat: priveAdresZelfde ? null : priveStraat.trim(),
+          stripe_prive_huisnummer: priveAdresZelfde ? null : priveHuisnummer.trim(),
+          stripe_prive_toevoeging: priveAdresZelfde ? null : priveToevoeging.trim() || null,
+          stripe_prive_postcode: priveAdresZelfde
+            ? null
+            : `${schoonPrivePostcode.slice(0, 4)} ${schoonPrivePostcode.slice(4)}`,
+          stripe_prive_woonplaats: priveAdresZelfde ? null : priveWoonplaats.trim(),
         },
       },
     });
@@ -132,6 +196,14 @@ export default function ProfessionalPage() {
     setAchternaam("");
     setEmail("");
     setTelefoon("");
+    setGeboortedatum("");
+    setEigenaarBevestigd(false);
+    setPriveAdresZelfde(true);
+    setPriveStraat("");
+    setPriveHuisnummer("");
+    setPriveToevoeging("");
+    setPrivePostcode("");
+    setPriveWoonplaats("");
     setPostcode("");
     setWoonplaats("");
     setKvkNummer("");
@@ -193,7 +265,7 @@ export default function ProfessionalPage() {
         >
           <h2 className="text-2xl font-bold text-gray-900">Aanmelden als professional</h2>
 
-          <p className="mt-2 text-gray-600">Vul je bedrijfs- en contactgegevens in.</p>
+          <p className="mt-2 text-gray-600">Vul je bedrijfs- en contactgegevens één keer in.</p>
 
           <div className="mt-8 space-y-7">
             <div>
@@ -238,7 +310,7 @@ export default function ProfessionalPage() {
             </div>
 
             <div className="border-t pt-7">
-              <h3 className="mb-4 text-lg font-bold text-gray-900">Contactpersoon</h3>
+              <h3 className="mb-4 text-lg font-bold text-gray-900">Contactpersoon & verificatie</h3>
 
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>
@@ -297,11 +369,36 @@ export default function ProfessionalPage() {
                     className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
                   />
                 </div>
+
+                <div>
+                  <label className="mb-2 block font-medium text-gray-800">Geboortedatum *</label>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    value={geboortedatum}
+                    onChange={(e) => setGeboortedatum(e.target.value)}
+                    placeholder="DD-MM-JJJJ"
+                    maxLength={10}
+                    className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                  />
+                </div>
               </div>
+
+              <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-xl border border-gray-200 p-4">
+                <input
+                  type="checkbox"
+                  checked={eigenaarBevestigd}
+                  onChange={(e) => setEigenaarBevestigd(e.target.checked)}
+                  className="mt-1 h-5 w-5"
+                />
+                <span className="text-sm text-gray-700">
+                  Ik ben eigenaar/vennoot en bevoegd vertegenwoordiger van dit bedrijf.
+                </span>
+              </label>
             </div>
 
             <div className="border-t pt-7">
-              <h3 className="mb-4 text-lg font-bold text-gray-900">Werkgebied</h3>
+              <h3 className="mb-4 text-lg font-bold text-gray-900">Werkgebied en adres</h3>
 
               <div className="grid gap-5 sm:grid-cols-2">
                 <div>
@@ -378,6 +475,58 @@ export default function ProfessionalPage() {
                   </select>
                 </div>
               </div>
+
+              <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-xl border border-gray-200 p-4">
+                <input
+                  type="checkbox"
+                  checked={priveAdresZelfde}
+                  onChange={(e) => setPriveAdresZelfde(e.target.checked)}
+                  className="mt-1 h-5 w-5"
+                />
+                <span className="text-sm text-gray-700">
+                  Mijn woonadres voor verificatie is hetzelfde als bovenstaand adres.
+                </span>
+              </label>
+
+              {!priveAdresZelfde && (
+                <div className="mt-5 grid gap-5 sm:grid-cols-2">
+                  <input
+                    type="text"
+                    value={priveStraat}
+                    onChange={(e) => setPriveStraat(e.target.value)}
+                    placeholder="Woonadres straat"
+                    className="rounded-xl border border-gray-300 px-4 py-3"
+                  />
+                  <input
+                    type="text"
+                    value={priveHuisnummer}
+                    onChange={(e) => setPriveHuisnummer(e.target.value)}
+                    placeholder="Huisnummer"
+                    className="rounded-xl border border-gray-300 px-4 py-3"
+                  />
+                  <input
+                    type="text"
+                    value={priveToevoeging}
+                    onChange={(e) => setPriveToevoeging(e.target.value)}
+                    placeholder="Toevoeging"
+                    className="rounded-xl border border-gray-300 px-4 py-3"
+                  />
+                  <input
+                    type="text"
+                    value={privePostcode}
+                    onChange={(e) => setPrivePostcode(e.target.value.toUpperCase())}
+                    placeholder="Postcode"
+                    className="rounded-xl border border-gray-300 px-4 py-3"
+                  />
+                  <input
+                    type="text"
+                    value={priveWoonplaats}
+                    onChange={(e) => setPriveWoonplaats(e.target.value)}
+                    placeholder="Woonplaats"
+                    className="rounded-xl border border-gray-300 px-4 py-3 sm:col-span-2"
+                  />
+                </div>
+              )}
             </div>
 
             <div className="border-t pt-7">
