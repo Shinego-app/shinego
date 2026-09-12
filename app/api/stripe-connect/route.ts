@@ -39,6 +39,62 @@ async function heeftMerchantConfiguratie(accountId: string) {
   return response.ok && Boolean(account?.configuration?.merchant);
 }
 
+async function zorgVoorUitbetalingsrekening(
+  accountId: string,
+  iban: string | undefined,
+  rekeninghouder: string
+) {
+  const lijstResponse = await fetch(
+    `https://api.stripe.com/v1/accounts/${encodeURIComponent(accountId)}/external_accounts?object=bank_account&limit=100`,
+    {
+      method: "GET",
+      headers: {
+        Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
+      },
+      cache: "no-store",
+    }
+  );
+
+  const lijst = await lijstResponse.json();
+  if (!lijstResponse.ok) {
+    throw new Error(
+      lijst?.error?.message || "Stripe-bankrekening kon niet worden gecontroleerd."
+    );
+  }
+
+  const bestaandeBankrekening = Array.isArray(lijst?.data) && lijst.data.length > 0;
+  if (bestaandeBankrekening || !iban) return;
+
+  const schoonIban = iban.replace(/\s/g, "").toUpperCase();
+  const params = new URLSearchParams();
+  params.set("external_account[object]", "bank_account");
+  params.set("external_account[country]", "NL");
+  params.set("external_account[currency]", "eur");
+  params.set("external_account[account_number]", schoonIban);
+  params.set("external_account[account_holder_name]", rekeninghouder);
+  params.set("external_account[account_holder_type]", "company");
+  params.set("default_for_currency", "true");
+
+  const response = await fetch(
+    `https://api.stripe.com/v1/accounts/${encodeURIComponent(accountId)}/external_accounts`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: params.toString(),
+    }
+  );
+
+  const resultaat = await response.json();
+  if (!response.ok) {
+    throw new Error(
+      resultaat?.error?.message || "Bankrekening kon niet aan Stripe worden gekoppeld."
+    );
+  }
+}
+
 async function zorgVoorVertegenwoordiger(
   accountId: string,
   professional: any,
@@ -265,7 +321,7 @@ export async function POST(request: Request) {
         },
         body: JSON.stringify({
           ...accountPrefill,
-          dashboard: "express",
+          dashboard: "none",
           identity: {
             country: "nl",
             entity_type: "company",
@@ -313,12 +369,20 @@ export async function POST(request: Request) {
       throw new Error("Stripe-account ontbreekt.");
     }
 
-    await zorgVoorVertegenwoordiger(
+    await zorgVoorVertegenwoordiger(accountId, professional, email, userMetadata);
+
+    await zorgVoorUitbetalingsrekening(
       accountId,
-      professional,
-      email,
-      userMetadata
+      typeof userMetadata?.stripe_iban === "string" ? userMetadata.stripe_iban : undefined,
+      professional.bedrijfsnaam || `${professional.voornaam || ""} ${professional.achternaam || ""}`.trim()
     );
+
+    if (userMetadata?.stripe_iban) {
+      const { stripe_iban: _verwijderdIban, ...metadataZonderIban } = userMetadata;
+      await supabaseAdmin.auth.admin.updateUserById(user.id, {
+        user_metadata: metadataZonderIban,
+      });
+    }
 
     return NextResponse.json({ account_id: accountId });
   } catch (error) {
