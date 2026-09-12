@@ -38,13 +38,19 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "E-mailadres ontbreekt." }, { status: 400 });
     }
 
-    const adresRegel = [professional.straat, professional.huisnummer, professional.toevoeging]
+    const adresRegel = [
+      professional.straat,
+      professional.huisnummer,
+      professional.toevoeging,
+    ]
       .filter(Boolean)
       .join(" ")
       .trim();
 
     const kvkNummer = professional.kvk_nummer?.replace(/\D/g, "");
-    const btwNummer = professional.btw_nummer?.replace(/[\s.\-]/g, "").toUpperCase();
+    const btwNummer = professional.btw_nummer
+      ?.replace(/[\s.\-]/g, "")
+      .toUpperCase();
 
     const idNumbers = [
       ...(kvkNummer ? [{ type: "nl_kvk", value: kvkNummer }] : []),
@@ -60,20 +66,12 @@ export async function POST(request: Request) {
           registered_name: professional.bedrijfsnaam,
           phone: professional.telefoon,
           ...(idNumbers.length > 0 ? { id_numbers: idNumbers } : {}),
-          ...(adresRegel || professional.postcode || professional.woonplaats
-            ? {
-                address: {
-                  country: "nl",
-                  ...(adresRegel ? { line1: adresRegel } : {}),
-                  ...(professional.postcode
-                    ? { postal_code: professional.postcode.trim().toUpperCase() }
-                    : {}),
-                  ...(professional.woonplaats
-                    ? { city: professional.woonplaats.trim() }
-                    : {}),
-                },
-              }
-            : {}),
+          address: {
+            country: "nl",
+            line1: adresRegel,
+            postal_code: professional.postcode?.trim().toUpperCase(),
+            city: professional.woonplaats?.trim(),
+          },
         },
       },
       defaults: {
@@ -84,12 +82,12 @@ export async function POST(request: Request) {
       },
     };
 
-    let accountId: string | null = professional.stripe_account_id;
+    let accountId = professional.stripe_account_id as string | null;
 
     if (accountId) {
       if (!professional.uitbetalingen_actief) {
         const updateResponse = await fetch(
-          `https://api.stripe.com/v2/core/accounts/${encodeURIComponent(accountId)}`,
+          `https://api.stripe.com/v2/core/accounts/${accountId}`,
           {
             method: "POST",
             headers: {
@@ -119,7 +117,7 @@ export async function POST(request: Request) {
         },
         body: JSON.stringify({
           ...accountPrefill,
-          dashboard: "express",
+          dashboard: "none",
           identity: {
             country: "nl",
             entity_type: "company",
@@ -135,9 +133,7 @@ export async function POST(request: Request) {
           },
           configuration: {
             merchant: {
-              capabilities: {
-                card_payments: { requested: true },
-              },
+              capabilities: { card_payments: { requested: true } },
             },
             recipient: {
               capabilities: {
@@ -149,11 +145,14 @@ export async function POST(request: Request) {
       });
 
       const account = await accountResponse.json();
-      if (!accountResponse.ok || !account?.id) {
-        throw new Error(account?.error?.message || "Stripe account kon niet worden gemaakt.");
+
+      if (!accountResponse.ok) {
+        throw new Error(
+          account?.error?.message || "Stripe account kon niet worden gemaakt."
+        );
       }
 
-      accountId = String(account.id);
+      accountId = account.id;
 
       const { error: updateError } = await supabaseAdmin
         .from("professionals")
@@ -163,14 +162,13 @@ export async function POST(request: Request) {
       if (updateError) throw updateError;
     }
 
-    if (!accountId) {
-      throw new Error("Stripe account ontbreekt.");
-    }
-
     return NextResponse.json({ account_id: accountId });
   } catch (error) {
     console.error("Stripe Connect fout:", error);
-    const message = error instanceof Error ? error.message : "Stripe Connect kon niet worden gestart.";
+    const message =
+      error instanceof Error
+        ? error.message
+        : "Stripe Connect kon niet worden gestart.";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
