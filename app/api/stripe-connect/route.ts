@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
-const STRIPE_API_VERSION = "2026-07-29.preview";
+const STRIPE_API_VERSION = "2026-08-26.preview";
 
 export async function POST(request: Request) {
   try {
@@ -117,7 +117,7 @@ export async function POST(request: Request) {
         },
         body: JSON.stringify({
           ...accountPrefill,
-          dashboard: "none",
+          dashboard: "express",
           identity: {
             country: "nl",
             entity_type: "company",
@@ -132,12 +132,11 @@ export async function POST(request: Request) {
             },
           },
           configuration: {
-            merchant: {
-              capabilities: { card_payments: { requested: true } },
-            },
             recipient: {
               capabilities: {
-                stripe_balance: { stripe_transfers: { requested: true } },
+                stripe_balance: {
+                  stripe_transfers: { requested: true },
+                },
               },
             },
           },
