@@ -29,6 +29,32 @@ declare global {
   }
 }
 
+function isoNaarNl(datum: string) {
+  const match = datum.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return datum;
+  return `${match[3]}-${match[2]}-${match[1]}`;
+}
+
+function nlNaarIso(datum: string) {
+  const match = datum.trim().match(/^(\d{2})-(\d{2})-(\d{4})$/);
+  if (!match) return null;
+
+  const dag = Number(match[1]);
+  const maand = Number(match[2]);
+  const jaar = Number(match[3]);
+  const testDatum = new Date(Date.UTC(jaar, maand - 1, dag));
+
+  if (
+    testDatum.getUTCFullYear() !== jaar ||
+    testDatum.getUTCMonth() !== maand - 1 ||
+    testDatum.getUTCDate() !== dag
+  ) {
+    return null;
+  }
+
+  return `${match[3]}-${match[2]}-${match[1]}`;
+}
+
 export default function UitbetalingenPage() {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -89,7 +115,7 @@ export default function UitbetalingenPage() {
       const eigenaar = metadata.stripe_eigenaar_bevestigd === true;
       const adresZelfde = metadata.stripe_priveadres_zelfde !== false;
 
-      setGeboortedatum(datum);
+      setGeboortedatum(datum ? isoNaarNl(datum) : "");
       setEigenaarBevestigd(eigenaar);
       setPriveAdresZelfde(adresZelfde);
       setPriveStraat(metadata.stripe_prive_straat || "");
@@ -109,8 +135,9 @@ export default function UitbetalingenPage() {
     e.preventDefault();
     setFout("");
 
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(geboortedatum)) {
-      setFout("Vul je geboortedatum in.");
+    const geboortedatumIso = nlNaarIso(geboortedatum);
+    if (!geboortedatumIso) {
+      setFout("Vul je geboortedatum in als DD-MM-JJJJ, bijvoorbeeld 07-04-1983.");
       return;
     }
 
@@ -134,7 +161,7 @@ export default function UitbetalingenPage() {
 
     const { error } = await supabase.auth.updateUser({
       data: {
-        stripe_geboortedatum: geboortedatum,
+        stripe_geboortedatum: geboortedatumIso,
         stripe_eigenaar_bevestigd: true,
         stripe_priveadres_zelfde: priveAdresZelfde,
         stripe_prive_straat: priveAdresZelfde ? null : priveStraat.trim(),
@@ -256,12 +283,16 @@ export default function UitbetalingenPage() {
               <div>
                 <label className="mb-2 block font-semibold text-gray-900">Geboortedatum *</label>
                 <input
-                  type="date"
+                  type="text"
+                  inputMode="numeric"
                   value={geboortedatum}
                   onChange={(e) => setGeboortedatum(e.target.value)}
+                  placeholder="DD-MM-JJJJ"
+                  maxLength={10}
                   required
                   className="w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900"
                 />
+                <p className="mt-1 text-sm text-gray-500">Bijvoorbeeld: 07-04-1983</p>
               </div>
 
               <label className="flex items-start gap-3 rounded-xl border border-gray-200 p-4">
