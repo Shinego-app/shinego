@@ -59,9 +59,6 @@ export async function POST(request: Request) {
             },
           },
           configuration: {
-            merchant: {
-              capabilities: { card_payments: { requested: true } },
-            },
             recipient: {
               capabilities: {
                 stripe_balance: { stripe_transfers: { requested: true } },
@@ -99,7 +96,7 @@ export async function POST(request: Request) {
         use_case: {
           type: "account_onboarding",
           account_onboarding: {
-            configurations: ["merchant", "recipient"],
+            configurations: ["recipient"],
             refresh_url: `${origin}/professional/dashboard`,
             return_url: `${origin}/professional/dashboard?stripe=return`,
           },
