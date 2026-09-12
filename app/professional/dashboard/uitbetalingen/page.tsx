@@ -30,18 +30,6 @@ declare global {
   }
 }
 
-const SHINEGO_PREFILLED_REQUIREMENTS = [
-  "contact_email",
-  "contact_phone",
-  "display_name",
-  "identity.business_details.registered_name",
-  "identity.business_details.phone",
-  "identity.business_details.address.*",
-  "identity.business_details.id_numbers.*",
-  "defaults.profile.doing_business_as",
-  "defaults.profile.product_description",
-];
-
 export default function UitbetalingenPage() {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
@@ -112,7 +100,7 @@ export default function UitbetalingenPage() {
           fields: "currently_due",
           futureRequirements: "omit",
           requirements: {
-            exclude: SHINEGO_PREFILLED_REQUIREMENTS,
+            only: ["external_account"],
           },
         });
 
@@ -151,9 +139,9 @@ export default function UitbetalingenPage() {
         </button>
 
         <section className="rounded-2xl bg-white p-5 shadow-sm sm:p-7">
-          <h1 className="text-2xl font-bold text-gray-900">Uitbetalingen instellen</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Bankrekening verifiëren</h1>
           <p className="mt-2 text-gray-600">
-            Je bedrijfs- en contactgegevens zijn al vanuit ShineGo aan Stripe doorgegeven. Hieronder verschijnen alleen gegevens die Stripe nog nodig heeft voor verificatie of uitbetaling.
+            ShineGo heeft je bedrijfsgegevens al aangeleverd. Stripe wordt hier alleen gebruikt om je uitbetalingsrekening veilig te koppelen en, wanneer Stripe dat vereist, je toegang te bevestigen.
           </p>
 
           {fout ? (
@@ -162,7 +150,7 @@ export default function UitbetalingenPage() {
             </div>
           ) : (
             <div className="mt-6">
-              {!scriptKlaar && <p className="text-gray-600">Verificatie laden...</p>}
+              {!scriptKlaar && <p className="text-gray-600">Bankverificatie laden...</p>}
               <div ref={containerRef} />
             </div>
           )}
