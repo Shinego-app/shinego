@@ -121,12 +121,19 @@ export async function POST(request: Request) {
         ...bestaandeMetadata,
         stripe_geboortedatum: geboortedatum,
         stripe_iban: iban,
+        stripe_eigenaar_bevestigd: true,
+        stripe_priveadres_zelfde: true,
+        stripe_prive_straat: null,
+        stripe_prive_huisnummer: null,
+        stripe_prive_toevoeging: null,
+        stripe_prive_postcode: null,
+        stripe_prive_woonplaats: null,
       },
     });
 
     if (metadataError) {
       console.error("Professional metadata fout:", metadataError);
-      return NextResponse.json({ error: "Geboortedatum en IBAN konden niet worden opgeslagen." }, { status: 500 });
+      return NextResponse.json({ error: "Verificatiegegevens konden niet worden opgeslagen." }, { status: 500 });
     }
 
     return NextResponse.json({
