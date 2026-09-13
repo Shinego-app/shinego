@@ -67,13 +67,22 @@ export default function UitbetalingenPage() {
       try {
         const token = await haalTokenOp();
 
-        const prefillResponse = await fetch("/api/stripe-connect", {
+        const accountResponse = await fetch("/api/stripe-connect", {
           method: "POST",
           headers: { Authorization: `Bearer ${token}` },
         });
-        const prefillResult = await prefillResponse.json();
-        if (!prefillResponse.ok) {
-          throw new Error(prefillResult.error || "Stripe-gegevens konden niet worden voorbereid.");
+        const accountResult = await accountResponse.json();
+        if (!accountResponse.ok) {
+          throw new Error(accountResult.error || "Stripe-account kon niet worden voorbereid.");
+        }
+
+        const personResponse = await fetch("/api/stripe-connect/prefill-person", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        const personResult = await personResponse.json();
+        if (!personResponse.ok) {
+          throw new Error(personResult.error || "Stripe-verificatiegegevens konden niet worden voorbereid.");
         }
 
         const eersteSession = await haalSessionOp(token);
