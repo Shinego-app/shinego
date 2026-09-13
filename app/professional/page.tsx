@@ -14,13 +14,6 @@ export default function ProfessionalPage() {
   const [telefoon, setTelefoon] = useState("");
   const [geboortedatum, setGeboortedatum] = useState("");
   const [iban, setIban] = useState("");
-  const [eigenaarBevestigd, setEigenaarBevestigd] = useState(false);
-  const [priveAdresZelfde, setPriveAdresZelfde] = useState(true);
-  const [priveStraat, setPriveStraat] = useState("");
-  const [priveHuisnummer, setPriveHuisnummer] = useState("");
-  const [priveToevoeging, setPriveToevoeging] = useState("");
-  const [privePostcode, setPrivePostcode] = useState("");
-  const [priveWoonplaats, setPriveWoonplaats] = useState("");
   const [postcode, setPostcode] = useState("");
   const [woonplaats, setWoonplaats] = useState("");
   const [straat, setStraat] = useState("");
@@ -116,36 +109,13 @@ export default function ProfessionalPage() {
       return;
     }
 
-    if (!eigenaarBevestigd) {
-      setMelding("Bevestig dat je eigenaar/vennoot en bevoegd vertegenwoordiger bent.");
-      return;
-    }
-
-    let schoonPrivePostcode = "";
-    if (!priveAdresZelfde) {
-      if (
-        !priveStraat.trim() ||
-        !priveHuisnummer.trim() ||
-        !privePostcode.trim() ||
-        !priveWoonplaats.trim()
-      ) {
-        setMelding("Vul je volledige woonadres in.");
-        return;
-      }
-      schoonPrivePostcode = privePostcode.replace(/\s/g, "").toUpperCase();
-      if (!/^[1-9][0-9]{3}[A-Z]{2}$/.test(schoonPrivePostcode)) {
-        setMelding("Vul een geldige postcode voor je woonadres in.");
-        return;
-      }
-    }
-
     if (wachtwoord.length < 8) {
       setMelding("Het wachtwoord moet minimaal 8 tekens bevatten.");
       return;
     }
 
     if (!voorwaarden) {
-      setMelding("Accepteer eerst de voorwaarden.");
+      setMelding("Bevestig onderaan de aanmelding en accepteer de voorwaarden.");
       return;
     }
 
@@ -171,14 +141,12 @@ export default function ProfessionalPage() {
           werkgebied_km: Number(werkgebiedKm),
           stripe_geboortedatum: stripeGeboortedatum,
           stripe_eigenaar_bevestigd: true,
-          stripe_priveadres_zelfde: priveAdresZelfde,
-          stripe_prive_straat: priveAdresZelfde ? null : priveStraat.trim(),
-          stripe_prive_huisnummer: priveAdresZelfde ? null : priveHuisnummer.trim(),
-          stripe_prive_toevoeging: priveAdresZelfde ? null : priveToevoeging.trim() || null,
-          stripe_prive_postcode: priveAdresZelfde
-            ? null
-            : `${schoonPrivePostcode.slice(0, 4)} ${schoonPrivePostcode.slice(4)}`,
-          stripe_prive_woonplaats: priveAdresZelfde ? null : priveWoonplaats.trim(),
+          stripe_priveadres_zelfde: true,
+          stripe_prive_straat: null,
+          stripe_prive_huisnummer: null,
+          stripe_prive_toevoeging: null,
+          stripe_prive_postcode: null,
+          stripe_prive_woonplaats: null,
           stripe_iban: schoonIban,
         },
       },
@@ -240,7 +208,6 @@ export default function ProfessionalPage() {
                 <div><label className="mb-2 block font-medium text-gray-800">Telefoonnummer *</label><input type="tel" value={telefoon} onChange={(e) => setTelefoon(e.target.value)} placeholder="06 12345678" className={inputClass} /></div>
                 <div><label className="mb-2 block font-medium text-gray-800">Geboortedatum *</label><input value={geboortedatum} onChange={(e) => setGeboortedatum(e.target.value)} placeholder="DD-MM-JJJJ" inputMode="numeric" maxLength={10} className={inputClass} /></div>
               </div>
-              <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-xl border border-gray-200 p-4"><input type="checkbox" checked={eigenaarBevestigd} onChange={(e) => setEigenaarBevestigd(e.target.checked)} className="mt-1 h-5 w-5" /><span className="text-sm text-gray-700">Ik ben eigenaar/vennoot en bevoegd vertegenwoordiger van dit bedrijf.</span></label>
             </div>
 
             <div className="border-t pt-7">
@@ -253,8 +220,7 @@ export default function ProfessionalPage() {
                 <div><label className="mb-2 block font-medium text-gray-800">Toevoeging</label><input value={toevoeging} onChange={(e) => setToevoeging(e.target.value)} className={inputClass} /></div>
                 <div><label className="mb-2 block font-medium text-gray-800">Maximale afstand</label><select value={werkgebiedKm} onChange={(e) => setWerkgebiedKm(e.target.value)} className={inputClass}><option value="10">10 km</option><option value="15">15 km</option><option value="25">25 km</option><option value="35">35 km</option><option value="50">50 km</option><option value="75">75 km</option><option value="100">100 km</option></select></div>
               </div>
-              <label className="mt-5 flex cursor-pointer items-start gap-3 rounded-xl border border-gray-200 p-4"><input type="checkbox" checked={priveAdresZelfde} onChange={(e) => setPriveAdresZelfde(e.target.checked)} className="mt-1 h-5 w-5" /><span className="text-sm text-gray-700">Mijn woonadres voor verificatie is hetzelfde als bovenstaand adres.</span></label>
-              {!priveAdresZelfde && <div className="mt-5 grid gap-5 sm:grid-cols-2"><input value={priveStraat} onChange={(e) => setPriveStraat(e.target.value)} placeholder="Woonadres straat" className={inputClass} /><input value={priveHuisnummer} onChange={(e) => setPriveHuisnummer(e.target.value)} placeholder="Huisnummer" className={inputClass} /><input value={priveToevoeging} onChange={(e) => setPriveToevoeging(e.target.value)} placeholder="Toevoeging" className={inputClass} /><input value={privePostcode} onChange={(e) => setPrivePostcode(e.target.value.toUpperCase())} placeholder="Postcode" className={inputClass} /><input value={priveWoonplaats} onChange={(e) => setPriveWoonplaats(e.target.value)} placeholder="Woonplaats" className={`${inputClass} sm:col-span-2`} /></div>}
+              <p className="mt-4 text-sm text-gray-600">Voor de verificatie gebruiken we bovenstaand adres ook als woonadres.</p>
             </div>
 
             <div className="border-t pt-7">
@@ -264,7 +230,7 @@ export default function ProfessionalPage() {
               <input value={iban} onChange={(e) => setIban(e.target.value.toUpperCase())} placeholder="NL00 BANK 0000 0000 00" autoComplete="off" spellCheck={false} className={inputClass} />
             </div>
 
-            <label className="flex cursor-pointer items-start gap-3 border-t pt-7"><input type="checkbox" checked={voorwaarden} onChange={(e) => setVoorwaarden(e.target.checked)} className="mt-1 h-5 w-5" /><span className="text-sm text-gray-600">Ik verklaar dat de ingevulde gegevens correct zijn en ik accepteer de voorwaarden van ShineGo.</span></label>
+            <label className="flex cursor-pointer items-start gap-3 border-t pt-7"><input type="checkbox" checked={voorwaarden} onChange={(e) => setVoorwaarden(e.target.checked)} className="mt-1 h-5 w-5" /><span className="text-sm text-gray-600">Ik verklaar dat mijn gegevens correct zijn, dat ik eigenaar/vennoot en bevoegd vertegenwoordiger ben, dat bovenstaand adres mijn woonadres voor verificatie is en ik accepteer de voorwaarden van ShineGo.</span></label>
 
             {melding && <div className={`rounded-xl p-4 text-sm font-medium ${succes ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>{melding}</div>}
 
