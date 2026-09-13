@@ -78,9 +78,20 @@ export async function POST(request: Request) {
     }
 
     const personen = Array.isArray(listData?.data) ? listData.data : [];
+    const voornaam = String(professional.voornaam || "").trim().toLowerCase();
+    const achternaam = String(professional.achternaam || "").trim().toLowerCase();
+
     const bestaandePersoon =
-      personen.find((persoon: any) => persoon?.relationship?.representative === true) ||
-      personen.find((persoon: any) => String(persoon?.email || "").toLowerCase() === email);
+      personen.find(
+        (persoon: any) => String(persoon?.email || "").trim().toLowerCase() === email
+      ) ||
+      personen.find((persoon: any) => {
+        const zelfdeNaam =
+          String(persoon?.given_name || "").trim().toLowerCase() === voornaam &&
+          String(persoon?.surname || "").trim().toLowerCase() === achternaam;
+        const stripeTelefoon = normaliseerTelefoon(persoon?.phone);
+        return Boolean(voornaam && achternaam && telefoon && zelfdeNaam && stripeTelefoon === telefoon);
+      });
 
     const payload: Record<string, any> = {
       given_name: professional.voornaam || undefined,
