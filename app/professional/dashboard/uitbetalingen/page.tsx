@@ -138,7 +138,7 @@ export default function UitbetalingenPage() {
       <Script
         src="https://connect-js.stripe.com/v1.0/connect.js"
         strategy="afterInteractive"
-        onLoad={() => setScriptKlaar(true)}
+        onReady={() => setScriptKlaar(true)}
         onError={() => setFout("Stripe Connect kon niet worden geladen.")}
       />
 
