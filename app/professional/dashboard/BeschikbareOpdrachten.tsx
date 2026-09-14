@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 
@@ -22,6 +22,9 @@ export default function BeschikbareOpdrachten() {
   const [opdrachten, setOpdrachten] = useState<any[]>([]);
   const [melding, setMelding] = useState("");
   const [bezigId, setBezigId] = useState<string | number | null>(null);
+  const [zoeken, setZoeken] = useState("");
+  const [afstand, setAfstand] = useState("25");
+  const [typeFilter, setTypeFilter] = useState("alle");
 
   async function token() {
     const { data } = await supabase.auth.getSession();
@@ -51,12 +54,33 @@ export default function BeschikbareOpdrachten() {
     }
 
     setOpdrachten(data.opdrachten || []);
+    if (data.werkgebied_km) setAfstand(String(data.werkgebied_km));
     if (data.melding) setMelding(data.melding);
   }
 
   useEffect(() => {
     ladenOpdrachten();
   }, []);
+
+  const zichtbareOpdrachten = useMemo(() => {
+    const zoekterm = zoeken.trim().toLowerCase();
+    const maxAfstand = afstand === "all" ? null : Number(afstand);
+
+    return opdrachten.filter((opdracht) => {
+      const matchZoeken =
+        !zoekterm ||
+        String(opdracht.plaats || "").toLowerCase().includes(zoekterm) ||
+        String(opdracht.postcode || "").replace(/\s/g, "").toLowerCase().includes(zoekterm.replace(/\s/g, ""));
+
+      const matchAfstand =
+        maxAfstand == null ||
+        (opdracht.afstand_km != null && Number(opdracht.afstand_km) <= maxAfstand);
+
+      const matchType = typeFilter === "alle" || opdracht.vereiste_dienst === typeFilter;
+
+      return matchZoeken && matchAfstand && matchType;
+    });
+  }, [opdrachten, zoeken, afstand, typeFilter]);
 
   async function aannemen(id: string | number) {
     setBezigId(id);
@@ -95,27 +119,67 @@ export default function BeschikbareOpdrachten() {
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-xl font-bold text-gray-900">Beschikbare opdrachten</h2>
-          <p className="mt-1 text-sm text-gray-600">Alleen betaalde opdrachten binnen jouw werkgebied en passend bij jouw diensten en materiaal worden hier getoond.</p>
+          <p className="mt-1 text-sm text-gray-600">Bekijk open betaalde opdrachten en bepaal zelf hoe ver je wilt zoeken. Klantgegevens blijven verborgen tot je een opdracht aanneemt.</p>
         </div>
         <button type="button" onClick={ladenOpdrachten} disabled={laden} className="rounded-xl border border-blue-200 bg-white px-4 py-2 text-sm font-semibold text-blue-700 disabled:opacity-50">
           {laden ? "Laden..." : "Vernieuwen"}
         </button>
       </div>
 
+      <div className="mt-5 grid gap-3 rounded-2xl bg-blue-50 p-4 sm:grid-cols-3">
+        <label className="block">
+          <span className="mb-1 block text-xs font-bold uppercase tracking-wide text-blue-800">Plaats of postcode</span>
+          <input
+            value={zoeken}
+            onChange={(e) => setZoeken(e.target.value)}
+            placeholder="Bijv. Deventer of 7411"
+            className="w-full rounded-xl border border-blue-100 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-400"
+          />
+        </label>
+
+        <label className="block">
+          <span className="mb-1 block text-xs font-bold uppercase tracking-wide text-blue-800">Afstand vanaf mijn adres</span>
+          <select value={afstand} onChange={(e) => setAfstand(e.target.value)} className="w-full rounded-xl border border-blue-100 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-400">
+            <option value="10">Tot 10 km</option>
+            <option value="15">Tot 15 km</option>
+            <option value="25">Tot 25 km</option>
+            <option value="35">Tot 35 km</option>
+            <option value="50">Tot 50 km</option>
+            <option value="75">Tot 75 km</option>
+            <option value="100">Tot 100 km</option>
+            <option value="all">Heel Nederland</option>
+          </select>
+        </label>
+
+        <label className="block">
+          <span className="mb-1 block text-xs font-bold uppercase tracking-wide text-blue-800">Soort opdracht</span>
+          <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className="w-full rounded-xl border border-blue-100 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-400">
+            <option value="alle">Alle opdrachten</option>
+            <option value="glazenwasser">Glazenwassen</option>
+            <option value="telewash">Telewash / telescoopsteel</option>
+            <option value="bedrijf">Winkel / bedrijfspand</option>
+            <option value="binnen">Binnenramen</option>
+          </select>
+        </label>
+      </div>
+
       {melding && <div className="mt-4 rounded-xl bg-amber-50 p-3 text-sm font-medium text-amber-800">{melding}</div>}
 
-      {!laden && opdrachten.length === 0 && !melding && (
-        <p className="mt-4 text-sm text-gray-600">Er zijn nu geen passende opdrachten beschikbaar.</p>
+      {!laden && zichtbareOpdrachten.length === 0 && !melding && (
+        <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
+          Geen opdrachten gevonden met deze filters. Vergroot de afstand of kies <strong>Heel Nederland</strong> om verder te kijken.
+        </div>
       )}
 
       <div className="mt-4 grid gap-4">
-        {opdrachten.map((opdracht) => (
+        {zichtbareOpdrachten.map((opdracht) => (
           <article key={opdracht.id} className="rounded-2xl border border-gray-200 bg-gray-50 p-4 sm:p-5">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
                   <strong className="text-base text-gray-900">{dienstLabel(opdracht)}</strong>
                   {opdracht.afstand_km != null && <span className="rounded-full bg-blue-50 px-2.5 py-1 text-xs font-bold text-blue-700">± {opdracht.afstand_km} km</span>}
+                  {!opdracht.dienst_match && <span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-800">Niet in jouw profiel</span>}
                 </div>
                 <div className="mt-3 grid gap-1 text-sm text-gray-700 sm:grid-cols-2 sm:gap-x-8">
                   <p><strong>Regio:</strong> {opdracht.postcode || "-"} {opdracht.plaats || ""}</p>
@@ -130,8 +194,13 @@ export default function BeschikbareOpdrachten() {
                 <p className="mt-3 text-base font-bold text-gray-900">Jouw vergoeding: {bedrag(opdracht.professional_bedrag)}</p>
                 <p className="mt-1 text-xs text-gray-500">Naam, telefoonnummer en exact adres worden pas zichtbaar nadat je de opdracht hebt aangenomen.</p>
               </div>
-              <button type="button" onClick={() => aannemen(opdracht.id)} disabled={bezigId === opdracht.id} className="shrink-0 rounded-xl bg-blue-600 px-5 py-3 font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:opacity-50">
-                {bezigId === opdracht.id ? "Aannemen..." : "Opdracht aannemen"}
+              <button
+                type="button"
+                onClick={() => aannemen(opdracht.id)}
+                disabled={bezigId === opdracht.id || !opdracht.dienst_match}
+                className="shrink-0 rounded-xl bg-blue-600 px-5 py-3 font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600"
+              >
+                {!opdracht.dienst_match ? "Profiel aanpassen" : bezigId === opdracht.id ? "Aannemen..." : "Opdracht aannemen"}
               </button>
             </div>
           </article>
