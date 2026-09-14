@@ -47,6 +47,7 @@ export async function POST(request: Request) {
     const btwNummer = String(body.btw_nummer || "").replace(/[\s.\-]/g, "").toUpperCase();
     const geboortedatumInvoer = String(body.geboortedatum || "").trim();
     const iban = String(body.iban || "").replace(/\s/g, "").toUpperCase();
+    const werkgebiedKm = Number(body.werkgebied_km);
 
     if (
       !bedrijfsnaam ||
@@ -62,6 +63,10 @@ export async function POST(request: Request) {
       !iban
     ) {
       return NextResponse.json({ error: "Vul alle verplichte gegevens in." }, { status: 400 });
+    }
+
+    if (![10, 15, 25, 35, 50, 75, 100].includes(werkgebiedKm)) {
+      return NextResponse.json({ error: "Kies een geldig werkgebied." }, { status: 400 });
     }
 
     const schoonTelefoon = telefoon.replace(/[\s().-]/g, "");
@@ -106,6 +111,7 @@ export async function POST(request: Request) {
         toevoeging: toevoeging || null,
         kvk_nummer: kvkNummer,
         btw_nummer: btwNummer || null,
+        werkgebied_km: werkgebiedKm,
       })
       .eq("user_id", userData.user.id)
       .select("*")
