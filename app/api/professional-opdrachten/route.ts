@@ -2,6 +2,15 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { heeftBenodigdeDienst, ligtBinnenWerkgebied, vereisteDienst } from "@/lib/opdrachtMatching";
 
+function vandaagNederland() {
+  return new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Europe/Amsterdam",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
+
 async function haalProfessional(request: Request) {
   const authorization = request.headers.get("authorization");
   const token = authorization?.startsWith("Bearer ") ? authorization.slice(7) : null;
@@ -43,13 +52,17 @@ export async function GET(request: Request) {
       });
     }
 
+    const vandaag = vandaagNederland();
+
     const { data: boekingen, error: boekingenError } = await supabaseAdmin
       .from("boekingen")
       .select("id, created_at, postcode, huisnummer, plaats, woningtype, glasbewassing_type, telescoop, aantal_ramen, verdiepingen, kozijnen, bereikbaar, gewenste_datum, gewenste_tijd, professional_bedrag, totaalprijs, status, betaald, professional_id")
       .eq("status", "nieuw")
       .eq("betaald", true)
       .is("professional_id", null)
-      .order("created_at", { ascending: false })
+      .gte("gewenste_datum", vandaag)
+      .order("gewenste_datum", { ascending: true })
+      .order("gewenste_tijd", { ascending: true })
       .limit(50);
 
     if (boekingenError) {
@@ -112,7 +125,7 @@ export async function POST(request: Request) {
 
     const { data: boeking, error: boekingError } = await supabaseAdmin
       .from("boekingen")
-      .select("id, postcode, huisnummer, plaats, woningtype, glasbewassing_type, telescoop, status, betaald, professional_id")
+      .select("id, postcode, huisnummer, plaats, woningtype, glasbewassing_type, telescoop, gewenste_datum, status, betaald, professional_id")
       .eq("id", bookingId)
       .single();
 
@@ -122,6 +135,10 @@ export async function POST(request: Request) {
 
     if (boeking.status !== "nieuw" || boeking.betaald !== true || boeking.professional_id) {
       return NextResponse.json({ error: "Deze opdracht is niet meer beschikbaar." }, { status: 409 });
+    }
+
+    if (!boeking.gewenste_datum || boeking.gewenste_datum < vandaagNederland()) {
+      return NextResponse.json({ error: "De datum van deze opdracht is inmiddels verstreken." }, { status: 409 });
     }
 
     if (!heeftBenodigdeDienst(professional, boeking)) {
@@ -143,6 +160,7 @@ export async function POST(request: Request) {
       .eq("status", "nieuw")
       .eq("betaald", true)
       .is("professional_id", null)
+      .gte("gewenste_datum", vandaagNederland())
       .select("*")
       .maybeSingle();
 
@@ -151,7 +169,7 @@ export async function POST(request: Request) {
     }
 
     if (!aangenomen) {
-      return NextResponse.json({ error: "Iemand anders heeft deze opdracht net aangenomen." }, { status: 409 });
+      return NextResponse.json({ error: "Deze opdracht is niet meer beschikbaar." }, { status: 409 });
     }
 
     return NextResponse.json({ booking: aangenomen });
