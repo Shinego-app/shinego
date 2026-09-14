@@ -100,7 +100,9 @@ export function heeftBenodigdeDienst(professional: ProfessionalVoorMatching, boe
 export async function ligtBinnenWerkgebied(professional: ProfessionalVoorMatching, boeking: BoekingVoorMatching) {
   const professionalPostcode = normaliseerPostcode(professional.postcode);
   const boekingPostcode = normaliseerPostcode(boeking.postcode);
-  if (!professionalPostcode || !boekingPostcode) return false;
+  if (!professionalPostcode || !boekingPostcode) {
+    return { binnen: false, afstand_km: null };
+  }
 
   if (professionalPostcode === boekingPostcode) {
     return { binnen: true, afstand_km: 0 };
