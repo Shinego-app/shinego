@@ -1,22 +1,28 @@
-"use client";
-
-import { useState } from "react";
-
 const vragen = [
+  {
+    vraag: "Welke glasbewassing kan ik via ShineGo boeken?",
+    antwoord:
+      "Je kunt glasbewassing boeken voor woningen, appartementen, winkels en bedrijfspanden. Voor hogere of moeilijk bereikbare ramen kun je aangeven dat een telescoopsteel nodig is.",
+  },
   {
     vraag: "Wat is een telescoopsteel?",
     antwoord:
-      "Een telescoopsteel is een uitschuifbaar hulpmiddel dat een professional kan gebruiken om ramen op hoogte vanaf de grond te reinigen. De professional bepaalt zelf welke werkmethode en hulpmiddelen voor de opdracht geschikt zijn.",
+      "Een telescoopsteel is een uitschuifbaar hulpmiddel waarmee een professional ramen op hoogte vanaf de grond kan reinigen. De professional bepaalt zelf welke werkmethode en hulpmiddelen voor de opdracht geschikt zijn.",
   },
   {
     vraag: "Wanneer heb ik een telescoopsteel nodig?",
     antwoord:
-      "Tijdens het boeken kun je aangeven dat ramen hoog of lastig bereikbaar zijn. Bij ramen op de 3e verdieping houdt de boekingsflow rekening met een telescoopsteel. De professional bepaalt ter plaatse zelfstandig welke werkmethode en hulpmiddelen geschikt zijn.",
+      "Tijdens het boeken kun je aangeven dat ramen hoog of lastig bereikbaar zijn. Bij ramen op de 3e verdieping wordt telescoopsteel automatisch verplicht en wordt de opdracht als extra lastig bereikbaar gemarkeerd.",
   },
   {
     vraag: "Tot welke hoogte kan ik via ShineGo boeken?",
     antwoord:
-      "Via de standaard boekingsflow kun je ramen tot en met de 3e verdieping boeken. De professional beoordeelt de situatie ter plaatse en bepaalt zelfstandig of en op welke wijze de opdracht kan worden uitgevoerd.",
+      "Via de standaard boekingsflow kun je ramen tot en met de 3e verdieping boeken. De professional beoordeelt de situatie ter plaatse en bepaalt zelfstandig of en op welke wijze de opdracht veilig kan worden uitgevoerd.",
+  },
+  {
+    vraag: "Worden de ramen binnen of buiten schoongemaakt?",
+    antwoord:
+      "In de boekingsflow zie je welke glasbewassing je kiest. Standaard gaat het om de buitenzijde van de ramen. Waar binnenreiniging beschikbaar is, wordt dat duidelijk aangegeven.",
   },
   {
     vraag: "Worden de kozijnen ook schoongemaakt?",
@@ -24,100 +30,120 @@ const vragen = [
       "Je kunt tijdens het boeken aangeven of je de kozijnen wilt laten reinigen. Wanneer je deze optie kiest, wordt de toeslag automatisch meegenomen in de prijs.",
   },
   {
-    vraag: "Moet ik thuis zijn?",
+    vraag: "Wat betekent extra lastig bereikbaar?",
     antwoord:
-      "Niet altijd. Als voor de opdracht geen toegang tot de woning nodig is, hoef je niet thuis te zijn. Tijdens het boeken kun je aangeven of aanwezigheid noodzakelijk is.",
+      "Dit geldt bijvoorbeeld voor ramen boven een serre, schuin dak of een andere situatie waarbij extra bereik nodig is. Geef dit tijdens het boeken aan zodat de professional vooraf weet wat hij kan verwachten.",
   },
   {
-    vraag: "Kan ik ook een winkel of bedrijfspand laten reinigen?",
+    vraag: "Hoe wordt de prijs bepaald?",
     antwoord:
-      "Ja. ShineGo is ook beschikbaar voor winkels en bedrijfspanden. Je geeft tijdens het boeken de benodigde informatie over het pand en de ramen door.",
+      "De prijs wordt vooraf berekend op basis van het type woning of pand, het aantal ramen of glasoppervlak, verdiepingen, bereikbaarheid en gekozen extra opties. Voor zeer grote zakelijke opdrachten kan een offerte nodig zijn.",
+  },
+  {
+    vraag: "Kan ik een terugkerende glasbewassing kiezen?",
+    antwoord:
+      "Ja. Naast een eenmalige afspraak kun je kiezen voor iedere 4, 8 of 12 weken. De korting wordt direct in de boekingsflow verwerkt.",
   },
   {
     vraag: "Wanneer betaal ik?",
     antwoord:
-      "Je betaalt vooraf via ShineGo. De betaling wordt verwerkt via onze betaalpartner. De professional ontvangt zijn vergoeding pas nadat de opdracht volgens de afgesproken procedure is afgerond.",
+      "Je betaalt vooraf via ShineGo. De betaling wordt veilig verwerkt via Stripe. De professional ontvangt zijn vergoeding volgens de uitbetalingsafspraken van ShineGo.",
+  },
+  {
+    vraag: "Moet ik thuis zijn?",
+    antwoord:
+      "Niet altijd. Tijdens het boeken geef je aan of je aanwezig bent. Als voor de opdracht toegang tot de woning nodig is, moet die toegang wel mogelijk zijn op het afgesproken moment.",
   },
   {
     vraag: "Kan ik mijn boeking annuleren?",
     antwoord:
-      "Ja. Een boeking kan worden geannuleerd. Afhankelijk van het moment van annuleren kunnen annuleringskosten gelden. Bij annulering door de professional kan de opdracht opnieuw beschikbaar worden gesteld.",
+      "Ja. Een boeking kan worden geannuleerd. Afhankelijk van het moment van annuleren kunnen annuleringskosten gelden. Bij annulering binnen 24 uur of wanneer de professional voor niets komt, kan een vergoeding van toepassing zijn volgens het annuleringsbeleid.",
+  },
+  {
+    vraag: "Wat gebeurt er als een professional annuleert?",
+    antwoord:
+      "Als een professional annuleert, wordt de opdracht weer beschikbaar gemaakt zodat ShineGo een andere professional kan zoeken. De klant betaalt daarvoor geen annuleringskosten.",
+  },
+  {
+    vraag: "Zijn de glazenwassers werknemers van ShineGo?",
+    antwoord:
+      "Nee. ShineGo is een bemiddelingsplatform. De opdrachten worden uitgevoerd door zelfstandige professionals die via het platform werken.",
   },
   {
     vraag: "Wie bepaalt hoe de werkzaamheden worden uitgevoerd?",
     antwoord:
-      "De professional voert de opdracht als zelfstandig ondernemer uit en bepaalt zelf de werkmethode en de benodigde hulpmiddelen. De professional is verantwoordelijk voor naleving van de voor zijn werkzaamheden geldende wet- en regelgeving. ShineGo faciliteert de boeking en de administratieve afhandeling en schrijft geen concrete werkmethode voor.",
+      "De professional voert de opdracht als zelfstandig ondernemer uit en bepaalt zelf de werkmethode en de benodigde hulpmiddelen. De professional is verantwoordelijk voor naleving van de voor zijn werkzaamheden geldende wet- en regelgeving. ShineGo faciliteert de boeking en de administratieve afhandeling.",
+  },
+  {
+    vraag: "Wat als ik na de afspraak een probleem heb?",
+    antwoord:
+      "Neem dan zo snel mogelijk contact op met ShineGo en vermeld je boekingsgegevens. We bekijken samen met de professional wat er aan de hand is en hoe het kan worden opgelost.",
   },
 ];
 
 export default function VeelgesteldeVragenPage() {
-  const [openVraag, setOpenVraag] = useState<number | null>(null);
-
   return (
-    <main className="min-h-screen bg-slate-50">
-      <div className="mx-auto max-w-3xl px-5 py-12 sm:py-16">
-        <div className="mb-10 text-center">
-          <p className="mb-2 text-sm font-semibold uppercase tracking-wider text-blue-600">
-            Hulp & informatie
-          </p>
-
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl">
-            Veelgestelde vragen
-          </h1>
-
-          <p className="mx-auto mt-4 max-w-2xl text-slate-600">
-            Alles wat je wilt weten over boeken, telescoopsteel, betalingen en
-            het laten reinigen van je ramen via ShineGo.
-          </p>
-        </div>
-
-        <div className="space-y-3">
-          {vragen.map((item, index) => {
-            const isOpen = openVraag === index;
-
-            return (
-              <div
-                key={item.vraag}
-                className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm"
-              >
-                <button
-                  type="button"
-                  onClick={() => setOpenVraag(isOpen ? null : index)}
-                  className="flex w-full items-center justify-between gap-4 px-5 py-5 text-left"
-                >
-                  <span className="font-semibold text-slate-900">
-                    {item.vraag}
-                  </span>
-
-                  <span className="text-2xl font-light text-blue-600">
-                    {isOpen ? "−" : "+"}
-                  </span>
-                </button>
-
-                {isOpen && (
-                  <div className="border-t border-slate-100 px-5 pb-5 pt-4">
-                    <p className="leading-7 text-slate-600">{item.antwoord}</p>
-                  </div>
-                )}
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="mt-10 rounded-2xl bg-slate-900 p-6 text-center text-white">
-          <h2 className="text-xl font-bold">Klaar om je ramen te laten reinigen?</h2>
-          <p className="mt-2 text-sm text-slate-300">
-            Bereken eenvoudig je prijs en boek een professional via ShineGo.
-          </p>
-
-          <a
-            href="/#diensten"
-            className="mt-5 inline-flex rounded-xl bg-white px-6 py-3 font-semibold text-slate-900 transition hover:bg-slate-100"
-          >
-            Bekijk je prijs
+    <main className="min-h-screen bg-gradient-to-b from-[#eaf6ff] to-[#f8fcff] text-[#123c70]">
+      <header className="border-b border-[#d7eaf8] bg-white/90 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-8">
+          <a href="/" className="text-[29px] font-extrabold tracking-tight text-[#0d3f79]">
+            Shine<span className="text-[#1683f8]">Go</span><span className="ml-1 text-[#1683f8]">✦</span>
+          </a>
+          <a href="/" className="rounded-xl border border-[#cfe3f4] bg-white px-4 py-2.5 text-sm font-bold text-[#315f88]">
+            ← Terug naar home
           </a>
         </div>
-      </div>
+      </header>
+
+      <section className="px-5 py-10 sm:px-8 sm:py-14">
+        <div className="mx-auto max-w-4xl">
+          <div className="text-center">
+            <p className="text-xs font-extrabold uppercase tracking-[.18em] text-[#1683f8]">Hulp & uitleg</p>
+            <h1 className="mt-2 text-4xl font-extrabold tracking-tight text-[#0b3d75] sm:text-5xl">Veelgestelde vragen</h1>
+            <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-[#6b86a0]">
+              Alles wat je wilt weten over boeken, prijzen, bereikbaarheid, betaling en annuleren via ShineGo.
+            </p>
+          </div>
+
+          <div className="mt-10 space-y-3">
+            {vragen.map((item) => (
+              <details key={item.vraag} className="group rounded-2xl border border-[#d5e9f8] bg-white shadow-[0_10px_28px_rgba(46,79,119,.07)]">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-5 text-left text-base font-extrabold text-[#123c70] sm:px-6">
+                  <span>{item.vraag}</span>
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#eaf6ff] text-xl font-bold text-[#1683f8] transition group-open:rotate-45">+</span>
+                </summary>
+                <div className="border-t border-[#e2eef7] px-5 py-5 text-sm leading-6 text-[#5f7e9c] sm:px-6 sm:text-base">
+                  {item.antwoord}
+                </div>
+              </details>
+            ))}
+          </div>
+
+          <div className="mt-10 rounded-[26px] border border-[#cfe5f6] bg-[#eaf6ff] p-6 text-center sm:p-8">
+            <h2 className="text-2xl font-extrabold text-[#0b3d75]">Staat je vraag er niet tussen?</h2>
+            <p className="mt-2 text-sm leading-6 text-[#6685a1]">Neem contact op met ShineGo. We helpen je graag verder.</p>
+            <a href="/contact" className="mt-5 inline-flex rounded-xl bg-[#1683f8] px-6 py-3 text-sm font-extrabold text-white shadow-[0_8px_20px_rgba(22,131,248,.22)]">
+              Contact opnemen →
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <footer className="border-t border-[#d5e9f8] bg-white/90 px-5 py-8">
+        <div className="mx-auto flex max-w-[1180px] flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <div className="text-xl font-extrabold tracking-tight text-[#0d3f79]">Shine<span className="text-[#1683f8]">Go</span><span className="ml-1 text-[#1683f8]">✦</span></div>
+            <p className="mt-1 text-sm text-[#7790a8]">Scherp in glaswerk</p>
+          </div>
+          <nav className="flex flex-wrap gap-x-5 gap-y-3 text-sm font-semibold text-[#52779b]">
+            <a href="/privacy">Privacy</a>
+            <a href="/voorwaarden">Algemene voorwaarden</a>
+            <a href="/cookies">Cookies</a>
+            <a href="/contact">Contact</a>
+          </nav>
+          <p className="text-xs text-[#8aa0b5]">© 2026 ShineGo</p>
+        </div>
+      </footer>
     </main>
   );
 }
