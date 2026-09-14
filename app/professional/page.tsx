@@ -22,6 +22,9 @@ export default function ProfessionalPage() {
   const [kvkNummer, setKvkNummer] = useState("");
   const [btwNummer, setBtwNummer] = useState("");
   const [werkgebiedKm, setWerkgebiedKm] = useState("25");
+  const [telewash, setTelewash] = useState(false);
+  const [bedrijfspanden, setBedrijfspanden] = useState(false);
+  const [binnenramen, setBinnenramen] = useState(false);
   const [voorwaarden, setVoorwaarden] = useState(false);
   const [bezig, setBezig] = useState(false);
   const [melding, setMelding] = useState("");
@@ -119,6 +122,13 @@ export default function ProfessionalPage() {
       return;
     }
 
+    const diensten = [
+      "glazenwasser",
+      ...(telewash ? ["telewash"] : []),
+      ...(bedrijfspanden ? ["bedrijf"] : []),
+      ...(binnenramen ? ["binnen"] : []),
+    ];
+
     setBezig(true);
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email: schoonEmail,
@@ -137,7 +147,7 @@ export default function ProfessionalPage() {
           toevoeging: toevoeging.trim() || null,
           kvk_nummer: schoonKvk,
           btw_nummer: schoonBtw,
-          diensten: ["glazenwasser"],
+          diensten,
           werkgebied_km: Number(werkgebiedKm),
           stripe_geboortedatum: stripeGeboortedatum,
           stripe_eigenaar_bevestigd: true,
@@ -186,7 +196,7 @@ export default function ProfessionalPage() {
 
         <form onSubmit={aanmelden} className="w-full rounded-3xl border border-gray-200 bg-white p-5 shadow-sm sm:p-9">
           <h2 className="text-2xl font-bold text-gray-900">Aanmelden als professional</h2>
-          <p className="mt-2 text-gray-600">Vul je gegevens één keer in. ShineGo gebruikt ze daarna voor de Stripe-verificatie en uitbetalingen.</p>
+          <p className="mt-2 text-gray-600">Vul je gegevens één keer in. ShineGo gebruikt ze daarna voor de Stripe-verificatie, opdrachtmatching en uitbetalingen.</p>
 
           <div className="mt-8 space-y-7">
             <div>
@@ -220,7 +230,18 @@ export default function ProfessionalPage() {
                 <div><label className="mb-2 block font-medium text-gray-800">Toevoeging</label><input value={toevoeging} onChange={(e) => setToevoeging(e.target.value)} className={inputClass} /></div>
                 <div><label className="mb-2 block font-medium text-gray-800">Maximale afstand</label><select value={werkgebiedKm} onChange={(e) => setWerkgebiedKm(e.target.value)} className={inputClass}><option value="10">10 km</option><option value="15">15 km</option><option value="25">25 km</option><option value="35">35 km</option><option value="50">50 km</option><option value="75">75 km</option><option value="100">100 km</option></select></div>
               </div>
-              <p className="mt-4 text-sm text-gray-600">Voor de verificatie gebruiken we bovenstaand adres ook als woonadres.</p>
+              <p className="mt-4 text-sm text-gray-600">ShineGo gebruikt je ingestelde afstand om alleen passende opdrachten in jouw werkgebied te tonen.</p>
+            </div>
+
+            <div className="border-t pt-7">
+              <h3 className="text-lg font-bold text-gray-900">Diensten en materiaal</h3>
+              <p className="mt-1 text-sm text-gray-600">Standaard ontvang je gewone glasbewassing. Vink alleen extra werkzaamheden aan waarvoor je bent uitgerust.</p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-xl border border-gray-200 bg-gray-50 p-4"><strong className="text-sm text-gray-900">✓ Gewone glasbewassing</strong><p className="mt-1 text-xs text-gray-600">Altijd onderdeel van je profiel.</p></div>
+                <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-gray-200 p-4"><input type="checkbox" checked={telewash} onChange={(e) => setTelewash(e.target.checked)} className="mt-1 h-5 w-5" /><span><strong className="block text-sm text-gray-900">Telewash / telescoopsteel</strong><span className="mt-1 block text-xs text-gray-600">Ik beschik over geschikt telescoopmateriaal voor hoog en groot glas.</span></span></label>
+                <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-gray-200 p-4"><input type="checkbox" checked={bedrijfspanden} onChange={(e) => setBedrijfspanden(e.target.checked)} className="mt-1 h-5 w-5" /><span><strong className="block text-sm text-gray-900">Winkel / bedrijfspand</strong><span className="mt-1 block text-xs text-gray-600">Ik neem zakelijke glasbewassingsopdrachten aan.</span></span></label>
+                <label className="flex cursor-pointer items-start gap-3 rounded-xl border border-gray-200 p-4"><input type="checkbox" checked={binnenramen} onChange={(e) => setBinnenramen(e.target.checked)} className="mt-1 h-5 w-5" /><span><strong className="block text-sm text-gray-900">Binnenramen</strong><span className="mt-1 block text-xs text-gray-600">Ik voer ook glasbewassing aan de binnenzijde uit.</span></span></label>
+              </div>
             </div>
 
             <div className="border-t pt-7">
