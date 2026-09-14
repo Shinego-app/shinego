@@ -19,6 +19,18 @@ function normaliseerGeboortedatum(value: string) {
   return `${jaar}-${maand}-${dag}`;
 }
 
+function normaliseerDiensten(value: unknown) {
+  const invoer = Array.isArray(value) ? value : [];
+  const toegestaan = new Set(["glazenwasser", "telewash", "bedrijf", "binnen"]);
+  const diensten = invoer
+    .map((dienst) => String(dienst || "").toLowerCase())
+    .map((dienst) => (dienst === "glazenwassen" ? "glazenwasser" : dienst))
+    .filter((dienst) => toegestaan.has(dienst));
+
+  if (!diensten.includes("glazenwasser")) diensten.unshift("glazenwasser");
+  return Array.from(new Set(diensten));
+}
+
 export async function POST(request: Request) {
   try {
     const authHeader = request.headers.get("authorization") || "";
@@ -48,6 +60,7 @@ export async function POST(request: Request) {
     const geboortedatumInvoer = String(body.geboortedatum || "").trim();
     const iban = String(body.iban || "").replace(/\s/g, "").toUpperCase();
     const werkgebiedKm = Number(body.werkgebied_km);
+    const diensten = normaliseerDiensten(body.diensten);
 
     if (
       !bedrijfsnaam ||
@@ -66,7 +79,7 @@ export async function POST(request: Request) {
     }
 
     if (![10, 15, 25, 35, 50, 75, 100].includes(werkgebiedKm)) {
-      return NextResponse.json({ error: "Kies een geldig werkgebied." }, { status: 400 });
+      return NextResponse.json({ error: "Kies een geldige voorkeursafstand voor meldingen." }, { status: 400 });
     }
 
     const schoonTelefoon = telefoon.replace(/[\s().-]/g, "");
@@ -112,6 +125,7 @@ export async function POST(request: Request) {
         kvk_nummer: kvkNummer,
         btw_nummer: btwNummer || null,
         werkgebied_km: werkgebiedKm,
+        diensten,
       })
       .eq("user_id", userData.user.id)
       .select("*")
@@ -134,6 +148,8 @@ export async function POST(request: Request) {
         stripe_prive_toevoeging: null,
         stripe_prive_postcode: null,
         stripe_prive_woonplaats: null,
+        diensten,
+        werkgebied_km: werkgebiedKm,
       },
     });
 
