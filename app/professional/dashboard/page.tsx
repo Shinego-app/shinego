@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
+import BeschikbareOpdrachten from "./BeschikbareOpdrachten";
 
 function toonGeboortedatum(value?: string | null) {
   if (!value) return "";
@@ -270,6 +271,8 @@ export default function ProfessionalDashboardPage() {
 
           {profielMelding && <p className="mt-4 text-sm font-medium text-gray-700">{profielMelding}</p>}
         </section>
+
+        <BeschikbareOpdrachten />
 
         <section className="mt-8 rounded-2xl bg-white p-5 shadow-sm sm:p-6">
           <h2>Mijn opdrachten</h2>
