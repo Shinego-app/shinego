@@ -25,6 +25,9 @@ export default function BeschikbareOpdrachten() {
   const [zoeken, setZoeken] = useState("");
   const [afstand, setAfstand] = useState("25");
   const [typeFilter, setTypeFilter] = useState("alle");
+  const [diensten, setDiensten] = useState<string[]>(["glazenwasser"]);
+  const [voorkeurBezig, setVoorkeurBezig] = useState(false);
+  const [voorkeurMelding, setVoorkeurMelding] = useState("");
 
   async function token() {
     const { data } = await supabase.auth.getSession();
@@ -55,12 +58,47 @@ export default function BeschikbareOpdrachten() {
 
     setOpdrachten(data.opdrachten || []);
     if (data.werkgebied_km) setAfstand(String(data.werkgebied_km));
+    if (Array.isArray(data.diensten)) setDiensten(data.diensten);
     if (data.melding) setMelding(data.melding);
   }
 
   useEffect(() => {
     ladenOpdrachten();
   }, []);
+
+  function wisselDienst(dienst: string, actief: boolean) {
+    if (dienst === "glazenwasser") return;
+    setDiensten((huidig) => actief ? Array.from(new Set([...huidig, dienst])) : huidig.filter((item) => item !== dienst));
+  }
+
+  async function voorkeurenOpslaan() {
+    setVoorkeurBezig(true);
+    setVoorkeurMelding("");
+    const accessToken = await token();
+    if (!accessToken) {
+      setVoorkeurBezig(false);
+      setVoorkeurMelding("Je sessie is verlopen. Log opnieuw in.");
+      return;
+    }
+
+    const meldingsAfstand = afstand === "all" ? 100 : Number(afstand);
+    const response = await fetch("/api/professional-voorkeuren", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
+      body: JSON.stringify({ werkgebied_km: meldingsAfstand, diensten }),
+    });
+    const data = await response.json();
+    setVoorkeurBezig(false);
+
+    if (!response.ok) {
+      setVoorkeurMelding(data.error || "Voorkeuren konden niet worden opgeslagen.");
+      return;
+    }
+
+    setDiensten(data.professional?.diensten || diensten);
+    setVoorkeurMelding("Diensten en meldingsafstand opgeslagen.");
+    await ladenOpdrachten();
+  }
 
   const zichtbareOpdrachten = useMemo(() => {
     const zoekterm = zoeken.trim().toLowerCase();
@@ -126,50 +164,43 @@ export default function BeschikbareOpdrachten() {
         </button>
       </div>
 
+      <div className="mt-5 rounded-2xl border border-gray-200 bg-gray-50 p-4">
+        <h3 className="font-bold text-gray-900">Mijn diensten en meldingen</h3>
+        <p className="mt-1 text-sm text-gray-600">Deze keuzes bepalen welke opdrachten je kunt aannemen en voor welke soorten opdrachten je later meldingen krijgt.</p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <label className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-3"><input type="checkbox" checked readOnly className="h-5 w-5" /><span className="text-sm font-semibold text-gray-800">Glazenwassen</span></label>
+          <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-200 bg-white p-3"><input type="checkbox" checked={diensten.includes("telewash")} onChange={(e) => wisselDienst("telewash", e.target.checked)} className="h-5 w-5" /><span className="text-sm font-semibold text-gray-800">Telewash / telescoopsteel</span></label>
+          <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-200 bg-white p-3"><input type="checkbox" checked={diensten.includes("bedrijf")} onChange={(e) => wisselDienst("bedrijf", e.target.checked)} className="h-5 w-5" /><span className="text-sm font-semibold text-gray-800">Winkel / bedrijfspand</span></label>
+          <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-200 bg-white p-3"><input type="checkbox" checked={diensten.includes("binnen")} onChange={(e) => wisselDienst("binnen", e.target.checked)} className="h-5 w-5" /><span className="text-sm font-semibold text-gray-800">Binnenramen</span></label>
+        </div>
+        <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
+          <label className="block sm:w-64"><span className="mb-1 block text-xs font-bold uppercase tracking-wide text-gray-700">Voorkeursafstand meldingen</span><select value={afstand === "all" ? "100" : afstand} onChange={(e) => setAfstand(e.target.value)} className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900"><option value="10">10 km</option><option value="15">15 km</option><option value="25">25 km</option><option value="35">35 km</option><option value="50">50 km</option><option value="75">75 km</option><option value="100">100 km</option></select></label>
+          <button type="button" onClick={voorkeurenOpslaan} disabled={voorkeurBezig} className="rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-bold text-white disabled:opacity-50">{voorkeurBezig ? "Opslaan..." : "Voorkeuren opslaan"}</button>
+        </div>
+        {voorkeurMelding && <p className="mt-3 text-sm font-medium text-gray-700">{voorkeurMelding}</p>}
+      </div>
+
       <div className="mt-5 grid gap-3 rounded-2xl bg-blue-50 p-4 sm:grid-cols-3">
         <label className="block">
           <span className="mb-1 block text-xs font-bold uppercase tracking-wide text-blue-800">Plaats of postcode</span>
-          <input
-            value={zoeken}
-            onChange={(e) => setZoeken(e.target.value)}
-            placeholder="Bijv. Deventer of 7411"
-            className="w-full rounded-xl border border-blue-100 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-400"
-          />
+          <input value={zoeken} onChange={(e) => setZoeken(e.target.value)} placeholder="Bijv. Deventer of 7411" className="w-full rounded-xl border border-blue-100 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-400" />
         </label>
-
         <label className="block">
-          <span className="mb-1 block text-xs font-bold uppercase tracking-wide text-blue-800">Afstand vanaf mijn adres</span>
+          <span className="mb-1 block text-xs font-bold uppercase tracking-wide text-blue-800">Zoekafstand</span>
           <select value={afstand} onChange={(e) => setAfstand(e.target.value)} className="w-full rounded-xl border border-blue-100 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-400">
-            <option value="10">Tot 10 km</option>
-            <option value="15">Tot 15 km</option>
-            <option value="25">Tot 25 km</option>
-            <option value="35">Tot 35 km</option>
-            <option value="50">Tot 50 km</option>
-            <option value="75">Tot 75 km</option>
-            <option value="100">Tot 100 km</option>
-            <option value="all">Heel Nederland</option>
+            <option value="10">Tot 10 km</option><option value="15">Tot 15 km</option><option value="25">Tot 25 km</option><option value="35">Tot 35 km</option><option value="50">Tot 50 km</option><option value="75">Tot 75 km</option><option value="100">Tot 100 km</option><option value="all">Heel Nederland</option>
           </select>
         </label>
-
         <label className="block">
           <span className="mb-1 block text-xs font-bold uppercase tracking-wide text-blue-800">Soort opdracht</span>
           <select value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)} className="w-full rounded-xl border border-blue-100 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-400">
-            <option value="alle">Alle opdrachten</option>
-            <option value="glazenwasser">Glazenwassen</option>
-            <option value="telewash">Telewash / telescoopsteel</option>
-            <option value="bedrijf">Winkel / bedrijfspand</option>
-            <option value="binnen">Binnenramen</option>
+            <option value="alle">Alle opdrachten</option><option value="glazenwasser">Glazenwassen</option><option value="telewash">Telewash / telescoopsteel</option><option value="bedrijf">Winkel / bedrijfspand</option><option value="binnen">Binnenramen</option>
           </select>
         </label>
       </div>
 
       {melding && <div className="mt-4 rounded-xl bg-amber-50 p-3 text-sm font-medium text-amber-800">{melding}</div>}
-
-      {!laden && zichtbareOpdrachten.length === 0 && !melding && (
-        <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">
-          Geen opdrachten gevonden met deze filters. Vergroot de afstand of kies <strong>Heel Nederland</strong> om verder te kijken.
-        </div>
-      )}
+      {!laden && zichtbareOpdrachten.length === 0 && !melding && <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">Geen opdrachten gevonden met deze filters. Vergroot de afstand of kies <strong>Heel Nederland</strong> om verder te kijken.</div>}
 
       <div className="mt-4 grid gap-4">
         {zichtbareOpdrachten.map((opdracht) => (
@@ -182,24 +213,12 @@ export default function BeschikbareOpdrachten() {
                   {!opdracht.dienst_match && <span className="rounded-full bg-amber-100 px-2.5 py-1 text-xs font-bold text-amber-800">Niet in jouw profiel</span>}
                 </div>
                 <div className="mt-3 grid gap-1 text-sm text-gray-700 sm:grid-cols-2 sm:gap-x-8">
-                  <p><strong>Regio:</strong> {opdracht.postcode || "-"} {opdracht.plaats || ""}</p>
-                  <p><strong>Datum:</strong> {opdracht.gewenste_datum || "Nog niet gepland"}</p>
-                  <p><strong>Tijd:</strong> {opdracht.gewenste_tijd || "Nog niet gepland"}</p>
-                  <p><strong>Type:</strong> {opdracht.woningtype || "Niet opgegeven"}</p>
-                  <p><strong>Ramen:</strong> {opdracht.aantal_ramen ?? "Niet opgegeven"}</p>
-                  <p><strong>Telescoopsteel:</strong> {opdracht.telescoop ? "Ja" : "Nee"}</p>
-                  <p><strong>Kozijnen:</strong> {opdracht.kozijnen ? "Ja" : "Nee"}</p>
-                  <p><strong>Lastig bereikbaar:</strong> {opdracht.lastig_bereikbaar ? "Ja" : "Nee"}</p>
+                  <p><strong>Regio:</strong> {opdracht.postcode || "-"} {opdracht.plaats || ""}</p><p><strong>Datum:</strong> {opdracht.gewenste_datum || "Nog niet gepland"}</p><p><strong>Tijd:</strong> {opdracht.gewenste_tijd || "Nog niet gepland"}</p><p><strong>Type:</strong> {opdracht.woningtype || "Niet opgegeven"}</p><p><strong>Ramen:</strong> {opdracht.aantal_ramen ?? "Niet opgegeven"}</p><p><strong>Telescoopsteel:</strong> {opdracht.telescoop ? "Ja" : "Nee"}</p><p><strong>Kozijnen:</strong> {opdracht.kozijnen ? "Ja" : "Nee"}</p><p><strong>Lastig bereikbaar:</strong> {opdracht.lastig_bereikbaar ? "Ja" : "Nee"}</p>
                 </div>
                 <p className="mt-3 text-base font-bold text-gray-900">Jouw vergoeding: {bedrag(opdracht.professional_bedrag)}</p>
                 <p className="mt-1 text-xs text-gray-500">Naam, telefoonnummer en exact adres worden pas zichtbaar nadat je de opdracht hebt aangenomen.</p>
               </div>
-              <button
-                type="button"
-                onClick={() => aannemen(opdracht.id)}
-                disabled={bezigId === opdracht.id || !opdracht.dienst_match}
-                className="shrink-0 rounded-xl bg-blue-600 px-5 py-3 font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600"
-              >
+              <button type="button" onClick={() => aannemen(opdracht.id)} disabled={bezigId === opdracht.id || !opdracht.dienst_match} className="shrink-0 rounded-xl bg-blue-600 px-5 py-3 font-bold text-white transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:text-gray-600">
                 {!opdracht.dienst_match ? "Profiel aanpassen" : bezigId === opdracht.id ? "Aannemen..." : "Opdracht aannemen"}
               </button>
             </div>
