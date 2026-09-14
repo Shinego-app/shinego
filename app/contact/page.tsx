@@ -130,6 +130,23 @@ export default function ContactPage() {
               : "Heb je een vraag over een boeking, betaling, opdracht of je account? Stuur ons een bericht via het contactformulier."}
           </p>
 
+          {!offerte500Plus && (
+            <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-6">
+              <h2 className="text-lg font-bold text-slate-900">Bedrijfsgegevens</h2>
+              <div className="mt-3 space-y-1 text-sm leading-6 text-slate-600">
+                <p><strong className="text-slate-900">Handelsnaam:</strong> ShineGo</p>
+                <p><strong className="text-slate-900">KvK-nummer:</strong> 57712913</p>
+                <p><strong className="text-slate-900">Btw-id:</strong> NL001205368B47</p>
+                <p>
+                  <strong className="text-slate-900">E-mail:</strong>{" "}
+                  <a href="mailto:info@shinego.nl" className="font-semibold text-blue-600 hover:text-blue-700">
+                    info@shinego.nl
+                  </a>
+                </p>
+              </div>
+            </div>
+          )}
+
           {offerte500Plus ? (
             <div className="mt-8 rounded-2xl border border-blue-200 bg-blue-50 p-6">
               <h2 className="text-lg font-bold text-blue-950">Jouw aanvraag</h2>
