@@ -51,6 +51,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         {children}
+        <a
+          href="/herroepen"
+          className="fixed bottom-4 right-4 z-40 rounded-full border border-slate-300 bg-white px-4 py-2 text-xs font-bold text-slate-700 shadow-lg transition hover:border-blue-400 hover:text-blue-700 sm:bottom-5 sm:right-5 sm:text-sm"
+        >
+          Overeenkomst herroepen
+        </a>
         <CookieNotice />
       </body>
     </html>
