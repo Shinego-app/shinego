@@ -9,8 +9,15 @@ export default function PrivacyPage() {
           <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">Privacyverklaring</h1>
           <p className="mt-3 text-sm text-slate-500">Concept voor juridische review · laatst bijgewerkt: 14 september 2026</p>
 
+          <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm leading-6 text-slate-700">
+            <p><strong>Handelsnaam:</strong> ShineGo</p>
+            <p><strong>KvK-nummer:</strong> 57712913</p>
+            <p><strong>Btw-id:</strong> NL001205368B47</p>
+            <p><strong>E-mail:</strong> <a href="mailto:info@shinego.nl" className="font-semibold text-blue-600 hover:text-blue-700">info@shinego.nl</a></p>
+          </div>
+
           <div className="mt-10 space-y-9 leading-7 text-slate-600">
-            <section><h2 className="text-xl font-bold text-slate-900">1. Wie is verantwoordelijk?</h2><p className="mt-2">ShineGo exploiteert het online platform waarop klanten glasbewassing kunnen boeken en zelfstandige professionals opdrachten kunnen ontvangen. ShineGo is voor de persoonsgegevens die het zelf voor deze dienstverlening verwerkt de verwerkingsverantwoordelijke.</p><p className="mt-2">Voor privacyvragen of verzoeken kun je contact opnemen via de contactpagina van ShineGo. De definitieve bedrijfs- en contactgegevens worden vóór commerciële lancering in deze verklaring opgenomen.</p></section>
+            <section><h2 className="text-xl font-bold text-slate-900">1. Wie is verantwoordelijk?</h2><p className="mt-2">ShineGo exploiteert het online platform waarop klanten glasbewassing kunnen boeken en zelfstandige professionals opdrachten kunnen ontvangen. ShineGo is voor de persoonsgegevens die het zelf voor deze dienstverlening verwerkt de verwerkingsverantwoordelijke.</p><p className="mt-2">Voor privacyvragen of verzoeken kun je contact opnemen via <a href="mailto:info@shinego.nl" className="font-semibold text-blue-600 hover:text-blue-700">info@shinego.nl</a> of via de contactpagina van ShineGo.</p></section>
 
             <section><h2 className="text-xl font-bold text-slate-900">2. Welke persoonsgegevens verwerken wij?</h2><p className="mt-2">Van klanten kunnen wij onder andere naam, e-mailadres, telefoonnummer, adresgegevens, boekingsgegevens, gewenste datum en tijd, informatie over het pand en de opdracht, betaalstatus, communicatie, klachten en administratieve gegevens verwerken.</p><p className="mt-2">Van professionals kunnen wij daarnaast bedrijfsnaam, KvK-nummer, btw-nummer, werkgebied, contact- en adresgegevens, accountgegevens, opdrachtinformatie, verificatie- en uitbetalingsstatus en gegevens die nodig zijn voor facturatie en afrekening verwerken.</p><p className="mt-2">Wanneer je contact opneemt, kunnen wij de inhoud van je bericht en de gegevens die je daarbij zelf verstrekt verwerken.</p></section>
 
@@ -36,11 +43,11 @@ export default function PrivacyPage() {
 
             <section><h2 className="text-xl font-bold text-slate-900">13. Wijzigingen</h2><p className="mt-2">Wij kunnen deze privacyverklaring aanpassen wanneer de dienstverlening, leveranciers of wet- en regelgeving verandert. De meest actuele versie wordt op de website gepubliceerd.</p></section>
 
-            <section><h2 className="text-xl font-bold text-slate-900">14. Contact</h2><p className="mt-2">Heb je vragen over privacy of wil je een privacyrecht uitoefenen? Neem dan contact op via de contactpagina van ShineGo en vermeld duidelijk dat het om een privacyverzoek gaat.</p></section>
+            <section><h2 className="text-xl font-bold text-slate-900">14. Contact</h2><p className="mt-2">Heb je vragen over privacy of wil je een privacyrecht uitoefenen? Mail dan naar <a href="mailto:info@shinego.nl" className="font-semibold text-blue-600 hover:text-blue-700">info@shinego.nl</a> en vermeld duidelijk dat het om een privacyverzoek gaat.</p></section>
           </div>
 
           <div className="mt-10 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-900">
-            Deze versie is opgesteld voor juridische controle. Voor de definitieve publicatie moeten onder meer de volledige juridische identiteit, het vestigingsadres en het definitieve privacy-contactadres van ShineGo worden toegevoegd en door een Nederlandse privacyjurist worden gecontroleerd.
+            Deze versie is opgesteld voor juridische controle. Het definitieve vestigings- of zakelijke adres wordt later toegevoegd zodra dit is vastgesteld.
           </div>
         </div>
       </div>
