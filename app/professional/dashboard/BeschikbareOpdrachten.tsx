@@ -67,7 +67,6 @@ export default function BeschikbareOpdrachten() {
   }, []);
 
   function wisselDienst(dienst: string, actief: boolean) {
-    if (dienst === "glazenwasser") return;
     setDiensten((huidig) => actief ? Array.from(new Set([...huidig, dienst])) : huidig.filter((item) => item !== dienst));
   }
 
@@ -78,6 +77,12 @@ export default function BeschikbareOpdrachten() {
     if (!accessToken) {
       setVoorkeurBezig(false);
       setVoorkeurMelding("Je sessie is verlopen. Log opnieuw in.");
+      return;
+    }
+
+    if (diensten.length === 0) {
+      setVoorkeurBezig(false);
+      setVoorkeurMelding("Kies minimaal één dienst die je kunt uitvoeren.");
       return;
     }
 
@@ -168,7 +173,7 @@ export default function BeschikbareOpdrachten() {
         <h3 className="font-bold text-gray-900">Mijn diensten en meldingen</h3>
         <p className="mt-1 text-sm text-gray-600">Deze keuzes bepalen welke opdrachten je kunt aannemen en voor welke soorten opdrachten je later meldingen krijgt.</p>
         <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <label className="flex items-center gap-3 rounded-xl border border-gray-200 bg-white p-3"><input type="checkbox" checked readOnly className="h-5 w-5" /><span className="text-sm font-semibold text-gray-800">Glazenwassen</span></label>
+          <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-200 bg-white p-3"><input type="checkbox" checked={diensten.includes("glazenwasser")} onChange={(e) => wisselDienst("glazenwasser", e.target.checked)} className="h-5 w-5" /><span className="text-sm font-semibold text-gray-800">Glazenwassen</span></label>
           <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-200 bg-white p-3"><input type="checkbox" checked={diensten.includes("telewash")} onChange={(e) => wisselDienst("telewash", e.target.checked)} className="h-5 w-5" /><span className="text-sm font-semibold text-gray-800">Telewash / telescoopsteel</span></label>
           <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-200 bg-white p-3"><input type="checkbox" checked={diensten.includes("bedrijf")} onChange={(e) => wisselDienst("bedrijf", e.target.checked)} className="h-5 w-5" /><span className="text-sm font-semibold text-gray-800">Winkel / bedrijfspand</span></label>
           <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-200 bg-white p-3"><input type="checkbox" checked={diensten.includes("binnen")} onChange={(e) => wisselDienst("binnen", e.target.checked)} className="h-5 w-5" /><span className="text-sm font-semibold text-gray-800">Binnenramen</span></label>
