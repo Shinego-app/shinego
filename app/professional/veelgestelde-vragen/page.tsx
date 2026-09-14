@@ -151,6 +151,12 @@ export default function ProfessionalVeelgesteldeVragenPage() {
           <div className="mt-8 rounded-2xl bg-blue-50 p-5 text-sm leading-6 text-blue-950">
             <strong>Belangrijk:</strong> ShineGo geeft geen werkinstructies voor de uitvoering van glasbewassing. Als zelfstandig professional beoordeel je zelf de situatie, kies je je werkmethode en hulpmiddelen en blijf je verantwoordelijk voor een veilige en vakmatige uitvoering.
           </div>
+
+          <div className="mt-6 rounded-2xl border border-gray-200 bg-gray-50 p-5 text-sm leading-6 text-gray-700">
+            <strong>Contact met ShineGo</strong><br />
+            Voor vragen over je account, opdrachten of uitbetalingen: info@shinego.nl<br />
+            ShineGo · KvK 57712913 · btw-id NL001205368B47
+          </div>
         </section>
       </div>
     </main>
