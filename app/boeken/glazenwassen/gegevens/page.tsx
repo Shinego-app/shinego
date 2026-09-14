@@ -1,17 +1,57 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 type Prijs = { basisprijs: number; ramenPrijs: number; verdiepingToeslag: number; bereikToeslag: number; kozijnenToeslag: number; totaal: number; };
+
+const maandNamen = ["januari", "februari", "maart", "april", "mei", "juni", "juli", "augustus", "september", "oktober", "november", "december"];
+const weekDagen = ["ma", "di", "wo", "do", "vr", "za", "zo"];
+
+function datumNaarWaarde(datum: Date) {
+  const jaar = datum.getFullYear();
+  const maand = String(datum.getMonth() + 1).padStart(2, "0");
+  const dag = String(datum.getDate()).padStart(2, "0");
+  return `${jaar}-${maand}-${dag}`;
+}
+
+function waardeNaarDatum(waarde: string) {
+  if (!waarde) return null;
+  const [jaar, maand, dag] = waarde.split("-").map(Number);
+  return new Date(jaar, maand - 1, dag);
+}
+
+function toonDatum(waarde: string) {
+  const datum = waardeNaarDatum(waarde);
+  if (!datum) return "Kies een datum";
+  return `${datum.getDate()} ${maandNamen[datum.getMonth()]} ${datum.getFullYear()}`;
+}
 
 export default function GegevensPage() {
   const [prijs, setPrijs] = useState<Prijs | null>(null);
   const [voornaam, setVoornaam] = useState(""); const [achternaam, setAchternaam] = useState(""); const [email, setEmail] = useState(""); const [telefoon, setTelefoon] = useState("");
   const [postcode, setPostcode] = useState(""); const [huisnummer, setHuisnummer] = useState(""); const [straat, setStraat] = useState(""); const [plaats, setPlaats] = useState("");
   const [gewensteDatum, setGewenensteDatum] = useState(""); const [gewensteTijd, setGewensteTijd] = useState(""); const [thuisNodig, setThuisNodig] = useState("");
+  const [kalenderOpen, setKalenderOpen] = useState(false);
+  const [zichtbareMaand, setZichtbareMaand] = useState(() => { const nu = new Date(); return new Date(nu.getFullYear(), nu.getMonth(), 1); });
 
   useEffect(() => { const opgeslagenPrijs = localStorage.getItem("shinegoPrijs"); if (opgeslagenPrijs) setPrijs(JSON.parse(opgeslagenPrijs)); }, []);
   useEffect(() => { async function haalAdresOp() { if (postcode.trim().length < 6 || huisnummer.trim() === "") return; try { const zoekterm = `${postcode} ${huisnummer}`; const response = await fetch(`https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?q=${encodeURIComponent(zoekterm)}&fq=type:adres`); const data = await response.json(); const adres = data.response?.docs?.[0]; if (adres) { setStraat(adres.straatnaam || ""); setPlaats(adres.woonplaatsnaam || ""); } } catch (error) { console.error("Adres ophalen mislukt:", error); } } haalAdresOp(); }, [postcode, huisnummer]);
+
+  const vandaag = useMemo(() => { const nu = new Date(); return new Date(nu.getFullYear(), nu.getMonth(), nu.getDate()); }, []);
+  const minDatum = datumNaarWaarde(vandaag);
+
+  const kalenderDagen = useMemo(() => {
+    const jaar = zichtbareMaand.getFullYear();
+    const maand = zichtbareMaand.getMonth();
+    const eersteDag = new Date(jaar, maand, 1);
+    const offset = (eersteDag.getDay() + 6) % 7;
+    const start = new Date(jaar, maand, 1 - offset);
+    return Array.from({ length: 42 }, (_, index) => {
+      const datum = new Date(start);
+      datum.setDate(start.getDate() + index);
+      return datum;
+    });
+  }, [zichtbareMaand]);
 
   const kanVerder = voornaam.trim() !== "" && achternaam.trim() !== "" && email.trim() !== "" && telefoon.trim() !== "" && postcode.trim() !== "" && huisnummer.trim() !== "" && straat.trim() !== "" && plaats.trim() !== "" && gewensteDatum !== "" && gewensteTijd !== "" && thuisNodig !== "";
   function gaVerder() { if (!kanVerder) return; localStorage.setItem("shinegoKlantGegevens", JSON.stringify({ voornaam, achternaam, email, telefoon, postcode, huisnummer, straat, plaats, gewensteDatum, gewensteTijd, thuisNodig })); window.location.href = "/boeken/glazenwassen/bevestigen"; }
@@ -38,7 +78,27 @@ export default function GegevensPage() {
               <label className="text-xs font-bold text-[#4f708f]">Straat<input value={straat} onChange={(e)=>setStraat(e.target.value)} className={`${inputClass} mt-1`} placeholder="Straatnaam" /></label>
               <label className="text-xs font-bold text-[#4f708f]">Plaats<input value={plaats} onChange={(e)=>setPlaats(e.target.value)} className={`${inputClass} mt-1`} placeholder="Amsterdam" /></label>
             </div>
-            <div className="mt-5 grid gap-3 sm:grid-cols-2"><label className="rounded-xl border border-[#cfe3f4] bg-[#f7fbff] p-3 text-xs font-bold text-[#4f708f]">Gewenste datum<input type="date" value={gewensteDatum} onChange={(e)=>setGewenensteDatum(e.target.value)} className="mt-2 w-full bg-transparent text-sm font-semibold text-[#123c70] outline-none" /></label><label className="rounded-xl border border-[#cfe3f4] bg-[#f7fbff] p-3 text-xs font-bold text-[#4f708f]">Gewenste tijd<select value={gewensteTijd} onChange={(e)=>setGewensteTijd(e.target.value)} className="mt-2 w-full bg-transparent text-sm font-semibold text-[#123c70] outline-none"><option value="">Kies tijdvak</option><option value="08:00-10:00">08:00 - 10:00</option><option value="10:00-12:00">10:00 - 12:00</option><option value="12:00-14:00">12:00 - 14:00</option><option value="14:00-16:00">14:00 - 16:00</option><option value="16:00-18:00">16:00 - 18:00</option></select></label></div>
+
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+              <div className="relative rounded-xl border border-[#cfe3f4] bg-[#f7fbff] p-3 text-xs font-bold text-[#4f708f]">
+                <div>Gewenste datum</div>
+                <input type="date" min={minDatum} value={gewensteDatum} onChange={(e)=>setGewenensteDatum(e.target.value)} className="mt-2 w-full bg-transparent text-sm font-semibold text-[#123c70] outline-none md:hidden" />
+                <button type="button" onClick={()=>{ const gekozen = waardeNaarDatum(gewensteDatum); if (gekozen) setZichtbareMaand(new Date(gekozen.getFullYear(), gekozen.getMonth(), 1)); setKalenderOpen(!kalenderOpen); }} className="mt-2 hidden w-full items-center justify-between rounded-lg bg-white px-3 py-2.5 text-left text-sm font-semibold text-[#123c70] shadow-sm ring-1 ring-[#d5e9f8] transition hover:ring-[#8fc7ef] md:flex">
+                  <span>{toonDatum(gewensteDatum)}</span><span className="text-[#1683f8]">▾</span>
+                </button>
+                {kalenderOpen && <div className="absolute left-0 top-full z-30 mt-2 hidden w-[340px] max-w-[calc(100vw-2rem)] rounded-2xl border border-[#d5e9f8] bg-white p-4 shadow-[0_18px_55px_rgba(40,93,140,.18)] md:block">
+                  <div className="flex items-center justify-between">
+                    <button type="button" onClick={()=>setZichtbareMaand(new Date(zichtbareMaand.getFullYear(), zichtbareMaand.getMonth()-1, 1))} className="flex h-9 w-9 items-center justify-center rounded-full bg-[#eef7ff] text-lg text-[#3971a4] hover:bg-[#e4f2ff]">‹</button>
+                    <div className="text-sm font-extrabold text-[#123c70]">{maandNamen[zichtbareMaand.getMonth()]} {zichtbareMaand.getFullYear()}</div>
+                    <button type="button" onClick={()=>setZichtbareMaand(new Date(zichtbareMaand.getFullYear(), zichtbareMaand.getMonth()+1, 1))} className="flex h-9 w-9 items-center justify-center rounded-full bg-[#eef7ff] text-lg text-[#3971a4] hover:bg-[#e4f2ff]">›</button>
+                  </div>
+                  <div className="mt-4 grid grid-cols-7 gap-1 text-center">{weekDagen.map((dag)=><div key={dag} className="py-1 text-[11px] font-extrabold uppercase text-[#8aa0b5]">{dag}</div>)}</div>
+                  <div className="mt-1 grid grid-cols-7 gap-1">{kalenderDagen.map((datum)=>{ const waarde=datumNaarWaarde(datum); const andereMaand=datum.getMonth()!==zichtbareMaand.getMonth(); const verleden=datum<vandaag; const gekozen=waarde===gewensteDatum; return <button key={waarde} type="button" disabled={verleden} onClick={()=>{setGewenensteDatum(waarde);setKalenderOpen(false);}} className={`flex h-9 items-center justify-center rounded-lg text-xs font-bold transition ${gekozen?"bg-[#1683f8] text-white":verleden?"cursor-not-allowed text-[#c1cfdb]":andereMaand?"text-[#9fb2c4] hover:bg-[#eef7ff]":"text-[#315f88] hover:bg-[#eaf6ff]"}`}>{datum.getDate()}</button>;})}</div>
+                  <button type="button" onClick={()=>{setGewenensteDatum(datumNaarWaarde(vandaag));setZichtbareMaand(new Date(vandaag.getFullYear(),vandaag.getMonth(),1));setKalenderOpen(false);}} className="mt-3 w-full rounded-xl bg-[#eef7ff] py-2 text-xs font-extrabold text-[#3971a4] hover:bg-[#e4f2ff]">Vandaag</button>
+                </div>}
+              </div>
+              <label className="rounded-xl border border-[#cfe3f4] bg-[#f7fbff] p-3 text-xs font-bold text-[#4f708f]">Gewenste tijd<select value={gewensteTijd} onChange={(e)=>setGewensteTijd(e.target.value)} className="mt-2 w-full bg-transparent text-sm font-semibold text-[#123c70] outline-none"><option value="">Kies tijdvak</option><option value="08:00-10:00">08:00 - 10:00</option><option value="10:00-12:00">10:00 - 12:00</option><option value="12:00-14:00">12:00 - 14:00</option><option value="14:00-16:00">14:00 - 16:00</option><option value="16:00-18:00">16:00 - 18:00</option></select></label>
+            </div>
             <div className="mt-5"><div className="text-xs font-bold text-[#4f708f]">Moet je thuis zijn?</div><div className="mt-2 space-y-2 text-sm text-[#4f708f]"><label className="flex items-center gap-2"><input type="radio" name="thuis" checked={thuisNodig === "ja"} onChange={()=>setThuisNodig("ja")} /> Ja, ik ben aanwezig</label><label className="flex items-center gap-2"><input type="radio" name="thuis" checked={thuisNodig === "nee"} onChange={()=>setThuisNodig("nee")} /> Nee, dat is niet nodig</label></div></div>
           </div>
           <aside className="space-y-5 rounded-[24px] bg-gradient-to-b from-[#eef8ff] to-[#e4f3ff] p-5">
