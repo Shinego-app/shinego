@@ -7,7 +7,7 @@ export default function VoorwaardenPage() {
         <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm sm:p-10">
           <p className="text-sm font-bold uppercase tracking-wider text-blue-600">ShineGo</p>
           <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">Algemene voorwaarden voor klanten</h1>
-          <p className="mt-3 text-sm text-slate-500">Concept voor juridische review · laatst bijgewerkt: 14 september 2026</p>
+          <p className="mt-3 text-sm text-slate-500">Laatst bijgewerkt: 14 september 2026</p>
 
           <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm leading-6 text-slate-700">
             <p><strong>Handelsnaam:</strong> ShineGo</p>
@@ -126,10 +126,6 @@ export default function VoorwaardenPage() {
               <h2 className="text-xl font-bold text-slate-900">18. Contact</h2>
               <p className="mt-2">Voor vragen over een boeking, annulering, herroeping, klacht of deze voorwaarden kan de klant contact opnemen via <a href="mailto:info@shinego.nl" className="font-semibold text-blue-600 hover:text-blue-700">info@shinego.nl</a> of via de contactpagina op de ShineGo-website.</p>
             </section>
-          </div>
-
-          <div className="mt-10 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-900">
-            Deze versie is opgesteld als concept voor juridische controle. Laat de definitieve voorwaarden vóór grootschalige commerciële inzet beoordelen door een Nederlandse jurist of advocaat met ervaring in consumentenrecht, platformrecht en overeenkomsten op afstand.
           </div>
         </div>
       </div>
