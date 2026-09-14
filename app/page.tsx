@@ -92,7 +92,7 @@ export default function Home() {
                 <p><a href="mailto:info@shinego.nl" className="hover:text-[#1768b5]">info@shinego.nl</a></p>
               </div>
             </div>
-            <nav className="flex flex-wrap gap-x-5 gap-y-3 text-sm font-semibold text-[#52779b]"><a href="/privacy">Privacy</a><a href="/voorwaarden">Algemene voorwaarden</a><a href="/cookies">Cookies</a><a href="/contact">Contact</a></nav>
+            <nav className="flex flex-wrap gap-x-5 gap-y-3 text-sm font-semibold text-[#52779b]"><a href="/privacy">Privacy</a><a href="/voorwaarden">Algemene voorwaarden</a><a href="/cookies">Cookies</a><a href="/herroepen">Herroepen</a><a href="/contact">Contact</a></nav>
             <p className="text-xs text-[#8aa0b5]">© 2026 ShineGo</p>
           </div>
         </div>
