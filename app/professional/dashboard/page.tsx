@@ -39,6 +39,7 @@ export default function ProfessionalDashboardPage() {
     toevoeging: "",
     kvk_nummer: "",
     btw_nummer: "",
+    werkgebied_km: "25",
     geboortedatum: "",
     iban: "",
   });
@@ -56,6 +57,7 @@ export default function ProfessionalDashboardPage() {
       toevoeging: data?.toevoeging || "",
       kvk_nummer: data?.kvk_nummer || "",
       btw_nummer: data?.btw_nummer || "",
+      werkgebied_km: String(data?.werkgebied_km || 25),
       geboortedatum: toonGeboortedatum(data?.stripe_geboortedatum),
       iban: data?.stripe_iban || "",
     });
@@ -162,7 +164,7 @@ export default function ProfessionalDashboardPage() {
     setProfessional(bijgewerkt);
     vulProfielForm(bijgewerkt);
     setProfielBewerken(false);
-    setProfielMelding("Gegevens opgeslagen.");
+    setProfielMelding("Gegevens opgeslagen. Je werkgebied wordt direct gebruikt voor nieuwe beschikbare opdrachten.");
   }
 
   async function startStripeConnect() {
@@ -207,7 +209,7 @@ export default function ProfessionalDashboardPage() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="text-xl font-bold text-gray-900">Mijn gegevens</h2>
-              <p className="mt-1 text-sm text-gray-600">Controleer en wijzig je bedrijfs-, contact- en uitbetalingsgegevens.</p>
+              <p className="mt-1 text-sm text-gray-600">Controleer en wijzig je bedrijfs-, contact-, werkgebied- en uitbetalingsgegevens.</p>
             </div>
             {!profielBewerken && (
               <button onClick={() => { setProfielMelding(""); setProfielBewerken(true); }} className="rounded-xl border border-blue-600 bg-white px-4 py-2 font-semibold text-blue-600">Gegevens wijzigen</button>
@@ -222,6 +224,7 @@ export default function ProfessionalDashboardPage() {
               <p><strong>Telefoon:</strong> {professional?.telefoon || "-"}</p>
               <p><strong>Adres:</strong> {[professional?.straat, professional?.huisnummer, professional?.toevoeging].filter(Boolean).join(" ") || "-"}</p>
               <p><strong>Postcode / plaats:</strong> {[professional?.postcode, professional?.woonplaats].filter(Boolean).join(" ") || "-"}</p>
+              <p><strong>Werkgebied:</strong> {professional?.werkgebied_km ? `${professional.werkgebied_km} km rondom jouw adres` : "Niet ingesteld"}</p>
               <p><strong>KVK:</strong> {professional?.kvk_nummer || "-"}</p>
               <p><strong>BTW:</strong> {professional?.btw_nummer || "Niet ingevuld"}</p>
               <p><strong>Geboortedatum:</strong> {toonGeboortedatum(professional?.stripe_geboortedatum) || "Niet ingevuld"}</p>
@@ -235,6 +238,24 @@ export default function ProfessionalDashboardPage() {
                   <input value={(profielForm as any)[key]} onChange={(e) => setProfielForm((prev) => ({ ...prev, [key]: e.target.value }))} className="w-full rounded-xl border border-gray-300 px-3 py-2 text-gray-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100" />
                 </label>
               ))}
+
+              <label className="block">
+                <span className="mb-1 block text-sm font-medium text-gray-800">Werkgebied</span>
+                <select
+                  value={profielForm.werkgebied_km}
+                  onChange={(e) => setProfielForm((prev) => ({ ...prev, werkgebied_km: e.target.value }))}
+                  className="w-full rounded-xl border border-gray-300 px-3 py-2 text-gray-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
+                >
+                  <option value="10">10 km</option>
+                  <option value="15">15 km</option>
+                  <option value="25">25 km</option>
+                  <option value="35">35 km</option>
+                  <option value="50">50 km</option>
+                  <option value="75">75 km</option>
+                  <option value="100">100 km</option>
+                </select>
+                <span className="mt-1 block text-xs text-gray-500">Nieuwe betaalde opdrachten binnen deze afstand worden automatisch bij Beschikbare opdrachten getoond als ze ook bij jouw diensten en materiaal passen.</span>
+              </label>
 
               <label className="block">
                 <span className="mb-1 block text-sm font-medium text-gray-800">Geboortedatum</span>
