@@ -3,41 +3,126 @@ export default function VoorwaardenPage() {
     <main className="min-h-screen bg-slate-50 text-slate-900">
       <div className="mx-auto max-w-4xl px-6 py-12 sm:py-16">
         <a href="/" className="mb-8 inline-block font-semibold text-blue-600 hover:text-blue-700">← Terug naar ShineGo</a>
+
         <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm sm:p-10">
           <p className="text-sm font-bold uppercase tracking-wider text-blue-600">ShineGo</p>
-          <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">Algemene voorwaarden</h1>
-          <p className="mt-3 text-sm text-slate-500">Laatst bijgewerkt: 11 september 2026</p>
+          <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">Algemene voorwaarden voor klanten</h1>
+          <p className="mt-3 text-sm text-slate-500">Concept voor juridische review · laatst bijgewerkt: 14 september 2026</p>
 
           <div className="mt-10 space-y-9 leading-7 text-slate-600">
-            <section><h2 className="text-xl font-bold text-slate-900">1. Over ShineGo</h2><p className="mt-2">ShineGo exploiteert een online platform waarop klanten diensten kunnen boeken die worden uitgevoerd door zelfstandige professionals.</p><p className="mt-2">ShineGo brengt klanten en professionals met elkaar in contact en faciliteert onder andere de boeking, betaling en administratieve afhandeling van opdrachten.</p></section>
+            <section>
+              <h2 className="text-xl font-bold text-slate-900">1. Over ShineGo</h2>
+              <p className="mt-2">ShineGo exploiteert een online bemiddelingsplatform voor glasbewassing. Via het platform kunnen klanten een opdracht aanvragen en kunnen zelfstandige professionals opdrachten aannemen.</p>
+              <p className="mt-2">ShineGo faciliteert onder andere de boeking, betaling, communicatie en administratieve afhandeling. De feitelijke werkzaamheden worden uitgevoerd door een zelfstandige professional.</p>
+            </section>
 
-            <section><h2 className="text-xl font-bold text-slate-900">2. De professional</h2><p className="mt-2">Professionals die via ShineGo werkzaamheden uitvoeren, werken als zelfstandige ondernemer. Zij zijn geen werknemers van ShineGo en bepalen zelf welke beschikbare opdrachten zij aannemen.</p><p className="mt-2">De professional bepaalt zelfstandig hoe een aangenomen opdracht wordt uitgevoerd en welke werkmethode en hulpmiddelen daarvoor geschikt zijn. De professional is verantwoordelijk voor de uitvoering van de opdracht en voor naleving van de voor zijn werkzaamheden geldende wet- en regelgeving.</p></section>
+            <section>
+              <h2 className="text-xl font-bold text-slate-900">2. Wie voert de opdracht uit?</h2>
+              <p className="mt-2">De professional die een opdracht via ShineGo aanneemt, werkt als zelfstandig ondernemer en is geen werknemer van ShineGo. De professional is verantwoordelijk voor de feitelijke uitvoering van de aangenomen werkzaamheden.</p>
+              <p className="mt-2">ShineGo faciliteert de totstandkoming en afhandeling van de opdracht en kan optreden als aanspreekpunt voor boekingen, betalingen, klachten en administratieve vragen.</p>
+            </section>
 
-            <section><h2 className="text-xl font-bold text-slate-900">3. Boeken van een opdracht</h2><p className="mt-2">De klant is verantwoordelijk voor het correct doorgeven van informatie die nodig is om de opdracht en prijs te bepalen, waaronder informatie over het pand, het aantal ramen, bereikbaarheid en verdiepingen.</p><p className="mt-2">Keuzes en aanduidingen in de boekingsflow zijn bedoeld om de opdracht en prijs te beschrijven. Zij vormen geen instructie van ShineGo over de concrete uitvoering of de te gebruiken werkmethode.</p><p className="mt-2">Wanneer de feitelijke situatie wezenlijk afwijkt van de opgegeven informatie, kan de opdracht mogelijk niet volgens de oorspronkelijke boeking worden uitgevoerd.</p></section>
+            <section>
+              <h2 className="text-xl font-bold text-slate-900">3. Totstandkoming van een boeking</h2>
+              <p className="mt-2">De klant doorloopt de boekingsstappen, controleert de ingevoerde gegevens, accepteert de toepasselijke voorwaarden en rondt de betaling af. De boekingsbevestiging vermeldt de voor de opdracht relevante gegevens.</p>
+              <p className="mt-2">De klant is verantwoordelijk voor het juist en volledig doorgeven van onder meer het adres, type woning of pand, aantal ramen, verdiepingen, bereikbaarheid, gewenste datum en andere informatie die van invloed is op de opdracht of prijs.</p>
+              <p className="mt-2">Kennelijke fouten in prijzen, omschrijvingen of technische weergaven binden ShineGo niet wanneer voor de klant redelijkerwijs duidelijk had moeten zijn dat sprake was van een fout.</p>
+            </section>
 
-            <section><h2 className="text-xl font-bold text-slate-900">4. Prijzen en betaling</h2><p className="mt-2">De prijs van een opdracht wordt vóór het afronden van de boeking aan de klant getoond. De klant betaalt de opdracht via de door ShineGo aangeboden betaalmethode.</p><p className="mt-2">Betalingen en uitbetalingen kunnen worden verwerkt door een externe betaaldienstverlener. ShineGo kan een platformvergoeding inhouden op de vergoeding van de professional.</p></section>
+            <section>
+              <h2 className="text-xl font-bold text-slate-900">4. Prijs en betaling</h2>
+              <p className="mt-2">De totaalprijs wordt vóór het afronden van de boeking aan de klant getoond. De klant betaalt via de betaalmethoden die op dat moment door ShineGo worden aangeboden.</p>
+              <p className="mt-2">Betalingen kunnen worden verwerkt door Stripe of een andere betaaldienstverlener. ShineGo bewaart geen volledige betaalkaartgegevens.</p>
+              <p className="mt-2">Wanneer de feitelijke situatie wezenlijk afwijkt van de informatie die bij de boeking is opgegeven, worden aanvullende werkzaamheden of prijswijzigingen niet zonder duidelijke afstemming uitgevoerd.</p>
+            </section>
 
-            <section><h2 className="text-xl font-bold text-slate-900">5. Uitvoering van de opdracht</h2><p className="mt-2">De professional beoordeelt zelfstandig de situatie ter plaatse en bepaalt of en op welke wijze de aangenomen opdracht kan worden uitgevoerd.</p><p className="mt-2">De professional kiest zelf de concrete werkmethode en benodigde hulpmiddelen en is verantwoordelijk voor naleving van de toepasselijke regels die voor zijn werkzaamheden gelden. ShineGo schrijft de professional geen concrete werkmethode voor.</p></section>
+            <section>
+              <h2 className="text-xl font-bold text-slate-900">5. Uitvoering en werkmethode</h2>
+              <p className="mt-2">De professional beoordeelt zelfstandig de situatie ter plaatse en bepaalt welke werkmethode en hulpmiddelen geschikt en verantwoord zijn. Vermeldingen zoals telescoopsteel, bereikbaarheid of verdieping beschrijven de opdracht en vormen geen instructie van ShineGo over de concrete uitvoering.</p>
+              <p className="mt-2">Wanneer uitvoering ter plaatse naar het oordeel van de professional niet verantwoord is, kan de professional de werkzaamheden onderbreken of niet uitvoeren en wordt de situatie via ShineGo verder afgehandeld.</p>
+            </section>
 
-            <section><h2 className="text-xl font-bold text-slate-900">6. Aanwezigheid en toegang</h2><p className="mt-2">Wanneer voor de uitvoering toegang tot de woning, tuin, balkon, bedrijfsruimte of een ander afgesloten gedeelte nodig is, moet de klant ervoor zorgen dat de professional op het afgesproken moment toegang heeft.</p></section>
+            <section>
+              <h2 className="text-xl font-bold text-slate-900">6. Aanwezigheid en toegang</h2>
+              <p className="mt-2">Wanneer voor de werkzaamheden toegang nodig is tot de woning, tuin, balkon, bedrijfsruimte of een ander afgesloten gedeelte, zorgt de klant ervoor dat de professional op het afgesproken moment toegang kan krijgen.</p>
+              <p className="mt-2">Wanneer de opdracht zonder aanwezigheid van de klant kan worden uitgevoerd, hoeft de klant niet thuis te zijn, tenzij bij de boeking anders is aangegeven.</p>
+            </section>
 
-            <section><h2 className="text-xl font-bold text-slate-900">7. Annulering door de klant</h2><p className="mt-2">De klant kan een boeking annuleren volgens de op dat moment geldende annuleringsvoorwaarden. Bij annulering minder dan 24 uur vóór het afgesproken tijdstip kan 30% van de boekingsprijs als annuleringskosten in rekening worden gebracht.</p></section>
+            <section>
+              <h2 className="text-xl font-bold text-slate-900">7. Wettelijke bedenktijd bij online boekingen</h2>
+              <p className="mt-2">Voor consumenten kan bij een online gesloten overeenkomst een wettelijke bedenktijd van 14 dagen gelden. Deze wettelijke rechten staan los van het commerciële annuleringsbeleid van ShineGo en worden door dat beleid niet beperkt.</p>
+              <p className="mt-2">Wanneer de klant uitdrukkelijk verzoekt om de dienstverlening al tijdens de bedenktijd te laten beginnen, kan de uitvoering binnen die periode starten. Als de klant vervolgens rechtsgeldig herroept nadat de dienstverlening op zijn verzoek is begonnen, kan voor het reeds uitgevoerde deel een evenredig bedrag verschuldigd zijn voor zover de wet dit toestaat.</p>
+              <p className="mt-2">Voor zover de wet voor het volledig uitvoeren van een dienst tijdens de bedenktijd aanvullende toestemming of erkenning vereist om het herroepingsrecht te laten vervallen, blijft dat wettelijke vereiste van toepassing.</p>
+              <p className="mt-2">Een consument kan zijn wettelijke herroepingsrecht uitoefenen via de daarvoor aangeboden online mogelijkheid of via de contactmogelijkheden op de website. ShineGo verstrekt de wettelijk vereiste informatie over herroeping vóór het sluiten van de overeenkomst.</p>
+            </section>
 
-            <section><h2 className="text-xl font-bold text-slate-900">8. Klant niet aanwezig</h2><p className="mt-2">Wanneer aanwezigheid of toegang noodzakelijk is en de klant niet aanwezig is of geen toegang kan worden verkregen, kan dit als een no-show worden behandeld. ShineGo kan bewijs van de professional vragen voordat eventuele kosten of een vergoeding worden vastgesteld.</p></section>
+            <section>
+              <h2 className="text-xl font-bold text-slate-900">8. Annulering door de klant</h2>
+              <p className="mt-2">Buiten een eventueel toepasselijk wettelijk herroepingsrecht geldt het annuleringsbeleid dat vóór het afronden van de boeking aan de klant wordt meegedeeld.</p>
+              <p className="mt-2">Bij annulering minder dan 24 uur vóór het afgesproken tijdstip kan 30% van de boekingsprijs als annuleringskosten in rekening worden gebracht, voor zover dit in de concrete situatie wettelijk is toegestaan.</p>
+            </section>
 
-            <section><h2 className="text-xl font-bold text-slate-900">9. Annulering door de professional</h2><p className="mt-2">Wanneer een professional een aangenomen opdracht annuleert, kan ShineGo de opdracht opnieuw beschikbaar stellen aan andere professionals. Voor de klant worden hiervoor geen annuleringskosten gerekend.</p></section>
+            <section>
+              <h2 className="text-xl font-bold text-slate-900">9. Klant niet aanwezig of geen toegang</h2>
+              <p className="mt-2">Wanneer aanwezigheid of toegang noodzakelijk is en de klant niet aanwezig is of geen toegang kan worden verkregen, kan dit als no-show worden behandeld. Daarbij kan 30% van de boekingsprijs in rekening worden gebracht, voor zover dit vooraf duidelijk is overeengekomen en wettelijk is toegestaan.</p>
+              <p className="mt-2">ShineGo kan de professional vragen om passende informatie of bewijs van aanwezigheid voordat kosten of een vergoeding worden vastgesteld.</p>
+            </section>
 
-            <section><h2 className="text-xl font-bold text-slate-900">10. Klachten</h2><p className="mt-2">Een klacht over een uitgevoerde opdracht moet zo snel mogelijk bij ShineGo worden gemeld. ShineGo kan informatie, foto's of andere relevante gegevens bij de klant en professional opvragen om de situatie te beoordelen.</p></section>
+            <section>
+              <h2 className="text-xl font-bold text-slate-900">10. Annulering door de professional of ShineGo</h2>
+              <p className="mt-2">Wanneer een professional een aangenomen opdracht annuleert, kan ShineGo proberen de opdracht opnieuw beschikbaar te stellen aan een andere professional. Voor deze annulering worden aan de klant geen annuleringskosten in rekening gebracht.</p>
+              <p className="mt-2">Wanneer een opdracht niet kan worden uitgevoerd en geen passend alternatief wordt overeengekomen, wordt een reeds betaald bedrag voor het niet-uitgevoerde deel terugbetaald volgens de toepasselijke wettelijke regels en betaalprocedure.</p>
+            </section>
 
-            <section><h2 className="text-xl font-bold text-slate-900">11. Aansprakelijkheid</h2><p className="mt-2">ShineGo faciliteert de totstandkoming en administratieve afhandeling van opdrachten tussen klanten en zelfstandige professionals. De professional blijft verantwoordelijk voor de feitelijke uitvoering van de door hem aangenomen opdracht. Iedere partij blijft daarnaast verantwoordelijk voor het eigen handelen en voor verplichtingen of aansprakelijkheid die volgens de wet niet kunnen worden uitgesloten of beperkt.</p></section>
+            <section>
+              <h2 className="text-xl font-bold text-slate-900">11. Periodieke boekingen</h2>
+              <p className="mt-2">Wanneer de klant kiest voor een terugkerende frequentie, bijvoorbeeld iedere 4, 8 of 12 weken, worden de frequentie, prijs of korting en overige relevante afspraken vóór het afronden van de boeking getoond.</p>
+              <p className="mt-2">De klant kan toekomstige periodieke opdrachten beëindigen volgens de voorwaarden die bij het aangaan van de periodieke boeking zijn meegedeeld. Dwingendrechtelijke regels over opzegging, verlenging en consumentenbescherming blijven altijd van toepassing.</p>
+            </section>
 
-            <section><h2 className="text-xl font-bold text-slate-900">12. Misbruik van het platform</h2><p className="mt-2">Het is niet toegestaan ShineGo te gebruiken voor fraude, misleiding, onrechtmatige activiteiten of het bewust verstrekken van onjuiste informatie. ShineGo kan bij misbruik de toegang tot het platform beperken of beëindigen.</p></section>
+            <section>
+              <h2 className="text-xl font-bold text-slate-900">12. Klachten en herstel</h2>
+              <p className="mt-2">Een klacht over de uitvoering van een opdracht meldt de klant zo snel mogelijk via ShineGo, zodat de situatie nog redelijk kan worden beoordeeld. ShineGo kan informatie, foto's of andere relevante gegevens opvragen bij de klant en de professional.</p>
+              <p className="mt-2">Afhankelijk van de omstandigheden kan worden onderzocht of herstel, een gedeeltelijke terugbetaling of een andere passende oplossing mogelijk is. Wettelijke rechten van de klant blijven daarbij van toepassing.</p>
+            </section>
 
-            <section><h2 className="text-xl font-bold text-slate-900">13. Wijzigingen</h2><p className="mt-2">ShineGo kan deze voorwaarden aanpassen wanneer de dienstverlening, het platform of toepasselijke wet- en regelgeving verandert. De actuele voorwaarden worden op de website gepubliceerd.</p></section>
+            <section>
+              <h2 className="text-xl font-bold text-slate-900">13. Schade en aansprakelijkheid</h2>
+              <p className="mt-2">De professional blijft verantwoordelijk voor de feitelijke uitvoering van de door hem aangenomen opdracht en voor schade die volgens de wet aan zijn handelen of nalaten kan worden toegerekend.</p>
+              <p className="mt-2">ShineGo is verantwoordelijk voor de eigen verplichtingen als platform en kan aansprakelijkheid niet uitsluiten voor zover uitsluiting volgens dwingend recht niet is toegestaan. Niets in deze voorwaarden beperkt wettelijke consumentenrechten.</p>
+            </section>
 
-            <section><h2 className="text-xl font-bold text-slate-900">14. Toepasselijk recht</h2><p className="mt-2">Op deze voorwaarden en het gebruik van ShineGo is Nederlands recht van toepassing. Wettelijke rechten van consumenten blijven van toepassing.</p></section>
+            <section>
+              <h2 className="text-xl font-bold text-slate-900">14. Misbruik, fraude en veiligheid</h2>
+              <p className="mt-2">Het is niet toegestaan ShineGo te gebruiken voor fraude, misleiding, bedreiging, discriminatie, onrechtmatige activiteiten of het bewust verstrekken van onjuiste informatie.</p>
+              <p className="mt-2">ShineGo kan een boeking of toegang tot het platform beperken wanneer dit noodzakelijk is vanwege veiligheid, fraude, misbruik, een wettelijke verplichting of een ernstig geschil.</p>
+            </section>
 
-            <section><h2 className="text-xl font-bold text-slate-900">15. Contact</h2><p className="mt-2">Voor vragen over een boeking, klacht of deze voorwaarden kun je contact opnemen met ShineGo via de contactmogelijkheden op de website.</p></section>
+            <section>
+              <h2 className="text-xl font-bold text-slate-900">15. Persoonsgegevens</h2>
+              <p className="mt-2">ShineGo verwerkt persoonsgegevens zoals beschreven in de privacyverklaring. Gegevens worden onder meer gebruikt voor boekingen, communicatie, betalingen, fraudepreventie, facturatie en ondersteuning.</p>
+              <p className="mt-2"><a href="/privacy" className="font-semibold text-blue-600 underline hover:text-blue-700">Bekijk de privacyverklaring</a>.</p>
+            </section>
+
+            <section>
+              <h2 className="text-xl font-bold text-slate-900">16. Wijzigingen van deze voorwaarden</h2>
+              <p className="mt-2">ShineGo kan deze voorwaarden aanpassen wanneer de dienstverlening, het platform of toepasselijke wet- en regelgeving verandert. Voor een reeds bevestigde eenmalige boeking gelden in beginsel de voorwaarden die bij het sluiten van die boeking van toepassing waren, tenzij een wijziging wettelijk noodzakelijk is of voor de klant gunstiger is.</p>
+            </section>
+
+            <section>
+              <h2 className="text-xl font-bold text-slate-900">17. Toepasselijk recht en geschillen</h2>
+              <p className="mt-2">Op deze voorwaarden en het gebruik van ShineGo is Nederlands recht van toepassing. Dwingendrechtelijke consumentenbescherming blijft van toepassing.</p>
+              <p className="mt-2">Bij een geschil proberen klant en ShineGo eerst in onderling overleg tot een oplossing te komen. De klant behoudt het recht een geschil voor te leggen aan de volgens de wet bevoegde rechter of bevoegde toezichthouder.</p>
+            </section>
+
+            <section>
+              <h2 className="text-xl font-bold text-slate-900">18. Contact</h2>
+              <p className="mt-2">Voor vragen over een boeking, annulering, herroeping, klacht of deze voorwaarden kan de klant contact opnemen via de contactmogelijkheden op de ShineGo-website.</p>
+            </section>
+          </div>
+
+          <div className="mt-10 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-900">
+            Deze versie is opgesteld als concept voor juridische controle. Laat de definitieve voorwaarden vóór grootschalige commerciële inzet beoordelen door een Nederlandse jurist of advocaat met ervaring in consumentenrecht, platformrecht en overeenkomsten op afstand.
           </div>
         </div>
       </div>
