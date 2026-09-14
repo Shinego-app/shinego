@@ -31,13 +31,13 @@ export default function BookingNavigation() {
         }
       `}</style>
 
-      <nav className="fixed right-5 top-5 z-40 hidden items-center gap-5 rounded-2xl border border-[#d5e9f8] bg-white/95 px-5 py-3 shadow-[0_10px_30px_rgba(46,79,119,.10)] backdrop-blur md:flex">
+      <nav className="fixed right-5 top-6 z-40 hidden items-center gap-6 md:flex">
         {links.map((link) => (
           <a key={link.href} href={link.href} className="text-sm font-semibold text-[#52779b] transition hover:text-[#1683f8]">
             {link.label}
           </a>
         ))}
-        <a href="/professional/login" className="rounded-xl border border-[#cfe3f4] bg-white px-4 py-2 text-sm font-bold text-[#315f88] transition hover:border-[#8cc7f2]">
+        <a href="/professional/login" className="rounded-xl border border-[#cfe3f4] bg-white px-4 py-2 text-sm font-bold text-[#315f88] shadow-sm transition hover:border-[#8cc7f2] hover:text-[#1768b5]">
           Inloggen
         </a>
       </nav>
