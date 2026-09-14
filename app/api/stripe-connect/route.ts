@@ -1,198 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
-const STRIPE_API_VERSION = "2026-08-26.preview";
-
-function normaliseerTelefoon(telefoon?: string | null) {
-  if (!telefoon) return undefined;
-
-  const opgeschoond = telefoon.replace(/[^\d+]/g, "");
-
-  if (opgeschoond.startsWith("+")) return opgeschoond;
-  if (opgeschoond.startsWith("0031")) return `+31${opgeschoond.slice(4)}`;
-  if (opgeschoond.startsWith("0")) return `+31${opgeschoond.slice(1)}`;
-
-  return `+31${opgeschoond}`;
-}
-
-function parseGeboortedatum(value?: string | null) {
-  if (!value || !/^\d{4}-\d{2}-\d{2}$/.test(value)) return null;
-  const [year, month, day] = value.split("-").map(Number);
-  if (!year || !month || !day) return null;
-  return { year, month, day };
-}
-
-async function heeftMerchantConfiguratie(accountId: string) {
-  const response = await fetch(
-    `https://api.stripe.com/v2/core/accounts/${encodeURIComponent(accountId)}?include[0]=configuration.merchant`,
-    {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
-        "Stripe-Version": STRIPE_API_VERSION,
-      },
-      cache: "no-store",
-    }
-  );
-
-  const account = await response.json();
-  return response.ok && Boolean(account?.configuration?.merchant);
-}
-
-async function zorgVoorUitbetalingsrekening(
-  accountId: string,
-  iban: string | undefined,
-  rekeninghouder: string
-) {
-  const lijstResponse = await fetch(
-    `https://api.stripe.com/v1/accounts/${encodeURIComponent(accountId)}/external_accounts?object=bank_account&limit=100`,
-    {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
-      },
-      cache: "no-store",
-    }
-  );
-
-  const lijst = await lijstResponse.json();
-  if (!lijstResponse.ok) {
-    throw new Error(
-      lijst?.error?.message || "Stripe-bankrekening kon niet worden gecontroleerd."
-    );
-  }
-
-  const bestaandeBankrekening = Array.isArray(lijst?.data) && lijst.data.length > 0;
-  if (bestaandeBankrekening || !iban) return;
-
-  const schoonIban = iban.replace(/\s/g, "").toUpperCase();
-  const params = new URLSearchParams();
-  params.set("external_account[object]", "bank_account");
-  params.set("external_account[country]", "NL");
-  params.set("external_account[currency]", "eur");
-  params.set("external_account[account_number]", schoonIban);
-  params.set("external_account[account_holder_name]", rekeninghouder);
-  params.set("external_account[account_holder_type]", "company");
-  params.set("default_for_currency", "true");
-
-  const response = await fetch(
-    `https://api.stripe.com/v1/accounts/${encodeURIComponent(accountId)}/external_accounts`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: params.toString(),
-    }
-  );
-
-  const resultaat = await response.json();
-  if (!response.ok) {
-    throw new Error(
-      resultaat?.error?.message || "Bankrekening kon niet aan Stripe worden gekoppeld."
-    );
-  }
-}
-
-async function zorgVoorVertegenwoordiger(
-  accountId: string,
-  professional: any,
-  email: string,
-  userMetadata: Record<string, any>
-) {
-  const listResponse = await fetch(
-    `https://api.stripe.com/v1/accounts/${encodeURIComponent(accountId)}/persons?limit=100`,
-    {
-      method: "GET",
-      headers: {
-        Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
-      },
-      cache: "no-store",
-    }
-  );
-
-  const listData = await listResponse.json();
-  if (!listResponse.ok) {
-    throw new Error(
-      listData?.error?.message || "Stripe-vertegenwoordiger kon niet worden opgehaald."
-    );
-  }
-
-  const bestaandeVertegenwoordiger = Array.isArray(listData?.data)
-    ? listData.data.find((person: any) => person?.relationship?.representative === true)
-    : null;
-
-  const params = new URLSearchParams();
-  params.set("first_name", professional.voornaam || "");
-  params.set("last_name", professional.achternaam || "");
-  params.set("email", email);
-
-  const telefoon = normaliseerTelefoon(professional.telefoon);
-  if (telefoon) params.set("phone", telefoon);
-
-  params.set("relationship[representative]", "true");
-
-  if (userMetadata?.stripe_eigenaar_bevestigd === true) {
-    params.set("relationship[owner]", "true");
-    params.set("relationship[executive]", "true");
-    params.set("relationship[title]", "Eigenaar / vennoot");
-  }
-
-  const geboortedatum = parseGeboortedatum(userMetadata?.stripe_geboortedatum);
-  if (geboortedatum) {
-    params.set("dob[day]", String(geboortedatum.day));
-    params.set("dob[month]", String(geboortedatum.month));
-    params.set("dob[year]", String(geboortedatum.year));
-  }
-
-  const priveAdresZelfde = userMetadata?.stripe_priveadres_zelfde !== false;
-  const straat = priveAdresZelfde
-    ? professional.straat
-    : userMetadata?.stripe_prive_straat;
-  const huisnummer = priveAdresZelfde
-    ? professional.huisnummer
-    : userMetadata?.stripe_prive_huisnummer;
-  const toevoeging = priveAdresZelfde
-    ? professional.toevoeging
-    : userMetadata?.stripe_prive_toevoeging;
-  const postcode = priveAdresZelfde
-    ? professional.postcode
-    : userMetadata?.stripe_prive_postcode;
-  const woonplaats = priveAdresZelfde
-    ? professional.woonplaats
-    : userMetadata?.stripe_prive_woonplaats;
-
-  const adresRegel = [straat, huisnummer, toevoeging]
-    .filter(Boolean)
-    .join(" ")
-    .trim();
-
-  if (adresRegel) params.set("address[line1]", adresRegel);
-  if (woonplaats) params.set("address[city]", String(woonplaats).trim());
-  if (postcode) params.set("address[postal_code]", String(postcode).trim().toUpperCase());
-  params.set("address[country]", "NL");
-
-  const personUrl = bestaandeVertegenwoordiger?.id
-    ? `https://api.stripe.com/v1/accounts/${encodeURIComponent(accountId)}/persons/${encodeURIComponent(bestaandeVertegenwoordiger.id)}`
-    : `https://api.stripe.com/v1/accounts/${encodeURIComponent(accountId)}/persons`;
-
-  const personResponse = await fetch(personUrl, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-    body: params.toString(),
-  });
-
-  const personData = await personResponse.json();
-  if (!personResponse.ok) {
-    throw new Error(
-      personData?.error?.message || "Stripe-vertegenwoordiger kon niet worden bijgewerkt."
-    );
-  }
-}
+const STRIPE_API_VERSION = "2026-07-29.preview";
 
 export async function POST(request: Request) {
   try {
@@ -212,8 +21,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Sessie ongeldig. Log opnieuw in." }, { status: 401 });
     }
 
-    const userMetadata = (user.user_metadata || {}) as Record<string, any>;
-
     const { data: professional, error: professionalError } = await supabaseAdmin
       .from("professionals")
       .select(
@@ -231,67 +38,58 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "E-mailadres ontbreekt." }, { status: 400 });
     }
 
-    const telefoon = normaliseerTelefoon(professional.telefoon);
-
-    const adresRegel = [
-      professional.straat,
-      professional.huisnummer,
-      professional.toevoeging,
-    ]
+    const adresRegel = [professional.straat, professional.huisnummer, professional.toevoeging]
       .filter(Boolean)
       .join(" ")
       .trim();
 
     const kvkNummer = professional.kvk_nummer?.replace(/\D/g, "");
-    const btwNummer = professional.btw_nummer
-      ?.replace(/[\s.\-]/g, "")
-      .toUpperCase();
+    const btwNummer = professional.btw_nummer?.replace(/[\s.\-]/g, "").toUpperCase();
 
     const idNumbers = [
       ...(kvkNummer ? [{ type: "nl_kvk", value: kvkNummer }] : []),
       ...(btwNummer ? [{ type: "nl_vat", value: btwNummer }] : []),
     ];
 
-    const accountPrefill: Record<string, any> = {
+    const accountPrefill = {
       contact_email: email,
       display_name: professional.bedrijfsnaam,
-      ...(telefoon ? { contact_phone: telefoon } : {}),
+      contact_phone: professional.telefoon,
       identity: {
         business_details: {
           registered_name: professional.bedrijfsnaam,
-          ...(telefoon ? { phone: telefoon } : {}),
+          phone: professional.telefoon,
           ...(idNumbers.length > 0 ? { id_numbers: idNumbers } : {}),
-          address: {
-            country: "nl",
-            line1: adresRegel,
-            postal_code: professional.postcode?.trim().toUpperCase(),
-            city: professional.woonplaats?.trim(),
-          },
+          ...(adresRegel || professional.postcode || professional.woonplaats
+            ? {
+                address: {
+                  country: "nl",
+                  ...(adresRegel ? { line1: adresRegel } : {}),
+                  ...(professional.postcode
+                    ? { postal_code: professional.postcode.trim().toUpperCase() }
+                    : {}),
+                  ...(professional.woonplaats
+                    ? { city: professional.woonplaats.trim() }
+                    : {}),
+                },
+              }
+            : {}),
         },
       },
       defaults: {
         profile: {
           doing_business_as: professional.bedrijfsnaam,
           product_description: "Glazenwasservice via ShineGo",
-          business_url: "https://www.shinego.nl",
         },
       },
     };
 
-    let accountId = professional.stripe_account_id as string | null;
+    let accountId: string | null = professional.stripe_account_id;
 
     if (accountId) {
       if (!professional.uitbetalingen_actief) {
-        if (await heeftMerchantConfiguratie(accountId)) {
-          accountPrefill.configuration = {
-            merchant: {
-              mcc: "7349",
-            },
-          };
-        }
-
         const updateResponse = await fetch(
-          `https://api.stripe.com/v2/core/accounts/${accountId}`,
+          `https://api.stripe.com/v2/core/accounts/${encodeURIComponent(accountId)}`,
           {
             method: "POST",
             headers: {
@@ -321,7 +119,7 @@ export async function POST(request: Request) {
         },
         body: JSON.stringify({
           ...accountPrefill,
-          dashboard: "none",
+          dashboard: "express",
           identity: {
             country: "nl",
             entity_type: "company",
@@ -338,9 +136,7 @@ export async function POST(request: Request) {
           configuration: {
             recipient: {
               capabilities: {
-                stripe_balance: {
-                  stripe_transfers: { requested: true },
-                },
+                stripe_balance: { stripe_transfers: { requested: true } },
               },
             },
           },
@@ -348,14 +144,11 @@ export async function POST(request: Request) {
       });
 
       const account = await accountResponse.json();
-
-      if (!accountResponse.ok) {
-        throw new Error(
-          account?.error?.message || "Stripe account kon niet worden gemaakt."
-        );
+      if (!accountResponse.ok || !account?.id) {
+        throw new Error(account?.error?.message || "Stripe account kon niet worden gemaakt.");
       }
 
-      accountId = account.id;
+      accountId = String(account.id);
 
       const { error: updateError } = await supabaseAdmin
         .from("professionals")
@@ -366,31 +159,13 @@ export async function POST(request: Request) {
     }
 
     if (!accountId) {
-      throw new Error("Stripe-account ontbreekt.");
-    }
-
-    await zorgVoorVertegenwoordiger(accountId, professional, email, userMetadata);
-
-    await zorgVoorUitbetalingsrekening(
-      accountId,
-      typeof userMetadata?.stripe_iban === "string" ? userMetadata.stripe_iban : undefined,
-      professional.bedrijfsnaam || `${professional.voornaam || ""} ${professional.achternaam || ""}`.trim()
-    );
-
-    if (userMetadata?.stripe_iban) {
-      const { stripe_iban: _verwijderdIban, ...metadataZonderIban } = userMetadata;
-      await supabaseAdmin.auth.admin.updateUserById(user.id, {
-        user_metadata: metadataZonderIban,
-      });
+      throw new Error("Stripe account ontbreekt.");
     }
 
     return NextResponse.json({ account_id: accountId });
   } catch (error) {
     console.error("Stripe Connect fout:", error);
-    const message =
-      error instanceof Error
-        ? error.message
-        : "Stripe Connect kon niet worden gestart.";
+    const message = error instanceof Error ? error.message : "Stripe Connect kon niet worden gestart.";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
