@@ -97,29 +97,30 @@ export function heeftBenodigdeDienst(professional: ProfessionalVoorMatching, boe
   return diensten.includes(vereist);
 }
 
-export async function ligtBinnenWerkgebied(professional: ProfessionalVoorMatching, boeking: BoekingVoorMatching) {
+export async function berekenAfstandTotBoeking(
+  professional: ProfessionalVoorMatching,
+  boeking: BoekingVoorMatching
+) {
   const professionalPostcode = normaliseerPostcode(professional.postcode);
   const boekingPostcode = normaliseerPostcode(boeking.postcode);
-  if (!professionalPostcode || !boekingPostcode) {
-    return { binnen: false, afstand_km: null };
-  }
+  if (!professionalPostcode || !boekingPostcode) return null;
 
-  if (professionalPostcode === boekingPostcode) {
-    return { binnen: true, afstand_km: 0 };
-  }
-
-  const maxKm = Math.max(0, Number(professional.werkgebied_km || 0));
-  if (!maxKm) return { binnen: false, afstand_km: null };
+  if (professionalPostcode === boekingPostcode) return 0;
 
   const [professionalLocatie, boekingLocatie] = await Promise.all([
     geocode(professional.postcode, professional.huisnummer),
     geocode(boeking.postcode, boeking.huisnummer),
   ]);
 
-  if (!professionalLocatie || !boekingLocatie) {
-    return { binnen: false, afstand_km: null };
-  }
+  if (!professionalLocatie || !boekingLocatie) return null;
 
   const afstand = afstandKm(professionalLocatie, boekingLocatie);
-  return { binnen: afstand <= maxKm, afstand_km: Math.round(afstand * 10) / 10 };
+  return Math.round(afstand * 10) / 10;
+}
+
+export async function ligtBinnenWerkgebied(professional: ProfessionalVoorMatching, boeking: BoekingVoorMatching) {
+  const maxKm = Math.max(0, Number(professional.werkgebied_km || 0));
+  const afstand = await berekenAfstandTotBoeking(professional, boeking);
+  if (afstand == null || !maxKm) return { binnen: false, afstand_km: afstand };
+  return { binnen: afstand <= maxKm, afstand_km: afstand };
 }
