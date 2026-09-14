@@ -8,6 +8,7 @@ import { supabase } from "@/lib/supabase";
 declare global {
   interface Window {
     StripeConnect?: {
+      onLoad?: () => void;
       init: (options: {
         publishableKey: string;
         fetchClientSecret: () => Promise<string | undefined>;
@@ -18,6 +19,10 @@ declare global {
           setCollectionOptions?: (options: {
             fields: "currently_due" | "eventually_due";
             futureRequirements?: "omit" | "include";
+            requirements?: {
+              exclude?: string[];
+              only?: string[];
+            };
           }) => void;
         };
       };
@@ -28,9 +33,9 @@ declare global {
 export default function UitbetalingenPage() {
   const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
-  const gestartRef = useRef(false);
   const [fout, setFout] = useState("");
   const [scriptKlaar, setScriptKlaar] = useState(false);
+  const gestartRef = useRef(false);
 
   async function haalTokenOp() {
     const { data: sessionData } = await supabase.auth.getSession();
@@ -66,25 +71,6 @@ export default function UitbetalingenPage() {
     async function startEmbeddedOnboarding() {
       try {
         const token = await haalTokenOp();
-
-        const accountResponse = await fetch("/api/stripe-connect", {
-          method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const accountResult = await accountResponse.json();
-        if (!accountResponse.ok) {
-          throw new Error(accountResult.error || "Stripe-account kon niet worden voorbereid.");
-        }
-
-        const personResponse = await fetch("/api/stripe-connect/prefill-person", {
-          method: "POST",
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        const personResult = await personResponse.json();
-        if (!personResponse.ok) {
-          throw new Error(personResult.error || "Stripe-verificatiegegevens konden niet worden voorbereid.");
-        }
-
         const eersteSession = await haalSessionOp(token);
 
         if (!window.StripeConnect) {
@@ -113,6 +99,9 @@ export default function UitbetalingenPage() {
         onboarding.setCollectionOptions?.({
           fields: "currently_due",
           futureRequirements: "omit",
+          requirements: {
+            only: ["external_account"],
+          },
         });
 
         onboarding.setOnExit?.(() => {
@@ -121,7 +110,6 @@ export default function UitbetalingenPage() {
 
         containerRef.current?.replaceChildren(onboarding);
       } catch (error) {
-        gestartRef.current = false;
         setFout(
           error instanceof Error
             ? error.message
@@ -138,7 +126,7 @@ export default function UitbetalingenPage() {
       <Script
         src="https://connect-js.stripe.com/v1.0/connect.js"
         strategy="afterInteractive"
-        onReady={() => setScriptKlaar(true)}
+        onLoad={() => setScriptKlaar(true)}
         onError={() => setFout("Stripe Connect kon niet worden geladen.")}
       />
 
@@ -151,21 +139,21 @@ export default function UitbetalingenPage() {
         </button>
 
         <section className="rounded-2xl bg-white p-5 shadow-sm sm:p-7">
-          <h1 className="text-2xl font-bold text-gray-900">Uitbetalingen instellen</h1>
+          <h1 className="text-2xl font-bold text-gray-900">Bankrekening verifiëren</h1>
           <p className="mt-2 text-gray-600">
-            Je ShineGo-gegevens worden automatisch aan Stripe doorgegeven. Stripe toont alleen onderdelen die nog verplicht gecontroleerd of bevestigd moeten worden.
+            ShineGo heeft je bedrijfsgegevens al aangeleverd. Stripe wordt hier alleen gebruikt om je uitbetalingsrekening veilig te koppelen en, wanneer Stripe dat vereist, je toegang te bevestigen.
           </p>
 
-          {fout && (
+          {fout ? (
             <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-medium text-red-700">
               {fout}
             </div>
+          ) : (
+            <div className="mt-6">
+              {!scriptKlaar && <p className="text-gray-600">Bankverificatie laden...</p>}
+              <div ref={containerRef} />
+            </div>
           )}
-
-          <div className="mt-6">
-            {!scriptKlaar && <p className="text-gray-600">Stripe-verificatie laden...</p>}
-            <div ref={containerRef} />
-          </div>
         </section>
       </div>
     </main>
