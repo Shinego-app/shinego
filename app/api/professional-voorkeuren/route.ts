@@ -9,7 +9,6 @@ function normaliseerDiensten(value: unknown) {
     .map((dienst) => (dienst === "glazenwassen" ? "glazenwasser" : dienst))
     .filter((dienst) => toegestaan.has(dienst));
 
-  if (!diensten.includes("glazenwasser")) diensten.unshift("glazenwasser");
   return Array.from(new Set(diensten));
 }
 
@@ -28,6 +27,10 @@ export async function POST(request: Request) {
 
     if (![10, 15, 25, 35, 50, 75, 100].includes(werkgebiedKm)) {
       return NextResponse.json({ error: "Kies een geldige voorkeursafstand voor meldingen." }, { status: 400 });
+    }
+
+    if (diensten.length === 0) {
+      return NextResponse.json({ error: "Kies minimaal één dienst die je kunt uitvoeren." }, { status: 400 });
     }
 
     const { data: professional, error } = await supabaseAdmin
