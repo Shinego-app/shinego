@@ -9,6 +9,13 @@ export default function ProfessionalVoorwaardenPage() {
           <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">Voorwaarden voor professionals</h1>
           <p className="mt-3 text-sm text-slate-500">Concept voor juridische review · laatst bijgewerkt: 14 september 2026</p>
 
+          <div className="mt-6 rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm leading-6 text-slate-700">
+            <strong className="text-slate-900">ShineGo</strong><br />
+            KvK: 57712913<br />
+            Btw-id: NL001205368B47<br />
+            E-mail: <a href="mailto:info@shinego.nl" className="font-semibold text-blue-600 underline hover:text-blue-700">info@shinego.nl</a>
+          </div>
+
           <div className="mt-10 space-y-9 leading-7 text-slate-600">
             <section><h2 className="text-xl font-bold text-slate-900">1. Rol van ShineGo</h2><p className="mt-2">ShineGo exploiteert een online bemiddelingsplatform waarop zelfstandige professionals opdrachten van klanten kunnen ontvangen en aannemen. ShineGo faciliteert onder andere de boeking, betaling, communicatie en administratieve afhandeling.</p><p className="mt-2">ShineGo is geen werkgever van de professional en geeft geen dagelijkse leiding aan de uitvoering van de werkzaamheden.</p></section>
 
@@ -46,7 +53,7 @@ export default function ProfessionalVoorwaardenPage() {
 
             <section><h2 className="text-xl font-bold text-slate-900">18. Toepasselijk recht en geschillen</h2><p className="mt-2">Op deze voorwaarden is Nederlands recht van toepassing. Partijen proberen een geschil eerst in onderling overleg op te lossen. Voor zover dwingend recht niet anders bepaalt, wordt een geschil voorgelegd aan de bevoegde Nederlandse rechter.</p></section>
 
-            <section><h2 className="text-xl font-bold text-slate-900">19. Contact</h2><p className="mt-2">Voor vragen over deze voorwaarden of het professional-account kan contact worden opgenomen via de contactmogelijkheden op de ShineGo-website.</p></section>
+            <section><h2 className="text-xl font-bold text-slate-900">19. Contact</h2><p className="mt-2">Voor vragen over deze voorwaarden of het professional-account kan contact worden opgenomen via <a href="mailto:info@shinego.nl" className="font-semibold text-blue-600 underline hover:text-blue-700">info@shinego.nl</a>.</p></section>
           </div>
 
           <div className="mt-10 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-6 text-amber-900">
