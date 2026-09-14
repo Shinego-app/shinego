@@ -3,7 +3,7 @@ export default function Home() {
     { icon: "🏠", titel: "Woning", tekst: "Van rijtjeshuis tot villa", href: "/boeken/glazenwassen/details?type=woning" },
     { icon: "🏢", titel: "Appartement / flat", tekst: "Snel en vakkundig", href: "/boeken/glazenwassen/details?type=appartement" },
     { icon: "🏬", titel: "Winkel / bedrijfspand", tekst: "Een verzorgde uitstraling", href: "/boeken/glazenwassen/details?type=bedrijf" },
-    { icon: "🏙️", titel: "Gevel / hoog glas", tekst: "Met telescoopsteel", href: "/boeken/glazenwassen/details?type=telewash" },
+    { icon: "🏙️", titel: "Telewash – hoog & groot glas", tekst: "Met telescoopsteel voor hoge en grote glaspartijen", href: "/boeken/glazenwassen/details?type=telewash" },
   ];
 
   return (
