@@ -22,6 +22,11 @@ function normaliseerPostcode(value?: string | null) {
   return String(value || "").replace(/\s/g, "").toUpperCase();
 }
 
+function normaliseerDienst(value: unknown) {
+  const dienst = String(value || "").toLowerCase();
+  return dienst === "glazenwassen" ? "glazenwasser" : dienst;
+}
+
 function radians(graden: number) {
   return (graden * Math.PI) / 180;
 }
@@ -90,10 +95,9 @@ export function vereisteDienst(boeking: BoekingVoorMatching) {
 
 export function heeftBenodigdeDienst(professional: ProfessionalVoorMatching, boeking: BoekingVoorMatching) {
   const diensten = Array.isArray(professional.diensten)
-    ? professional.diensten.map((dienst) => String(dienst).toLowerCase())
+    ? professional.diensten.map(normaliseerDienst)
     : [];
   const vereist = vereisteDienst(boeking);
-  if (vereist === "glazenwasser") return diensten.includes("glazenwasser");
   return diensten.includes(vereist);
 }
 
