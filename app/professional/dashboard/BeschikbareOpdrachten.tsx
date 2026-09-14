@@ -178,9 +178,11 @@ export default function BeschikbareOpdrachten() {
           <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-200 bg-white p-3"><input type="checkbox" checked={diensten.includes("bedrijf")} onChange={(e) => wisselDienst("bedrijf", e.target.checked)} className="h-5 w-5" /><span className="text-sm font-semibold text-gray-800">Winkel / bedrijfspand</span></label>
           <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-200 bg-white p-3"><input type="checkbox" checked={diensten.includes("binnen")} onChange={(e) => wisselDienst("binnen", e.target.checked)} className="h-5 w-5" /><span className="text-sm font-semibold text-gray-800">Binnenramen</span></label>
         </div>
-        <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
-          <label className="block sm:w-64"><span className="mb-1 block text-xs font-bold uppercase tracking-wide text-gray-700">Voorkeursafstand meldingen</span><select value={afstand === "all" ? "100" : afstand} onChange={(e) => setAfstand(e.target.value)} className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900"><option value="10">10 km</option><option value="15">15 km</option><option value="25">25 km</option><option value="35">35 km</option><option value="50">50 km</option><option value="75">75 km</option><option value="100">100 km</option></select></label>
-          <button type="button" onClick={voorkeurenOpslaan} disabled={voorkeurBezig} className="rounded-xl bg-gray-900 px-4 py-2.5 text-sm font-bold text-white disabled:opacity-50">{voorkeurBezig ? "Opslaan..." : "Voorkeuren opslaan"}</button>
+        <div className="mt-4">
+          <label className="block max-w-xs"><span className="mb-1 block text-xs font-bold uppercase tracking-wide text-gray-700">Voorkeursafstand meldingen</span><select value={afstand === "all" ? "100" : afstand} onChange={(e) => setAfstand(e.target.value)} className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900"><option value="10">10 km</option><option value="15">15 km</option><option value="25">25 km</option><option value="35">35 km</option><option value="50">50 km</option><option value="75">75 km</option><option value="100">100 km</option></select></label>
+          <div className="mt-4 flex justify-end">
+            <button type="button" onClick={voorkeurenOpslaan} disabled={voorkeurBezig} className="w-full rounded-xl bg-gray-900 px-5 py-3 text-sm font-bold text-white disabled:opacity-50 sm:w-auto">{voorkeurBezig ? "Opslaan..." : "Voorkeuren opslaan"}</button>
+          </div>
         </div>
         {voorkeurMelding && <p className="mt-3 text-sm font-medium text-gray-700">{voorkeurMelding}</p>}
       </div>
