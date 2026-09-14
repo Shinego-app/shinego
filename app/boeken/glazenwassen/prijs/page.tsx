@@ -55,7 +55,7 @@ export default function PrijsPage() {
           <div className="grid gap-7 lg:grid-cols-[1.2fr_.8fr] lg:gap-10">
             <div>
               <h1 className="text-[32px] font-extrabold leading-tight tracking-[-.035em] text-[#0b3d75] sm:text-[38px]">Jouw prijs</h1>
-              <p className="mt-1 text-sm font-medium text-[#537797] sm:text-base">Hier zie je een overzicht van de prijs.</p>
+              <p className="mt-1 text-sm font-medium text-[#537797] sm:text-base">Hier zie je vooraf de boekingsprijs voor deze opdracht.</p>
               <div className="mt-5 divide-y divide-[#dcecf8] text-sm">
                 <div className="flex items-center justify-between py-3"><span className="text-[#4f708f]">{gegevens.woningtype === "bedrijfspand" ? "Zakelijke glasprijs" : `Basisprijs (${gegevens.ramen} ramen)`}</span><strong className="text-[#123c70]">{offerteOpMaat ? "Offerte" : geld(gegevens.woningtype === "bedrijfspand" ? prijs.bedrijfsPrijs : prijs.basisprijs + prijs.ramenPrijs)}</strong></div>
                 {prijs.verdiepingToeslag > 0 && <div className="flex items-center justify-between py-3"><span className="text-[#4f708f]">Hoogtetoeslag</span><strong>{geld(prijs.verdiepingToeslag)}</strong></div>}
@@ -64,14 +64,14 @@ export default function PrijsPage() {
                 {prijs.kortingPercentage > 0 && <div className="flex items-center justify-between py-3"><span className="text-[#4f708f]">Periodieke korting ({Math.round(prijs.kortingPercentage*100)}%)</span><strong className="text-emerald-600">- {geld(prijs.kortingBedrag)}</strong></div>}
                 <div className="flex items-center justify-between pt-4"><span className="text-lg font-extrabold text-[#0b3d75]">Totaal</span><strong className="text-3xl font-extrabold text-[#0b3d75]">{offerteOpMaat?"Offerte":geld(prijs.totaal)}</strong></div>
               </div>
-              <div className="mt-5 rounded-2xl bg-[#eafaf1] px-4 py-4"><div className="flex gap-3"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#21a366] text-white">✓</span><div><strong className="text-sm text-[#27643f]">Vaste prijs</strong><p className="mt-1 text-xs leading-5 text-[#5f7f6b]">Geen verrassingen, je weet vooraf precies waar je aan toe bent.</p></div></div></div>
-              <a href="/prijzen" className="mt-3 flex items-center justify-between rounded-xl border border-[#d5e9f8] bg-[#f7fbff] px-4 py-3 text-sm font-semibold text-[#3971a4]"><span>ⓘ &nbsp;Hoe zijn onze prijzen opgebouwd?</span><span>›</span></a>
+              <div className="mt-5 rounded-2xl bg-[#eafaf1] px-4 py-4"><div className="flex gap-3"><span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#21a366] text-white">✓</span><div><strong className="text-sm text-[#27643f]">Prijs vooraf duidelijk</strong><p className="mt-1 text-xs leading-5 text-[#5f7f6b]">Je ziet vóór het boeken wat deze opdracht kost.</p></div></div></div>
+              <a href="/prijzen" className="mt-3 flex items-center justify-between rounded-xl border border-[#d5e9f8] bg-[#f7fbff] px-4 py-3 text-sm font-semibold text-[#3971a4]"><span>ⓘ &nbsp;Hoe is deze boekingsprijs opgebouwd?</span><span>›</span></a>
             </div>
             <aside className="rounded-[24px] bg-gradient-to-b from-[#eef8ff] to-[#e4f3ff] p-5">
               <div className="space-y-4">
-                <div className="flex gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-xl">🏷️</span><div><strong className="block text-sm text-[#123c70]">Eerlijke prijzen</strong><span className="text-xs text-[#6d89a4]">Duidelijke opbouw</span></div></div>
-                <div className="flex gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-xl">🗓️</span><div><strong className="block text-sm text-[#123c70]">Geen verrassingen</strong><span className="text-xs text-[#6d89a4]">Vaste tarieven</span></div></div>
-                <div className="flex gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-xl">🛡️</span><div><strong className="block text-sm text-[#123c70]">Betrouwbare professionals</strong><span className="text-xs text-[#6d89a4]">Geverifieerd door ShineGo</span></div></div>
+                <div className="flex gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-xl">🏷️</span><div><strong className="block text-sm text-[#123c70]">Duidelijke boekingsprijs</strong><span className="text-xs text-[#6d89a4]">Vooraf inzicht in de opbouw</span></div></div>
+                <div className="flex gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-xl">🗓️</span><div><strong className="block text-sm text-[#123c70]">Vooraf bekend</strong><span className="text-xs text-[#6d89a4]">Geen verrassingen bij het boeken</span></div></div>
+                <div className="flex gap-3"><span className="flex h-10 w-10 items-center justify-center rounded-xl bg-white text-xl">🛡️</span><div><strong className="block text-sm text-[#123c70]">Zelfstandige professionals</strong><span className="text-xs text-[#6d89a4]">De opdracht wordt zelfstandig uitgevoerd</span></div></div>
               </div>
               <div className="mt-12 -rotate-6 text-right text-2xl font-medium italic text-[#4f6f8d]">Dat is<br />ShineGo ✨</div>
             </aside>
