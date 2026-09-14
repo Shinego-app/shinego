@@ -11,6 +11,14 @@ function vandaagNederland() {
   }).format(new Date());
 }
 
+function normaliseerDiensten(value: unknown) {
+  const invoer = Array.isArray(value) ? value : [];
+  return Array.from(new Set(invoer.map((dienst) => {
+    const naam = String(dienst || "").toLowerCase();
+    return naam === "glazenwassen" ? "glazenwasser" : naam;
+  })));
+}
+
 async function haalProfessional(request: Request) {
   const authorization = request.headers.get("authorization");
   const token = authorization?.startsWith("Bearer ") ? authorization.slice(7) : null;
@@ -44,11 +52,14 @@ export async function GET(request: Request) {
     }
 
     const professional = resultaat.professional;
+    const diensten = normaliseerDiensten(professional.diensten);
+
     if (!professional.actief || !professional.geverifieerd) {
       return NextResponse.json({
         opdrachten: [],
         profiel_actief: false,
         werkgebied_km: Number(professional.werkgebied_km || 25),
+        diensten,
         melding: "Je profiel moet eerst actief en geverifieerd zijn voordat je beschikbare opdrachten kunt aannemen.",
       });
     }
@@ -98,6 +109,7 @@ export async function GET(request: Request) {
       opdrachten,
       profiel_actief: true,
       werkgebied_km: Number(professional.werkgebied_km || 25),
+      diensten,
     });
   } catch (error) {
     console.error("Beschikbare opdrachten fout:", error);
