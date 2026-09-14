@@ -42,7 +42,7 @@ export default function HerroepenPage() {
         "Je herroeping is ontvangen. We hebben direct een ontvangstbevestiging naar je e-mailadres gestuurd."
       );
     } catch {
-      setMelding("De herroeping kon niet worden verzonden. Probeer het opnieuw of neem contact op met ShineGo.");
+      setMelding("De herroeping kon niet worden verzonden. Probeer het opnieuw of mail info@shinego.nl.");
     } finally {
       setBezig(false);
     }
@@ -135,8 +135,9 @@ export default function HerroepenPage() {
               Deze functie is bedoeld voor het wettelijke herroepingsrecht bij overeenkomsten op afstand. Een gewone annulering van een geplande opdracht kan andere gevolgen hebben volgens de algemene voorwaarden en het annuleringsbeleid.
             </p>
             <p>
-              Kun je je boekingsnummer niet vinden? Neem dan contact op via de contactpagina en vermeld het e-mailadres waarmee je hebt geboekt.
+              Kun je je boekingsnummer niet vinden? Mail dan <a href="mailto:info@shinego.nl" className="font-semibold text-blue-600 underline hover:text-blue-700">info@shinego.nl</a> en vermeld het e-mailadres waarmee je hebt geboekt.
             </p>
+            <p className="text-slate-500">ShineGo · KvK 57712913 · btw-id NL001205368B47</p>
           </div>
 
           <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3">
