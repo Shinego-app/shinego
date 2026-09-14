@@ -9,6 +9,13 @@ export default function VoorwaardenPage() {
           <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">Algemene voorwaarden voor klanten</h1>
           <p className="mt-3 text-sm text-slate-500">Concept voor juridische review · laatst bijgewerkt: 14 september 2026</p>
 
+          <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm leading-6 text-slate-700">
+            <p><strong>Handelsnaam:</strong> ShineGo</p>
+            <p><strong>KvK-nummer:</strong> 57712913</p>
+            <p><strong>Btw-id:</strong> NL001205368B47</p>
+            <p><strong>E-mail:</strong> <a href="mailto:info@shinego.nl" className="font-semibold text-blue-600 hover:text-blue-700">info@shinego.nl</a></p>
+          </div>
+
           <div className="mt-10 space-y-9 leading-7 text-slate-600">
             <section>
               <h2 className="text-xl font-bold text-slate-900">1. Over ShineGo</h2>
@@ -117,7 +124,7 @@ export default function VoorwaardenPage() {
 
             <section>
               <h2 className="text-xl font-bold text-slate-900">18. Contact</h2>
-              <p className="mt-2">Voor vragen over een boeking, annulering, herroeping, klacht of deze voorwaarden kan de klant contact opnemen via de contactmogelijkheden op de ShineGo-website.</p>
+              <p className="mt-2">Voor vragen over een boeking, annulering, herroeping, klacht of deze voorwaarden kan de klant contact opnemen via <a href="mailto:info@shinego.nl" className="font-semibold text-blue-600 hover:text-blue-700">info@shinego.nl</a> of via de contactpagina op de ShineGo-website.</p>
             </section>
           </div>
 
