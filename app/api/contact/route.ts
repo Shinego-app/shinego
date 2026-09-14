@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY!);
+const CONTACT_EMAIL = process.env.CONTACT_EMAIL || "info@shinego.nl";
 
 export async function POST(req: NextRequest) {
   try {
@@ -43,18 +44,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const contactEmail = process.env.CONTACT_EMAIL;
-    if (!contactEmail) {
-      console.error("CONTACT_EMAIL ontbreekt");
-      return NextResponse.json(
-        { error: "Contactformulier is tijdelijk niet beschikbaar." },
-        { status: 503 }
-      );
-    }
-
     const { error } = await resend.emails.send({
       from: "ShineGo <noreply@shinego.nl>",
-      to: contactEmail,
+      to: CONTACT_EMAIL,
       replyTo: email.trim(),
       subject: `Contact ShineGo: ${onderwerp.trim()}`,
       html: `
