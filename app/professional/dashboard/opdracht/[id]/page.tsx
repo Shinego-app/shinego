@@ -12,6 +12,7 @@ export default function OpdrachtPage() {
   const opdrachtId = params.id as string;
   const [opdracht, setOpdracht] = useState<any>(null);
   const [laden, setLaden] = useState(true);
+  const [startBezig, setStartBezig] = useState(false);
   const [afrekeningBezig, setAfrekeningBezig] = useState(false);
   const [annulerenBezig, setAnnulerenBezig] = useState(false);
 
@@ -28,8 +29,25 @@ export default function OpdrachtPage() {
   }, [opdrachtId]);
 
   async function startOpdracht() {
-    const { error } = await supabase.from("boekingen").update({ status: "onderweg" }).eq("id", opdrachtId).eq("professional_id", opdracht.professional_id);
-    if (!error) setOpdracht({ ...opdracht, status: "onderweg" });
+    if (startBezig) return;
+    setStartBezig(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session?.access_token) { alert("Je sessie is verlopen. Log opnieuw in."); return; }
+      const response = await fetch("/api/opdracht-starten", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${session.access_token}` },
+        body: JSON.stringify({ booking_id: opdrachtId }),
+      });
+      const resultaat = await response.json();
+      if (!response.ok) { alert(resultaat.error || "Opdracht starten mislukt."); return; }
+      setOpdracht(resultaat.booking || { ...opdracht, status: "onderweg" });
+    } catch (error) {
+      console.error("Opdracht starten mislukt:", error);
+      alert("Opdracht starten mislukt.");
+    } finally {
+      setStartBezig(false);
+    }
   }
 
   async function annuleerOpdracht() {
@@ -99,8 +117,8 @@ export default function OpdrachtPage() {
 
         <section className="mt-6 rounded-3xl border border-blue-100 bg-blue-50 p-6"><p className="text-sm font-bold uppercase tracking-wider text-blue-700">Jouw vergoeding</p><p className="mt-2 text-3xl font-extrabold text-slate-950">€{opdracht.professional_bedrag || "0,00"}</p></section>
 
-        <section className="mt-6 rounded-3xl border border-slate-100 bg-white p-6 shadow-sm"><h2 className="text-xl font-bold text-slate-900">Acties</h2><p className="mt-1 text-sm text-slate-500">Kies alleen de actie die bij de huidige status hoort.</p><div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-          {opdracht.status === "toegewezen" && <button type="button" onClick={startOpdracht} className="rounded-xl bg-blue-600 px-5 py-3 font-bold text-white hover:bg-blue-700">Opdracht starten</button>}
+        <section className="mt-6 rounded-3xl border border-slate-100 bg-white p-6 shadow-sm"><h2 className="text-xl font-bold text-slate-900">Acties</h2><p className="mt-1 text-sm text-slate-500">Starten en afronden worden door ShineGo geblokkeerd zolang de geplande datum en begintijd nog niet zijn bereikt.</p><div className="mt-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          {opdracht.status === "toegewezen" && <button type="button" onClick={startOpdracht} disabled={startBezig} className="rounded-xl bg-blue-600 px-5 py-3 font-bold text-white hover:bg-blue-700 disabled:opacity-50">{startBezig ? "Controleren..." : "Opdracht starten"}</button>}
           {opdracht.status === "onderweg" && <button type="button" onClick={afrondOpdracht} className="rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white hover:bg-emerald-700">Opdracht afronden</button>}
           {(opdracht.status === "toegewezen" || opdracht.status === "onderweg") && <button type="button" onClick={annuleerOpdracht} disabled={annulerenBezig} className="rounded-xl border border-red-200 bg-red-50 px-5 py-3 font-bold text-red-700 hover:bg-red-100 disabled:opacity-50">{annulerenBezig ? "Opdracht annuleren..." : "Opdracht annuleren"}</button>}
           {opdracht.status === "afgerond" && opdracht.uitbetaald !== true && <div className="rounded-xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">Opdracht afgerond. Je vergoeding wordt automatisch verwerkt volgens het uitbetalingsschema.</div>}
