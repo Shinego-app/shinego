@@ -230,7 +230,13 @@ export default function ProfessionalPage() {
               <input value={iban} onChange={(e) => setIban(e.target.value.toUpperCase())} placeholder="NL00 BANK 0000 0000 00" autoComplete="off" spellCheck={false} className={inputClass} />
             </div>
 
-            <label className="flex cursor-pointer items-start gap-3 border-t pt-7"><input type="checkbox" checked={voorwaarden} onChange={(e) => setVoorwaarden(e.target.checked)} className="mt-1 h-5 w-5" /><span className="text-sm text-gray-600">Ik verklaar dat mijn gegevens correct zijn, dat ik eigenaar/vennoot en bevoegd vertegenwoordiger ben, dat bovenstaand adres mijn woonadres voor verificatie is en ik accepteer de voorwaarden van ShineGo.</span></label>
+            <label className="flex cursor-pointer items-start gap-3 border-t pt-7">
+              <input type="checkbox" checked={voorwaarden} onChange={(e) => setVoorwaarden(e.target.checked)} className="mt-1 h-5 w-5" />
+              <span className="text-sm text-gray-600">
+                Ik verklaar dat mijn gegevens correct zijn, dat ik eigenaar/vennoot en bevoegd vertegenwoordiger ben, dat bovenstaand adres mijn woonadres voor verificatie is en ik accepteer de {" "}
+                <a href="/professional/voorwaarden" target="_blank" rel="noreferrer" className="font-semibold text-blue-600 underline hover:text-blue-700">voorwaarden voor professionals</a>.
+              </span>
+            </label>
 
             {melding && <div className={`rounded-xl p-4 text-sm font-medium ${succes ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>{melding}</div>}
 
