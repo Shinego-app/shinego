@@ -4,6 +4,7 @@ import { Resend } from "resend";
 import { supabaseAdmin } from "../../../lib/supabaseAdmin";
 import { maakFactuurnummer } from "@/lib/factuur";
 import { maakProfessionalAfrekeningPdf } from "@/lib/professionalAfrekening";
+import { magOpdrachtStarten } from "@/lib/opdrachtTijd";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const resend = new Resend(process.env.RESEND_API_KEY!);
@@ -64,6 +65,14 @@ export async function POST(request: Request) {
       return NextResponse.json(
         { error: "Boeking niet gevonden of niet aan jou toegewezen." },
         { status: 404 }
+      );
+    }
+
+    const tijdControle = magOpdrachtStarten(booking.gewenste_datum, booking.gewenste_tijd);
+    if (!tijdControle.toegestaan) {
+      return NextResponse.json(
+        { error: `Uitbetaling geblokkeerd. ${tijdControle.reden}` },
+        { status: 400 }
       );
     }
 
