@@ -121,7 +121,7 @@ export default function VeelgesteldeVragenPage() {
 
           <div className="mt-10 rounded-[26px] border border-[#cfe5f6] bg-[#eaf6ff] p-6 text-center sm:p-8">
             <h2 className="text-2xl font-extrabold text-[#0b3d75]">Staat je vraag er niet tussen?</h2>
-            <p className="mt-2 text-sm leading-6 text-[#6685a1]">Neem contact op met ShineGo. We helpen je graag verder.</p>
+            <p className="mt-2 text-sm leading-6 text-[#6685a1]">Neem contact op via info@shinego.nl of het contactformulier. We helpen je graag verder.</p>
             <a href="/contact" className="mt-5 inline-flex rounded-xl bg-[#1683f8] px-6 py-3 text-sm font-extrabold text-white shadow-[0_8px_20px_rgba(22,131,248,.22)]">
               Contact opnemen →
             </a>
@@ -134,6 +134,7 @@ export default function VeelgesteldeVragenPage() {
           <div>
             <div className="text-xl font-extrabold tracking-tight text-[#0d3f79]">Shine<span className="text-[#1683f8]">Go</span><span className="ml-1 text-[#1683f8]">✦</span></div>
             <p className="mt-1 text-sm text-[#7790a8]">Scherp in glaswerk</p>
+            <p className="mt-2 text-xs leading-5 text-[#8aa0b5]">KvK 57712913 · btw-id NL001205368B47<br />info@shinego.nl</p>
           </div>
           <nav className="flex flex-wrap gap-x-5 gap-y-3 text-sm font-semibold text-[#52779b]">
             <a href="/privacy">Privacy</a>
