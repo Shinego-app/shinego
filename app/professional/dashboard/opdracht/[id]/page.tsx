@@ -12,7 +12,6 @@ export default function OpdrachtPage() {
   const opdrachtId = params.id as string;
   const [opdracht, setOpdracht] = useState<any>(null);
   const [laden, setLaden] = useState(true);
-  const [uitbetalenBezig, setUitbetalenBezig] = useState(false);
   const [afrekeningBezig, setAfrekeningBezig] = useState(false);
   const [annulerenBezig, setAnnulerenBezig] = useState(false);
 
@@ -66,19 +65,6 @@ export default function OpdrachtPage() {
     }
   }
 
-  async function voerUitbetalingUit() {
-    if (uitbetalenBezig) return; setUitbetalenBezig(true);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session?.access_token) { alert("Je sessie is verlopen. Log opnieuw in."); return; }
-      const response = await fetch("/api/stripe-payout", { method:"POST", headers:{"Content-Type":"application/json",Authorization:`Bearer ${session.access_token}`}, body:JSON.stringify({ booking_id:opdrachtId }) });
-      const resultaat = await response.json();
-      if (!response.ok) { alert(resultaat.error || "Uitbetaling mislukt."); return; }
-      alert("Uitbetaling geslaagd."); setOpdracht({ ...opdracht, uitbetaald:true });
-    } catch (error) { console.error("Uitbetaling mislukt:", error); alert("Uitbetaling mislukt."); }
-    finally { setUitbetalenBezig(false); }
-  }
-
   async function mailAfrekening() {
     if (afrekeningBezig) return; setAfrekeningBezig(true);
     try {
@@ -117,7 +103,7 @@ export default function OpdrachtPage() {
           {opdracht.status === "toegewezen" && <button type="button" onClick={startOpdracht} className="rounded-xl bg-blue-600 px-5 py-3 font-bold text-white hover:bg-blue-700">Opdracht starten</button>}
           {opdracht.status === "onderweg" && <button type="button" onClick={afrondOpdracht} className="rounded-xl bg-emerald-600 px-5 py-3 font-bold text-white hover:bg-emerald-700">Opdracht afronden</button>}
           {(opdracht.status === "toegewezen" || opdracht.status === "onderweg") && <button type="button" onClick={annuleerOpdracht} disabled={annulerenBezig} className="rounded-xl border border-red-200 bg-red-50 px-5 py-3 font-bold text-red-700 hover:bg-red-100 disabled:opacity-50">{annulerenBezig ? "Opdracht annuleren..." : "Opdracht annuleren"}</button>}
-          {opdracht.status === "afgerond" && opdracht.uitbetaald !== true && <button type="button" onClick={voerUitbetalingUit} disabled={uitbetalenBezig} className="rounded-xl bg-slate-950 px-5 py-3 font-bold text-white hover:bg-slate-800 disabled:opacity-50">{uitbetalenBezig ? "Uitbetaling uitvoeren..." : "Uitbetaling uitvoeren"}</button>}
+          {opdracht.status === "afgerond" && opdracht.uitbetaald !== true && <div className="rounded-xl bg-amber-50 px-4 py-3 text-sm font-semibold text-amber-800">Opdracht afgerond. Je vergoeding wordt automatisch verwerkt volgens het uitbetalingsschema.</div>}
           {opdracht.uitbetaald === true && <button type="button" onClick={mailAfrekening} disabled={afrekeningBezig} className="rounded-xl bg-blue-600 px-5 py-3 font-bold text-white hover:bg-blue-700 disabled:opacity-50">{afrekeningBezig ? "Afrekening verzenden..." : "Afrekening e-mailen"}</button>}
         </div>{opdracht.uitbetaald === true && <div className="mt-4 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">✓ Uitbetaling uitgevoerd</div>}</section>
       </div>
