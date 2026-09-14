@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { maakFactuurPdf, maakFactuurnummer } from "@/lib/factuur";
+import { magOpdrachtStarten } from "@/lib/opdrachtTijd";
 
 const resend = new Resend(process.env.RESEND_API_KEY!);
 
@@ -64,6 +65,14 @@ export async function POST(req: NextRequest) {
     if (booking.betaald !== true) {
       return NextResponse.json(
         { error: "Boeking is niet betaald" },
+        { status: 400 }
+      );
+    }
+
+    const tijdControle = magOpdrachtStarten(booking.gewenste_datum, booking.gewenste_tijd);
+    if (!tijdControle.toegestaan) {
+      return NextResponse.json(
+        { error: tijdControle.reden },
         { status: 400 }
       );
     }
