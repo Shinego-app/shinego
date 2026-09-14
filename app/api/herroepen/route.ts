@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY!);
+const CONTACT_EMAIL = process.env.CONTACT_EMAIL || "info@shinego.nl";
 
 function escapeHtml(value: string) {
   return value
@@ -46,15 +47,6 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Een of meer velden zijn te lang." }, { status: 400 });
     }
 
-    const contactEmail = process.env.CONTACT_EMAIL;
-    if (!contactEmail) {
-      console.error("CONTACT_EMAIL ontbreekt");
-      return NextResponse.json(
-        { error: "De herroepingsfunctie is tijdelijk niet beschikbaar. Neem contact op met ShineGo." },
-        { status: 503 }
-      );
-    }
-
     const ingediendOp = new Date();
     const datumTijd = new Intl.DateTimeFormat("nl-NL", {
       dateStyle: "full",
@@ -85,14 +77,14 @@ export async function POST(req: NextRequest) {
     if (klantMail.error) {
       console.error("Herroepingsbevestiging aan klant mislukt", klantMail.error);
       return NextResponse.json(
-        { error: "De ontvangstbevestiging kon niet worden verzonden. Probeer het opnieuw of neem contact op met ShineGo." },
+        { error: "De ontvangstbevestiging kon niet worden verzonden. Probeer het opnieuw of neem contact op met ShineGo via info@shinego.nl." },
         { status: 500 }
       );
     }
 
     const internMail = await resend.emails.send({
       from: "ShineGo <noreply@shinego.nl>",
-      to: contactEmail,
+      to: CONTACT_EMAIL,
       replyTo: schoonEmail,
       subject: `HERROEPING – boeking ${boekingsnummer.trim()}`,
       html: `
