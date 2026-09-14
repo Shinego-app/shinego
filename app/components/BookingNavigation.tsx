@@ -31,7 +31,7 @@ export default function BookingNavigation() {
         }
       `}</style>
 
-      <nav className="fixed right-5 top-6 z-40 hidden items-center gap-6 md:flex">
+      <nav className="fixed right-5 top-6 z-40 hidden items-center gap-6 xl:flex">
         {links.map((link) => (
           <a key={link.href} href={link.href} className="text-sm font-semibold text-[#52779b] transition hover:text-[#1683f8]">
             {link.label}
@@ -42,7 +42,7 @@ export default function BookingNavigation() {
         </a>
       </nav>
 
-      <div className="fixed right-5 top-4 z-50 md:hidden">
+      <div className="fixed right-5 top-4 z-50 xl:hidden">
         <button
           type="button"
           aria-label="Menu openen"
