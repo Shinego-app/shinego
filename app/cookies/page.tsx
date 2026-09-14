@@ -19,7 +19,7 @@ export default function CookiesPage() {
           </h1>
 
           <p className="mt-3 text-sm text-slate-500">
-            Laatst bijgewerkt: 8 september 2026
+            Laatst bijgewerkt: 14 september 2026
           </p>
 
           <div className="mt-10 space-y-9 leading-7 text-slate-600">
@@ -92,9 +92,11 @@ export default function CookiesPage() {
             <section>
               <h2 className="text-xl font-bold text-slate-900">7. Contact</h2>
               <p className="mt-2">
-                Heb je vragen over het gebruik van cookies of lokale opslag?
-                Neem dan contact op met ShineGo via onze contactmogelijkheden op
-                de website.
+                Heb je vragen over het gebruik van cookies of lokale opslag? Neem dan contact op via
+                <a href="mailto:info@shinego.nl" className="ml-1 font-semibold text-blue-600 underline hover:text-blue-700">info@shinego.nl</a>.
+              </p>
+              <p className="mt-2 text-sm text-slate-500">
+                ShineGo · KvK 57712913 · btw-id NL001205368B47
               </p>
             </section>
           </div>
