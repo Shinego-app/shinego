@@ -35,25 +35,33 @@ export default function DetailsPage() {
     setVerdiepingen(data.verdiepingen?.length ? data.verdiepingen : data.woningtype === "appartement" ? [] : ["1"]);
     setGlasOppervlak(data.glasOppervlak || "");
     setTelescoop(Boolean(data.telescoop) || Boolean(data.verdiepingen?.includes("4")));
+    if (data.verdiepingen?.includes("4")) setBereikbaar("nee");
     setFrequentie(data.frequentie || "eenmalig");
   }, []);
 
   const bedrijf = gegevens?.woningtype === "bedrijfspand";
-  const woning = gegevens?.type === "buiten" && gegevens?.woningtype !== "appartement";
-  const kanVerder = Boolean(gegevens) && (!woning || woningtype !== "") && (bedrijf ? glasOppervlak !== "" : ramen > 0 && verdiepingen.length > 0);
+  const appartement = gegevens?.woningtype === "appartement";
+  const woning = gegevens?.type === "buiten" && !appartement;
+  const kanVerder = Boolean(gegevens) && (!woning || woningtype !== "") && (bedrijf ? glasOppervlak !== "" : appartement ? ramen > 0 : ramen > 0 && verdiepingen.length > 0);
 
   function toggleVerdieping(v: string) {
     setVerdiepingen((vorige) => {
       const nieuw = vorige.includes(v) ? vorige.filter((x) => x !== v) : [...vorige, v];
-      if (v === "4" && !vorige.includes("4")) setTelescoop(true);
-      if (v === "4" && vorige.includes("4") && nieuw.length > 0) setTelescoop(false);
+      if (v === "4" && !vorige.includes("4")) {
+        setTelescoop(true);
+        setBereikbaar("nee");
+      }
+      if (v === "4" && vorige.includes("4")) {
+        if (nieuw.length > 0) setTelescoop(false);
+        setBereikbaar("ja");
+      }
       return nieuw;
     });
   }
 
   function gaVerder() {
     if (!gegevens || !kanVerder) return;
-    const bijgewerkt: Gegevens = { ...gegevens, woningtype: woning ? woningtype : gegevens.woningtype, ramen, verdiepingen, glasOppervlak, telescoop, frequentie };
+    const bijgewerkt: Gegevens = { ...gegevens, woningtype: woning ? woningtype : gegevens.woningtype, ramen, verdiepingen: appartement ? [] : verdiepingen, glasOppervlak, telescoop, frequentie };
     localStorage.setItem("shinegoGlazenwassen", JSON.stringify(bijgewerkt));
     localStorage.setItem("shinegoGlazenwassenDetails", JSON.stringify({ bereikbaar, kozijnen, opmerking: "" }));
     if (bedrijf && glasOppervlak === "500+") { window.location.href = "/contact?offerte=500plus"; return; }
@@ -72,12 +80,12 @@ export default function DetailsPage() {
           {bedrijf?<div className="mt-6"><label className="text-sm font-extrabold text-[#123c70]">Hoeveel m² glas?</label><div className="mt-3 grid gap-2 sm:grid-cols-2">{[["0-15","Tot 15 m²"],["16-30","16 - 30 m²"],["31-50","31 - 50 m²"],["51-100","51 - 100 m²"],["101-200","101 - 200 m²"],["201-500","201 - 500 m²"],["500+","Meer dan 500 m²"]].map(([waarde,label])=><button key={waarde} type="button" onClick={()=>setGlasOppervlak(waarde)} className={`rounded-xl border px-4 py-3 text-left text-sm font-semibold transition ${glasOppervlak===waarde?"border-[#1683f8] bg-[#eaf6ff] text-[#0f66b6]":"border-[#cfe3f4] bg-white text-[#4f708f]"}`}>{label}</button>)}</div></div>:<>
             {woning&&<div className="mt-6 border-b border-[#dcecf8] pb-5"><div className="text-sm font-extrabold text-[#123c70]">Type woning</div><div className="mt-3 flex flex-wrap gap-2">{[["Rijtjeshuis","Rijtjeshuis"],["Twee-onder-een-kap","Twee-onder-een-kap"],["Vrijstaande woning","Vrijstaande woning"],["Villa","Villa"]].map(([waarde,label])=><button key={waarde} type="button" onClick={()=>setWoningtype(waarde)} className={`rounded-xl border px-4 py-2.5 text-sm font-semibold transition ${woningtype===waarde?"border-[#1683f8] bg-[#eaf6ff] text-[#0f66b6]":"border-[#cfe3f4] bg-white text-[#5f7e9c]"}`}>{label}</button>)}</div></div>}
             <div className="mt-5 flex items-center justify-between border-b border-[#dcecf8] pb-5"><div><div className="text-sm font-extrabold text-[#123c70]">Aantal ramen</div><div className="mt-1 text-xs text-[#6d89a4]">Buitenzijde van de ramen</div></div><div className="flex items-center gap-4"><button type="button" onClick={()=>setRamen(Math.max(0,ramen-1))} className="flex h-10 w-10 items-center justify-center rounded-full bg-[#eef7ff] text-xl text-[#4b7197]">−</button><div className="min-w-8 text-center text-2xl font-extrabold text-[#0b3d75]">{ramen}</div><button type="button" onClick={()=>setRamen(ramen+1)} className="flex h-10 w-10 items-center justify-center rounded-full bg-[#eef7ff] text-xl font-bold text-[#1683f8]">+</button></div></div>
-            <div className="border-b border-[#dcecf8] py-5"><div className="text-sm font-extrabold text-[#123c70]">Verdiepingen met ramen</div><div className="mt-1 text-xs text-[#6d89a4]">Je kunt meerdere verdiepingen kiezen.</div><div className="mt-3 flex flex-wrap gap-2">{[["1","Begane grond"],["2","1e verdieping"],["3","2e verdieping"],["4","3e verdieping"]].map(([waarde,label])=><button key={waarde} type="button" onClick={()=>toggleVerdieping(waarde)} className={`min-w-24 rounded-xl border px-4 py-2.5 text-sm font-semibold transition ${verdiepingen.includes(waarde)?"border-[#1683f8] bg-[#1683f8] text-white":"border-[#cfe3f4] bg-white text-[#5f7e9c]"}`}>{label}</button>)}</div>{verdiepingen.includes("4")&&<div className="mt-2 text-xs font-semibold text-[#537797]">Bij ramen op de 3e verdieping is een telescoopsteel verplicht.</div>}</div>
+            {!appartement&&<div className="border-b border-[#dcecf8] py-5"><div className="text-sm font-extrabold text-[#123c70]">Verdiepingen met ramen</div><div className="mt-1 text-xs text-[#6d89a4]">Je kunt meerdere verdiepingen kiezen.</div><div className="mt-3 flex flex-wrap gap-2">{[["1","Begane grond"],["2","1e verdieping"],["3","2e verdieping"],["4","3e verdieping"]].map(([waarde,label])=><button key={waarde} type="button" onClick={()=>toggleVerdieping(waarde)} className={`min-w-24 rounded-xl border px-4 py-2.5 text-sm font-semibold transition ${verdiepingen.includes(waarde)?"border-[#1683f8] bg-[#1683f8] text-white":"border-[#cfe3f4] bg-white text-[#5f7e9c]"}`}>{label}</button>)}</div>{verdiepingen.includes("4")&&<div className="mt-2 text-xs font-semibold text-[#537797]">Bij ramen op de 3e verdieping zijn telescoopsteel en extra lastig bereikbaar automatisch ingeschakeld.</div>}</div>}
           </>}
           <div className="mt-5 divide-y divide-[#e5f0f8] rounded-2xl border border-[#dcecf8] bg-[#fbfdff] px-4">
             <button type="button" disabled={verdiepingen.includes("4")} onClick={()=>setTelescoop(!telescoop)} className={`flex w-full items-center justify-between py-4 text-left ${verdiepingen.includes("4")?"cursor-not-allowed":""}`}><div><div className="text-sm font-extrabold text-[#123c70]">Telescoopsteel nodig?</div><div className="text-xs text-[#6d89a4]">{verdiepingen.includes("4")?"Verplicht bij de 3e verdieping":"Voor moeilijk bereikbare ramen"}</div></div><span className={`relative h-7 w-12 rounded-full ${telescoop?"bg-[#1683f8]":"bg-[#d5e5f2]"}`}><span className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow ${telescoop?"left-6":"left-1"}`}/></span></button>
             <button type="button" onClick={()=>setKozijnen(!kozijnen)} className="flex w-full items-center justify-between py-4 text-left"><div><div className="text-sm font-extrabold text-[#123c70]">Kozijnen schoonmaken?</div><div className="text-xs text-[#6d89a4]">Binnen- en/of buitenkozijnen</div></div><span className={`relative h-7 w-12 rounded-full ${kozijnen?"bg-[#1683f8]":"bg-[#d5e5f2]"}`}><span className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow ${kozijnen?"left-6":"left-1"}`}/></span></button>
-            <button type="button" onClick={()=>setBereikbaar(bereikbaar==="ja"?"nee":"ja")} className="flex w-full items-center justify-between py-4 text-left"><div><div className="text-sm font-extrabold text-[#123c70]">Extra lastig bereikbaar?</div><div className="text-xs text-[#6d89a4]">Bijvoorbeeld boven een serre of schuin dak</div></div><span className={`relative h-7 w-12 rounded-full ${bereikbaar==="nee"?"bg-[#1683f8]":"bg-[#d5e5f2]"}`}><span className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow ${bereikbaar==="nee"?"left-6":"left-1"}`}/></span></button>
+            <button type="button" disabled={verdiepingen.includes("4")} onClick={()=>setBereikbaar(bereikbaar==="ja"?"nee":"ja")} className={`flex w-full items-center justify-between py-4 text-left ${verdiepingen.includes("4")?"cursor-not-allowed":""}`}><div><div className="text-sm font-extrabold text-[#123c70]">Extra lastig bereikbaar?</div><div className="text-xs text-[#6d89a4]">{verdiepingen.includes("4")?"Automatisch bij de 3e verdieping":"Bijvoorbeeld boven een serre of schuin dak"}</div></div><span className={`relative h-7 w-12 rounded-full ${bereikbaar==="nee"?"bg-[#1683f8]":"bg-[#d5e5f2]"}`}><span className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow ${bereikbaar==="nee"?"left-6":"left-1"}`}/></span></button>
           </div>
           <div className="mt-5 border-t border-[#dcecf8] pt-5"><div className="text-sm font-extrabold text-[#123c70]">Hoe vaak?</div><div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">{[["eenmalig","Eenmalig"],["4weken","4 weken"],["8weken","8 weken"],["12weken","12 weken"]].map(([id,label])=><button key={id} type="button" onClick={()=>setFrequentie(id)} className={`rounded-xl border px-3 py-2.5 text-xs font-bold transition ${frequentie===id?"border-[#1683f8] bg-[#eaf6ff] text-[#0f66b6]":"border-[#cfe3f4] bg-white text-[#5f7e9c]"}`}>{label}</button>)}</div></div>
         </>}
