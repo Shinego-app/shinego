@@ -5,20 +5,6 @@ import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
 import BeschikbareOpdrachten from "./BeschikbareOpdrachten";
 
-function toonGeboortedatum(value?: string | null) {
-  if (!value) return "";
-  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if (!match) return value;
-  return `${match[3]}-${match[2]}-${match[1]}`;
-}
-
-function maskeerIban(value?: string | null) {
-  if (!value) return "Niet ingevuld";
-  const schoon = value.replace(/\s/g, "").toUpperCase();
-  if (schoon.length < 8) return schoon;
-  return `${schoon.slice(0, 4)} •••• •••• ${schoon.slice(-4)}`;
-}
-
 export default function ProfessionalDashboardPage() {
   const router = useRouter();
   const [laden, setLaden] = useState(true);
@@ -40,8 +26,6 @@ export default function ProfessionalDashboardPage() {
     kvk_nummer: "",
     btw_nummer: "",
     werkgebied_km: "25",
-    geboortedatum: "",
-    iban: "",
   });
 
   function vulProfielForm(data: any) {
@@ -58,8 +42,6 @@ export default function ProfessionalDashboardPage() {
       kvk_nummer: data?.kvk_nummer || "",
       btw_nummer: data?.btw_nummer || "",
       werkgebied_km: String(data?.werkgebied_km || 25),
-      geboortedatum: toonGeboortedatum(data?.stripe_geboortedatum),
-      iban: data?.stripe_iban || "",
     });
   }
 
@@ -81,14 +63,6 @@ export default function ProfessionalDashboardPage() {
         .select("*")
         .eq("user_id", user.id)
         .single();
-
-      if (data) {
-        data = {
-          ...data,
-          stripe_geboortedatum: user.user_metadata?.stripe_geboortedatum || null,
-          stripe_iban: user.user_metadata?.stripe_iban || null,
-        };
-      }
 
       const { data: sessionData } = await supabase.auth.getSession();
       const token = sessionData.session?.access_token;
@@ -155,14 +129,8 @@ export default function ProfessionalDashboardPage() {
       return;
     }
 
-    const bijgewerkt = {
-      ...result.professional,
-      stripe_geboortedatum: result.verificatie?.geboortedatum || null,
-      stripe_iban: result.verificatie?.iban || null,
-    };
-
-    setProfessional(bijgewerkt);
-    vulProfielForm(bijgewerkt);
+    setProfessional(result.professional);
+    vulProfielForm(result.professional);
     setProfielBewerken(false);
     setProfielMelding("Gegevens opgeslagen. Je werkgebied wordt direct gebruikt voor nieuwe beschikbare opdrachten.");
   }
@@ -209,7 +177,7 @@ export default function ProfessionalDashboardPage() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="text-xl font-bold text-gray-900">Mijn gegevens</h2>
-              <p className="mt-1 text-sm text-gray-600">Controleer en wijzig je bedrijfs-, contact-, werkgebied- en uitbetalingsgegevens.</p>
+              <p className="mt-1 text-sm text-gray-600">Controleer en wijzig je bedrijfs-, contact- en werkgebiedgegevens.</p>
             </div>
             {!profielBewerken && (
               <button onClick={() => { setProfielMelding(""); setProfielBewerken(true); }} className="rounded-xl border border-blue-600 bg-white px-4 py-2 font-semibold text-blue-600">Gegevens wijzigen</button>
@@ -227,8 +195,6 @@ export default function ProfessionalDashboardPage() {
               <p><strong>Werkgebied:</strong> {professional?.werkgebied_km ? `${professional.werkgebied_km} km rondom jouw adres` : "Niet ingesteld"}</p>
               <p><strong>KVK:</strong> {professional?.kvk_nummer || "-"}</p>
               <p><strong>BTW:</strong> {professional?.btw_nummer || "Niet ingevuld"}</p>
-              <p><strong>Geboortedatum:</strong> {toonGeboortedatum(professional?.stripe_geboortedatum) || "Niet ingevuld"}</p>
-              <p><strong>IBAN:</strong> {maskeerIban(professional?.stripe_iban)}</p>
             </div>
           ) : (
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
@@ -241,47 +207,14 @@ export default function ProfessionalDashboardPage() {
 
               <label className="block">
                 <span className="mb-1 block text-sm font-medium text-gray-800">Werkgebied</span>
-                <select
-                  value={profielForm.werkgebied_km}
-                  onChange={(e) => setProfielForm((prev) => ({ ...prev, werkgebied_km: e.target.value }))}
-                  className="w-full rounded-xl border border-gray-300 px-3 py-2 text-gray-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
-                >
-                  <option value="10">10 km</option>
-                  <option value="15">15 km</option>
-                  <option value="25">25 km</option>
-                  <option value="35">35 km</option>
-                  <option value="50">50 km</option>
-                  <option value="75">75 km</option>
-                  <option value="100">100 km</option>
+                <select value={profielForm.werkgebied_km} onChange={(e) => setProfielForm((prev) => ({ ...prev, werkgebied_km: e.target.value }))} className="w-full rounded-xl border border-gray-300 px-3 py-2 text-gray-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
+                  <option value="10">10 km</option><option value="15">15 km</option><option value="25">25 km</option><option value="35">35 km</option><option value="50">50 km</option><option value="75">75 km</option><option value="100">100 km</option>
                 </select>
                 <span className="mt-1 block text-xs text-gray-500">Nieuwe betaalde opdrachten binnen deze afstand worden automatisch bij Beschikbare opdrachten getoond als ze ook bij jouw diensten en materiaal passen.</span>
               </label>
 
-              <label className="block">
-                <span className="mb-1 block text-sm font-medium text-gray-800">Geboortedatum</span>
-                <input
-                  value={profielForm.geboortedatum}
-                  onChange={(e) => setProfielForm((prev) => ({ ...prev, geboortedatum: e.target.value }))}
-                  placeholder="DD-MM-JJJJ"
-                  inputMode="numeric"
-                  maxLength={10}
-                  className="w-full rounded-xl border border-gray-300 px-3 py-2 text-gray-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
-                />
-              </label>
-
-              <label className="block">
-                <span className="mb-1 block text-sm font-medium text-gray-800">IBAN</span>
-                <input
-                  value={profielForm.iban}
-                  onChange={(e) => setProfielForm((prev) => ({ ...prev, iban: e.target.value.toUpperCase() }))}
-                  placeholder="NL00 BANK 0000 0000 00"
-                  autoComplete="off"
-                  className="w-full rounded-xl border border-gray-300 px-3 py-2 text-gray-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
-                />
-              </label>
-
               <div className="sm:col-span-2">
-                <p className="mb-3 text-sm text-gray-500">E-mailadres wijzigen loopt apart via accountbeveiliging en is hier daarom niet aanpasbaar. Je IBAN wordt buiten de bewerkmodus afgeschermd weergegeven.</p>
+                <p className="mb-3 text-sm text-gray-500">E-mailadres wijzigen loopt apart via accountbeveiliging. Bankrekening en betaalverificatie beheer je uitsluitend via de aparte Stripe-uitbetalingsstap.</p>
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <button onClick={profielOpslaan} disabled={profielBezig} className="rounded-xl bg-blue-600 px-4 py-2 font-semibold text-white disabled:opacity-50">{profielBezig ? "Opslaan..." : "Wijzigingen opslaan"}</button>
                   <button onClick={() => { vulProfielForm(professional); setProfielBewerken(false); setProfielMelding(""); }} disabled={profielBezig} className="rounded-xl border border-gray-300 bg-white px-4 py-2 font-semibold text-gray-900 disabled:opacity-50">Annuleren</button>
