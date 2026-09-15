@@ -15,7 +15,7 @@ export async function POST(request: Request) {
 
     const { data: booking, error: bookingError } = await supabaseAdmin
       .from("boekingen")
-      .select("id, totaalprijs, annuleringskosten, betaald, stripe_payment_id, stripe_refund_id, terugbetaald, terugbetaald_bedrag")
+      .select("id, status, totaalprijs, annuleringskosten, betaald, uitbetaald, stripe_payment_id, stripe_refund_id, terugbetaald, terugbetaald_bedrag")
       .eq("id", bookingId)
       .single();
 
@@ -23,8 +23,16 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Boeking niet gevonden." }, { status: 404 });
     }
 
+    if (booking.status !== "geannuleerd") {
+      return NextResponse.json({ error: "Alleen een geannuleerde boeking kan worden terugbetaald." }, { status: 400 });
+    }
+
     if (booking.betaald !== true) {
       return NextResponse.json({ error: "Deze boeking is niet betaald." }, { status: 400 });
+    }
+
+    if (booking.uitbetaald === true) {
+      return NextResponse.json({ error: "Deze boeking is al aan de professional uitbetaald. Refund eerst handmatig beoordelen." }, { status: 409 });
     }
 
     if (!booking.stripe_payment_id) {
@@ -61,7 +69,8 @@ export async function POST(request: Request) {
         terugbetaald: true,
         terugbetaald_bedrag: terugTeBetalen,
       })
-      .eq("id", booking.id);
+      .eq("id", booking.id)
+      .eq("terugbetaald", false);
 
     if (updateError) throw updateError;
 
