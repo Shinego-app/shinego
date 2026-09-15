@@ -123,16 +123,16 @@ export default function Home() {
           </div>
 
           <div className="mt-9 border-t border-white/15 pt-6">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-xs text-[#9fb7cf]">© 2026 ShineGo. Alle rechten voorbehouden.</p>
-              <div className="flex flex-col items-start gap-2 sm:items-end">
-                <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#9fb7cf]">Veilig betalen met</span>
-                <div className="flex flex-wrap items-center gap-3">
-                  <a href="https://ideal.nl/ideal-wero-branding" target="_blank" rel="noreferrer" className="flex h-12 items-center rounded-xl bg-white px-3 shadow-sm" aria-label="iDEAL | Wero">
-                    <img src="https://www.e-captain.nl/images/ideal-wero-lockup-yellow-horizontal-rgb-half.png" alt="iDEAL | Wero" className="h-8 w-auto" />
+              <div className="flex flex-col items-start gap-1 sm:items-end">
+                <span className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#9fb7cf]">Veilig betalen met</span>
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <a href="https://ideal.nl/ideal-wero-branding" target="_blank" rel="noreferrer" className="flex h-10 items-center rounded-lg bg-white px-2.5 shadow-sm" aria-label="iDEAL | Wero">
+                    <img src="https://www.e-captain.nl/images/ideal-wero-lockup-yellow-horizontal-rgb-half.png" alt="iDEAL | Wero" className="h-7 w-auto" />
                   </a>
-                  <a href="https://stripe.com" target="_blank" rel="noreferrer" className="flex h-12 items-center rounded-xl bg-white px-3 shadow-sm" aria-label="Powered by Stripe">
-                    <img src="https://images.stripeassets.com/fzn2n1nzq965/4M6d6BSWzlgsrJx8rdZb0I/733f37ef69b5ca1d3d33e127184f4ce4/Powered_by_Stripe.svg?q=80&w=1082" alt="Powered by Stripe" className="h-7 w-auto" />
+                  <a href="https://stripe.com" target="_blank" rel="noreferrer" className="flex h-10 items-center rounded-lg bg-white px-2.5 shadow-sm" aria-label="Powered by Stripe">
+                    <img src="https://images.stripeassets.com/fzn2n1nzq965/4M6d6BSWzlgsrJx8rdZb0I/733f37ef69b5ca1d3d33e127184f4ce4/Powered_by_Stripe.svg?q=80&w=1082" alt="Powered by Stripe" className="h-6 w-auto" />
                   </a>
                 </div>
               </div>
