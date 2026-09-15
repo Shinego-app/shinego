@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+type Reiniging = "buiten" | "binnen-buiten" | "binnen";
+
 type Gegevens = {
   woningtype: string;
   verdiepingen: string[];
@@ -11,6 +13,9 @@ type Gegevens = {
   type: string;
   frequentie: string;
   appartementToegang?: "balkon" | "buiten";
+  binnenkant?: boolean;
+  alleenBinnen?: boolean;
+  achterkant?: boolean;
 };
 
 const keuzes: Record<string, Gegevens> = {
@@ -30,6 +35,8 @@ export default function DetailsPage() {
   const [kozijnen, setKozijnen] = useState(false);
   const [frequentie, setFrequentie] = useState("eenmalig");
   const [appartementToegang, setAppartementToegang] = useState<"balkon" | "buiten" | "">("");
+  const [reiniging, setReiniging] = useState<Reiniging>("buiten");
+  const [achterkant, setAchterkant] = useState(false);
 
   useEffect(() => {
     const type = new URLSearchParams(window.location.search).get("type") || "";
@@ -50,34 +57,44 @@ export default function DetailsPage() {
     }
     setFrequentie(data.frequentie || "eenmalig");
     setAppartementToegang(data.appartementToegang || "");
+    setAchterkant(Boolean(data.achterkant));
+    if (data.alleenBinnen || data.type === "binnen") setReiniging("binnen");
+    else if (data.binnenkant) setReiniging("binnen-buiten");
   }, []);
 
   const bedrijf = gegevens?.woningtype === "bedrijfspand";
   const appartement = gegevens?.woningtype === "appartement";
   const telewash = gegevens?.type === "telewash";
   const woning = gegevens?.type === "buiten" && !appartement;
-  const appartementBuiten = appartement && appartementToegang === "buiten";
+  const alleenBinnen = reiniging === "binnen";
+  const appartementBuiten = appartement && appartementToegang === "buiten" && !alleenBinnen;
   const appartementVerdieping = verdiepingen[0] || "";
   const appartementTelescoopVerplicht = appartementBuiten && ["2", "3", "4"].includes(appartementVerdieping);
-  const derdeVerdiepingVerplicht = verdiepingen.includes("4");
+  const derdeVerdiepingVerplicht = !alleenBinnen && verdiepingen.includes("4");
 
   const kanVerder = Boolean(gegevens) &&
     (!woning || woningtype !== "") &&
     (bedrijf
       ? glasOppervlak !== ""
       : appartement
-        ? ramen > 0 && appartementToegang !== "" && (appartementToegang === "balkon" || verdiepingen.length === 1)
-        : ramen > 0 && verdiepingen.length > 0);
+        ? ramen > 0 && (alleenBinnen || (appartementToegang !== "" && (appartementToegang === "balkon" || verdiepingen.length === 1)))
+        : ramen > 0 && (alleenBinnen || verdiepingen.length > 0));
+
+  function kiesReiniging(keuze: Reiniging) {
+    setReiniging(keuze);
+    if (keuze === "binnen") {
+      setTelescoop(false);
+      return;
+    }
+    if (telewash) setTelescoop(true);
+    else if (verdiepingen.includes("4") || appartementTelescoopVerplicht) setTelescoop(true);
+  }
 
   function toggleVerdieping(v: string) {
     setVerdiepingen((vorige) => {
       const nieuw = vorige.includes(v) ? vorige.filter((x) => x !== v) : [...vorige, v];
-      if (v === "4" && !vorige.includes("4")) {
-        setTelescoop(true);
-      }
-      if (v === "4" && vorige.includes("4") && nieuw.length > 0) {
-        setTelescoop(false);
-      }
+      if (!alleenBinnen && v === "4" && !vorige.includes("4")) setTelescoop(true);
+      if (!alleenBinnen && v === "4" && vorige.includes("4") && nieuw.length > 0) setTelescoop(false);
       return nieuw;
     });
   }
@@ -85,12 +102,12 @@ export default function DetailsPage() {
   function kiesAppartementToegang(keuze: "balkon" | "buiten") {
     setAppartementToegang(keuze);
     setVerdiepingen([]);
-    setTelescoop(false);
+    if (!alleenBinnen) setTelescoop(false);
   }
 
   function kiesAppartementVerdieping(v: string) {
     setVerdiepingen([v]);
-    setTelescoop(["2", "3", "4"].includes(v));
+    if (!alleenBinnen) setTelescoop(["2", "3", "4"].includes(v));
   }
 
   function gaVerder() {
@@ -101,9 +118,12 @@ export default function DetailsPage() {
       ramen,
       verdiepingen: appartement && appartementToegang === "balkon" ? [] : verdiepingen,
       glasOppervlak,
-      telescoop,
+      telescoop: alleenBinnen ? false : telescoop,
       frequentie,
       appartementToegang: appartement ? appartementToegang || undefined : undefined,
+      binnenkant: reiniging === "binnen-buiten",
+      alleenBinnen,
+      achterkant,
     };
     localStorage.setItem("shinegoGlazenwassen", JSON.stringify(bijgewerkt));
     localStorage.setItem("shinegoGlazenwassenDetails", JSON.stringify({ bereikbaar: "ja", kozijnen, opmerking: "" }));
@@ -123,16 +143,20 @@ export default function DetailsPage() {
           {bedrijf?<div className="mt-6"><label className="text-sm font-extrabold text-[#123c70]">Hoeveel m² glas?</label><div className="mt-3 grid gap-2 sm:grid-cols-2">{[["0-15","Tot 15 m²"],["16-30","16 - 30 m²"],["31-50","31 - 50 m²"],["51-100","51 - 100 m²"],["101-200","101 - 200 m²"],["201-500","201 - 500 m²"],["500+","Meer dan 500 m²"]].map(([waarde,label])=><button key={waarde} type="button" onClick={()=>setGlasOppervlak(waarde)} className={`rounded-xl border px-4 py-3 text-left text-sm font-semibold transition ${glasOppervlak===waarde?"border-[#1683f8] bg-[#eaf6ff] text-[#0f66b6]":"border-[#cfe3f4] bg-white text-[#4f708f]"}`}>{label}</button>)}</div></div>:<>
             {woning&&<div className="mt-6 border-b border-[#dcecf8] pb-5"><div className="text-sm font-extrabold text-[#123c70]">Type woning</div><div className="mt-3 flex flex-wrap gap-2">{[["Rijtjeshuis","Rijtjeshuis"],["Twee-onder-een-kap","Twee-onder-een-kap"],["Vrijstaande woning","Vrijstaande woning"],["Villa","Villa"]].map(([waarde,label])=><button key={waarde} type="button" onClick={()=>setWoningtype(waarde)} className={`rounded-xl border px-4 py-2.5 text-sm font-semibold transition ${woningtype===waarde?"border-[#1683f8] bg-[#eaf6ff] text-[#0f66b6]":"border-[#cfe3f4] bg-white text-[#5f7e9c]"}`}>{label}</button>)}</div></div>}
 
-            {appartement&&<div className="mt-6 border-b border-[#dcecf8] pb-5"><div className="text-sm font-extrabold text-[#123c70]">Hoe zijn de ramen bereikbaar?</div><div className="mt-1 text-xs text-[#6d89a4]">Kies hoe de buitenzijde van de ramen wordt bereikt.</div><div className="mt-3 grid gap-2 sm:grid-cols-2"><button type="button" onClick={()=>kiesAppartementToegang("balkon")} className={`rounded-xl border px-4 py-3 text-left text-sm font-semibold transition ${appartementToegang==="balkon"?"border-[#1683f8] bg-[#eaf6ff] text-[#0f66b6]":"border-[#cfe3f4] bg-white text-[#5f7e9c]"}`}>Vanaf balkon / galerij</button><button type="button" onClick={()=>kiesAppartementToegang("buiten")} className={`rounded-xl border px-4 py-3 text-left text-sm font-semibold transition ${appartementToegang==="buiten"?"border-[#1683f8] bg-[#eaf6ff] text-[#0f66b6]":"border-[#cfe3f4] bg-white text-[#5f7e9c]"}`}>Van buitenaf reinigen</button></div></div>}
+            {!telewash&&<div className="mt-5 border-b border-[#dcecf8] pb-5"><div className="text-sm font-extrabold text-[#123c70]">Welke zijde wil je laten reinigen?</div><div className="mt-3 grid gap-2 sm:grid-cols-3">{[["buiten","Alleen buiten"],["binnen-buiten","Binnen + buiten"],["binnen","Alleen binnen"]].map(([waarde,label])=><button key={waarde} type="button" onClick={()=>kiesReiniging(waarde as Reiniging)} className={`rounded-xl border px-4 py-3 text-left text-sm font-semibold transition ${reiniging===waarde?"border-[#1683f8] bg-[#eaf6ff] text-[#0f66b6]":"border-[#cfe3f4] bg-white text-[#5f7e9c]"}`}>{label}</button>)}</div>{alleenBinnen&&<div className="mt-2 text-xs font-semibold text-[#537797]">Bij alleen binnen geldt €15 starttoeslag. Hoogte en telescoopsteel tellen niet mee.</div>}</div>}
 
-            <div className="mt-5 flex items-center justify-between border-b border-[#dcecf8] pb-5"><div><div className="text-sm font-extrabold text-[#123c70]">Aantal ramen</div><div className="mt-1 text-xs text-[#6d89a4]">Buitenzijde van de ramen</div></div><div className="flex items-center gap-4"><button type="button" onClick={()=>setRamen(Math.max(0,ramen-1))} className="flex h-10 w-10 items-center justify-center rounded-full bg-[#eef7ff] text-xl text-[#4b7197]">−</button><div className="min-w-8 text-center text-2xl font-extrabold text-[#0b3d75]">{ramen}</div><button type="button" onClick={()=>setRamen(ramen+1)} className="flex h-10 w-10 items-center justify-center rounded-full bg-[#eef7ff] text-xl font-bold text-[#1683f8]">+</button></div></div>
+            {!telewash&&<button type="button" onClick={()=>setAchterkant(!achterkant)} className="mt-5 flex w-full items-center justify-between border-b border-[#dcecf8] pb-5 text-left"><div><div className="text-sm font-extrabold text-[#123c70]">Achterkant woning meenemen?</div><div className="mt-1 text-xs text-[#6d89a4]">Zelfde prijs per raam als aan de voorkant. Tel alle ramen samen bij het aantal ramen.</div></div><span className={`relative h-7 w-12 shrink-0 rounded-full ${achterkant?"bg-[#1683f8]":"bg-[#d5e5f2]"}`}><span className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow ${achterkant?"left-6":"left-1"}`}/></span></button>}
+
+            {appartement&&!alleenBinnen&&<div className="mt-6 border-b border-[#dcecf8] pb-5"><div className="text-sm font-extrabold text-[#123c70]">Hoe zijn de ramen bereikbaar?</div><div className="mt-1 text-xs text-[#6d89a4]">Kies hoe de buitenzijde van de ramen wordt bereikt.</div><div className="mt-3 grid gap-2 sm:grid-cols-2"><button type="button" onClick={()=>kiesAppartementToegang("balkon")} className={`rounded-xl border px-4 py-3 text-left text-sm font-semibold transition ${appartementToegang==="balkon"?"border-[#1683f8] bg-[#eaf6ff] text-[#0f66b6]":"border-[#cfe3f4] bg-white text-[#5f7e9c]"}`}>Vanaf balkon / galerij</button><button type="button" onClick={()=>kiesAppartementToegang("buiten")} className={`rounded-xl border px-4 py-3 text-left text-sm font-semibold transition ${appartementToegang==="buiten"?"border-[#1683f8] bg-[#eaf6ff] text-[#0f66b6]":"border-[#cfe3f4] bg-white text-[#5f7e9c]"}`}>Van buitenaf reinigen</button></div></div>}
+
+            <div className="mt-5 flex items-center justify-between border-b border-[#dcecf8] pb-5"><div><div className="text-sm font-extrabold text-[#123c70]">Aantal ramen</div><div className="mt-1 text-xs text-[#6d89a4]">{achterkant?"Totaal aantal ramen voor- en achterkant":"Aantal ramen voor deze opdracht"}</div></div><div className="flex items-center gap-4"><button type="button" onClick={()=>setRamen(Math.max(0,ramen-1))} className="flex h-10 w-10 items-center justify-center rounded-full bg-[#eef7ff] text-xl text-[#4b7197]">−</button><div className="min-w-8 text-center text-2xl font-extrabold text-[#0b3d75]">{ramen}</div><button type="button" onClick={()=>setRamen(ramen+1)} className="flex h-10 w-10 items-center justify-center rounded-full bg-[#eef7ff] text-xl font-bold text-[#1683f8]">+</button></div></div>
 
             {appartementBuiten&&<div className="border-b border-[#dcecf8] py-5"><div className="text-sm font-extrabold text-[#123c70]">Op welke verdieping ligt het appartement?</div><div className="mt-1 text-xs text-[#6d89a4]">Kies één verdieping. Boven de 3e verdieping kan niet via de standaard boekingsflow.</div><div className="mt-3 flex flex-wrap gap-2">{[["1","Begane grond"],["2","1e verdieping"],["3","2e verdieping"],["4","3e verdieping"]].map(([waarde,label])=><button key={waarde} type="button" onClick={()=>kiesAppartementVerdieping(waarde)} className={`min-w-24 rounded-xl border px-4 py-2.5 text-sm font-semibold transition ${verdiepingen.includes(waarde)?"border-[#1683f8] bg-[#1683f8] text-white":"border-[#cfe3f4] bg-white text-[#5f7e9c]"}`}>{label}</button>)}</div>{appartementVerdieping&&["2","3","4"].includes(appartementVerdieping)&&<div className="mt-2 text-xs font-semibold text-[#537797]">Vanaf de 1e verdieping is telescoopsteel automatisch ingeschakeld.</div>}{appartementVerdieping==="4"&&<div className="mt-1 text-xs font-semibold text-[#537797]">Bij de 3e verdieping geldt een hoogtetoeslag van €15.</div>}</div>}
 
-            {!appartement&&<div className="border-b border-[#dcecf8] py-5"><div className="text-sm font-extrabold text-[#123c70]">Verdiepingen met ramen</div><div className="mt-1 text-xs text-[#6d89a4]">Je kunt meerdere verdiepingen kiezen.</div><div className="mt-3 flex flex-wrap gap-2">{[["1","Begane grond"],["2","1e verdieping"],["3","2e verdieping"],["4","3e verdieping"]].map(([waarde,label])=><button key={waarde} type="button" onClick={()=>toggleVerdieping(waarde)} className={`min-w-24 rounded-xl border px-4 py-2.5 text-sm font-semibold transition ${verdiepingen.includes(waarde)?"border-[#1683f8] bg-[#1683f8] text-white":"border-[#cfe3f4] bg-white text-[#5f7e9c]"}`}>{label}</button>)}</div>{verdiepingen.includes("4")&&<div className="mt-2 text-xs font-semibold text-[#537797]">Bij ramen op de 3e verdieping is telescoopsteel automatisch ingeschakeld en geldt een hoogtetoeslag van €15.</div>}</div>}
+            {!appartement&&!alleenBinnen&&<div className="border-b border-[#dcecf8] py-5"><div className="text-sm font-extrabold text-[#123c70]">Verdiepingen met ramen</div><div className="mt-1 text-xs text-[#6d89a4]">Je kunt meerdere verdiepingen kiezen.</div><div className="mt-3 flex flex-wrap gap-2">{[["1","Begane grond"],["2","1e verdieping"],["3","2e verdieping"],["4","3e verdieping"]].map(([waarde,label])=><button key={waarde} type="button" onClick={()=>toggleVerdieping(waarde)} className={`min-w-24 rounded-xl border px-4 py-2.5 text-sm font-semibold transition ${verdiepingen.includes(waarde)?"border-[#1683f8] bg-[#1683f8] text-white":"border-[#cfe3f4] bg-white text-[#5f7e9c]"}`}>{label}</button>)}</div>{verdiepingen.includes("4")&&<div className="mt-2 text-xs font-semibold text-[#537797]">Bij ramen op de 3e verdieping is telescoopsteel automatisch ingeschakeld en geldt een hoogtetoeslag van €15.</div>}</div>}
           </>}
           <div className="mt-5 divide-y divide-[#e5f0f8] rounded-2xl border border-[#dcecf8] bg-[#fbfdff] px-4">
-            <button type="button" disabled={telewash || derdeVerdiepingVerplicht || appartementTelescoopVerplicht} onClick={()=>setTelescoop(!telescoop)} className={`flex w-full items-center justify-between py-4 text-left ${telewash||derdeVerdiepingVerplicht||appartementTelescoopVerplicht?"cursor-not-allowed":""}`}><div><div className="text-sm font-extrabold text-[#123c70]">Telescoopsteel nodig?</div><div className="text-xs text-[#6d89a4]">{telewash?"Standaard bij Telewash":appartementTelescoopVerplicht?"Verplicht bij reinigen van buitenaf op deze verdieping":derdeVerdiepingVerplicht?"Verplicht bij de 3e verdieping":"Voor moeilijk bereikbare ramen"}</div></div><span className={`relative h-7 w-12 rounded-full ${telescoop?"bg-[#1683f8]":"bg-[#d5e5f2]"}`}><span className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow ${telescoop?"left-6":"left-1"}`}/></span></button>
+            {!alleenBinnen&&<button type="button" disabled={telewash || derdeVerdiepingVerplicht || appartementTelescoopVerplicht} onClick={()=>setTelescoop(!telescoop)} className={`flex w-full items-center justify-between py-4 text-left ${telewash||derdeVerdiepingVerplicht||appartementTelescoopVerplicht?"cursor-not-allowed":""}`}><div><div className="text-sm font-extrabold text-[#123c70]">Telescoopsteel nodig?</div><div className="text-xs text-[#6d89a4]">{telewash?"Standaard bij Telewash":appartementTelescoopVerplicht?"Verplicht bij reinigen van buitenaf op deze verdieping":derdeVerdiepingVerplicht?"Verplicht bij de 3e verdieping":"Voor moeilijk bereikbare ramen"}</div></div><span className={`relative h-7 w-12 rounded-full ${telescoop?"bg-[#1683f8]":"bg-[#d5e5f2]"}`}><span className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow ${telescoop?"left-6":"left-1"}`}/></span></button>}
             <button type="button" disabled={telewash} onClick={()=>setKozijnen(!kozijnen)} className={`flex w-full items-center justify-between py-4 text-left ${telewash?"cursor-not-allowed":""}`}><div><div className="text-sm font-extrabold text-[#123c70]">Kozijnen schoonmaken?</div><div className="text-xs text-[#6d89a4]">{telewash?"Standaard inbegrepen bij Telewash":"Binnen- en/of buitenkozijnen"}</div></div><span className={`relative h-7 w-12 rounded-full ${kozijnen?"bg-[#1683f8]":"bg-[#d5e5f2]"}`}><span className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow ${kozijnen?"left-6":"left-1"}`}/></span></button>
           </div>
           <div className="mt-5 border-t border-[#dcecf8] pt-5"><div className="text-sm font-extrabold text-[#123c70]">Hoe vaak?</div><div className="mt-3 grid grid-cols-2 gap-2 sm:grid-cols-4">{[["eenmalig","Eenmalig"],["4weken","4 weken"],["8weken","8 weken"],["12weken","12 weken"]].map(([id,label])=><button key={id} type="button" onClick={()=>setFrequentie(id)} className={`rounded-xl border px-3 py-2.5 text-xs font-bold transition ${frequentie===id?"border-[#1683f8] bg-[#eaf6ff] text-[#0f66b6]":"border-[#cfe3f4] bg-white text-[#5f7e9c]"}`}>{label}</button>)}</div></div>
