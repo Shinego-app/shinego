@@ -1,24 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
-function normaliseerGeboortedatum(value: string) {
-  const match = value.trim().match(/^(\d{2})-(\d{2})-(\d{4})$/);
-  if (!match) return null;
-
-  const [, dag, maand, jaar] = match;
-  const datum = new Date(`${jaar}-${maand}-${dag}T00:00:00Z`);
-  if (
-    Number.isNaN(datum.getTime()) ||
-    datum.getUTCFullYear() !== Number(jaar) ||
-    datum.getUTCMonth() + 1 !== Number(maand) ||
-    datum.getUTCDate() !== Number(dag)
-  ) {
-    return null;
-  }
-
-  return `${jaar}-${maand}-${dag}`;
-}
-
 function normaliseerDiensten(value: unknown) {
   const invoer = Array.isArray(value) ? value : [];
   const toegestaan = new Set(["glazenwasser", "telewash", "bedrijf", "binnen"]);
@@ -57,23 +39,12 @@ export async function POST(request: Request) {
     const toevoeging = String(body.toevoeging || "").trim();
     const kvkNummer = String(body.kvk_nummer || "").replace(/\D/g, "");
     const btwNummer = String(body.btw_nummer || "").replace(/[\s.\-]/g, "").toUpperCase();
-    const geboortedatumInvoer = String(body.geboortedatum || "").trim();
-    const iban = String(body.iban || "").replace(/\s/g, "").toUpperCase();
     const werkgebiedKm = Number(body.werkgebied_km);
     const diensten = normaliseerDiensten(body.diensten);
 
     if (
-      !bedrijfsnaam ||
-      !voornaam ||
-      !achternaam ||
-      !telefoon ||
-      !postcodeRaw ||
-      !woonplaats ||
-      !straat ||
-      !huisnummer ||
-      !kvkNummer ||
-      !geboortedatumInvoer ||
-      !iban
+      !bedrijfsnaam || !voornaam || !achternaam || !telefoon ||
+      !postcodeRaw || !woonplaats || !straat || !huisnummer || !kvkNummer
     ) {
       return NextResponse.json({ error: "Vul alle verplichte gegevens in." }, { status: 400 });
     }
@@ -97,15 +68,6 @@ export async function POST(request: Request) {
 
     if (btwNummer && !/^NL\d{9}B\d{2}$/.test(btwNummer)) {
       return NextResponse.json({ error: "Vul een geldig Nederlands BTW-id in." }, { status: 400 });
-    }
-
-    const geboortedatum = normaliseerGeboortedatum(geboortedatumInvoer);
-    if (!geboortedatum) {
-      return NextResponse.json({ error: "Vul je geboortedatum in als DD-MM-JJJJ." }, { status: 400 });
-    }
-
-    if (!/^NL\d{2}[A-Z]{4}\d{10}$/.test(iban)) {
-      return NextResponse.json({ error: "Vul een geldig Nederlands IBAN in." }, { status: 400 });
     }
 
     const postcode = `${postcodeRaw.slice(0, 4)} ${postcodeRaw.slice(4)}`;
@@ -139,15 +101,6 @@ export async function POST(request: Request) {
     const { error: metadataError } = await supabaseAdmin.auth.admin.updateUserById(userData.user.id, {
       user_metadata: {
         ...bestaandeMetadata,
-        stripe_geboortedatum: geboortedatum,
-        stripe_iban: iban,
-        stripe_eigenaar_bevestigd: true,
-        stripe_priveadres_zelfde: true,
-        stripe_prive_straat: null,
-        stripe_prive_huisnummer: null,
-        stripe_prive_toevoeging: null,
-        stripe_prive_postcode: null,
-        stripe_prive_woonplaats: null,
         diensten,
         werkgebied_km: werkgebiedKm,
       },
@@ -155,16 +108,10 @@ export async function POST(request: Request) {
 
     if (metadataError) {
       console.error("Professional metadata fout:", metadataError);
-      return NextResponse.json({ error: "Verificatiegegevens konden niet worden opgeslagen." }, { status: 500 });
+      return NextResponse.json({ error: "Profielgegevens konden niet volledig worden opgeslagen." }, { status: 500 });
     }
 
-    return NextResponse.json({
-      professional,
-      verificatie: {
-        geboortedatum,
-        iban,
-      },
-    });
+    return NextResponse.json({ professional });
   } catch (error) {
     console.error("Professional profiel fout:", error);
     return NextResponse.json({ error: "Gegevens konden niet worden opgeslagen." }, { status: 500 });
