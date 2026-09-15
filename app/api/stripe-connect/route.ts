@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
+import Stripe from "stripe";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
-const STRIPE_API_VERSION = "2026-07-29.preview";
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(request: Request) {
   try {
@@ -24,7 +25,7 @@ export async function POST(request: Request) {
     const { data: professional, error: professionalError } = await supabaseAdmin
       .from("professionals")
       .select(
-        "id, email, stripe_account_id, uitbetalingen_actief, bedrijfsnaam, voornaam, achternaam, telefoon, postcode, woonplaats, straat, huisnummer, toevoeging, kvk_nummer, btw_nummer"
+        "id, email, stripe_account_id, bedrijfsnaam, telefoon, postcode, woonplaats, straat, huisnummer, toevoeging, kvk_nummer, btw_nummer"
       )
       .eq("user_id", user.id)
       .single();
@@ -43,123 +44,59 @@ export async function POST(request: Request) {
       .join(" ")
       .trim();
 
-    const kvkNummer = professional.kvk_nummer?.replace(/\D/g, "");
-    const btwNummer = professional.btw_nummer?.replace(/[\s.\-]/g, "").toUpperCase();
-
-    const idNumbers = [
-      ...(kvkNummer ? [{ type: "nl_kvk", value: kvkNummer }] : []),
-      ...(btwNummer ? [{ type: "nl_vat", value: btwNummer }] : []),
-    ];
-
-    const accountPrefill = {
-      contact_email: email,
-      display_name: professional.bedrijfsnaam,
-      contact_phone: professional.telefoon,
-      identity: {
-        business_details: {
-          registered_name: professional.bedrijfsnaam,
-          phone: professional.telefoon,
-          ...(idNumbers.length > 0 ? { id_numbers: idNumbers } : {}),
-          ...(adresRegel || professional.postcode || professional.woonplaats
-            ? {
-                address: {
-                  country: "nl",
-                  ...(adresRegel ? { line1: adresRegel } : {}),
-                  ...(professional.postcode
-                    ? { postal_code: professional.postcode.trim().toUpperCase() }
-                    : {}),
-                  ...(professional.woonplaats
-                    ? { city: professional.woonplaats.trim() }
-                    : {}),
-                },
-              }
-            : {}),
-        },
-      },
-      defaults: {
-        profile: {
-          doing_business_as: professional.bedrijfsnaam,
-          product_description: "Glazenwasservice via ShineGo",
-        },
-      },
-    };
-
     let accountId: string | null = professional.stripe_account_id;
 
-    if (accountId) {
-      if (!professional.uitbetalingen_actief) {
-        const updateResponse = await fetch(
-          `https://api.stripe.com/v2/core/accounts/${encodeURIComponent(accountId)}`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
-              "Content-Type": "application/json",
-              "Stripe-Version": STRIPE_API_VERSION,
-            },
-            body: JSON.stringify(accountPrefill),
-          }
-        );
-
-        const updatedAccount = await updateResponse.json();
-        if (!updateResponse.ok) {
-          throw new Error(
-            updatedAccount?.error?.message ||
-              "Bestaande Stripe-account kon niet worden bijgewerkt."
-          );
-        }
-      }
-    } else {
-      const accountResponse = await fetch("https://api.stripe.com/v2/core/accounts", {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
-          "Content-Type": "application/json",
-          "Stripe-Version": STRIPE_API_VERSION,
+    if (!accountId) {
+      const account = await stripe.accounts.create({
+        type: "express",
+        country: "NL",
+        email,
+        business_type: "company",
+        business_profile: {
+          name: professional.bedrijfsnaam || undefined,
+          product_description: "Glazenwasservice via ShineGo",
         },
-        body: JSON.stringify({
-          ...accountPrefill,
-          dashboard: "express",
-          identity: {
-            country: "nl",
-            entity_type: "company",
-            ...accountPrefill.identity,
+        company: {
+          name: professional.bedrijfsnaam || undefined,
+          phone: professional.telefoon || undefined,
+          address: {
+            line1: adresRegel || undefined,
+            postal_code: professional.postcode || undefined,
+            city: professional.woonplaats || undefined,
+            country: "NL",
           },
-          defaults: {
-            ...accountPrefill.defaults,
-            locales: ["nl-NL"],
-            responsibilities: {
-              fees_collector: "application",
-              losses_collector: "application",
-            },
-          },
-          configuration: {
-            recipient: {
-              capabilities: {
-                stripe_balance: { stripe_transfers: { requested: true } },
-              },
-            },
-          },
-        }),
+        },
+        capabilities: {
+          transfers: { requested: true },
+        },
+        metadata: {
+          shinego_professional_id: String(professional.id),
+          kvk_nummer: professional.kvk_nummer || "",
+          btw_nummer: professional.btw_nummer || "",
+        },
       });
 
-      const account = await accountResponse.json();
-      if (!accountResponse.ok || !account?.id) {
-        throw new Error(account?.error?.message || "Stripe account kon niet worden gemaakt.");
-      }
-
-      accountId = String(account.id);
+      accountId = account.id;
 
       const { error: updateError } = await supabaseAdmin
         .from("professionals")
-        .update({ stripe_account_id: accountId })
+        .update({ stripe_account_id: accountId, uitbetalingen_actief: false })
         .eq("id", professional.id);
 
       if (updateError) throw updateError;
-    }
-
-    if (!accountId) {
-      throw new Error("Stripe account ontbreekt.");
+    } else {
+      await stripe.accounts.update(accountId, {
+        email,
+        business_profile: {
+          name: professional.bedrijfsnaam || undefined,
+          product_description: "Glazenwasservice via ShineGo",
+        },
+        metadata: {
+          shinego_professional_id: String(professional.id),
+          kvk_nummer: professional.kvk_nummer || "",
+          btw_nummer: professional.btw_nummer || "",
+        },
+      });
     }
 
     return NextResponse.json({ account_id: accountId });
