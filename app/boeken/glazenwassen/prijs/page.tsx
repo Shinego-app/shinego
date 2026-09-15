@@ -25,9 +25,9 @@ export default function PrijsPage() {
     const totaalVoorKorting = gegevens.woningtype === "bedrijfspand" ? bedrijfsPrijs : basisprijs + ramenPrijs;
     const kortingPercentage = gegevens.frequentie === "4weken" ? 0.12 : gegevens.frequentie === "8weken" ? 0.1 : gegevens.frequentie === "12weken" ? 0.07 : 0;
     const verdiepingToeslag = gegevens.verdiepingen.includes("4") ? 15 : 0;
-    const bereikToeslag = details.bereikbaar === "nee" ? 15 : 0;
+    const bereikToeslag = 0;
     const kozijnenToeslag = details.kozijnen ? 9.95 + Math.max(0, gegevens.ramen - 10) : 0;
-    const subtotaal = totaalVoorKorting + verdiepingToeslag + bereikToeslag + kozijnenToeslag;
+    const subtotaal = totaalVoorKorting + verdiepingToeslag + kozijnenToeslag;
     const kortingBedrag = subtotaal * kortingPercentage;
     const totaal = subtotaal - kortingBedrag;
     return { bedrijfsPrijs, basisprijs, ramenPrijs, verdiepingToeslag, bereikToeslag, kozijnenToeslag, kortingPercentage, kortingBedrag, totaal };
@@ -60,7 +60,6 @@ export default function PrijsPage() {
                 <div className="flex items-center justify-between py-3"><span className="text-[#4f708f]">{gegevens.woningtype === "bedrijfspand" ? "Zakelijke glasprijs" : `Basisprijs (${gegevens.ramen} ramen)`}</span><strong className="text-[#123c70]">{offerteOpMaat ? "Offerte" : geld(gegevens.woningtype === "bedrijfspand" ? prijs.bedrijfsPrijs : prijs.basisprijs + prijs.ramenPrijs)}</strong></div>
                 {prijs.verdiepingToeslag > 0 && <div className="flex items-center justify-between py-3"><span className="text-[#4f708f]">Hoogtetoeslag</span><strong>{geld(prijs.verdiepingToeslag)}</strong></div>}
                 {prijs.kozijnenToeslag > 0 && <div className="flex items-center justify-between py-3"><span className="text-[#4f708f]">Kozijnen schoonmaken</span><strong>{geld(prijs.kozijnenToeslag)}</strong></div>}
-                {prijs.bereikToeslag > 0 && <div className="flex items-center justify-between py-3"><span className="text-[#4f708f]">Moeilijk bereikbaar</span><strong>{geld(prijs.bereikToeslag)}</strong></div>}
                 {prijs.kortingPercentage > 0 && <div className="flex items-center justify-between py-3"><span className="text-[#4f708f]">Periodieke korting ({Math.round(prijs.kortingPercentage*100)}%)</span><strong className="text-emerald-600">- {geld(prijs.kortingBedrag)}</strong></div>}
                 <div className="flex items-center justify-between pt-4"><span className="text-lg font-extrabold text-[#0b3d75]">Totaal</span><strong className="text-3xl font-extrabold text-[#0b3d75]">{offerteOpMaat?"Offerte":geld(prijs.totaal)}</strong></div>
               </div>
