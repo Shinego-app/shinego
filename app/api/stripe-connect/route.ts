@@ -67,7 +67,9 @@ export async function POST(request: Request) {
           },
         },
         capabilities: {
-          card_payments: { requested: true },
+          // ShineGo verwerkt klantbetalingen op het platformaccount.
+          // De professional hoeft alleen overschrijvingen/uitbetalingen te ontvangen.
+          // Geen card_payments aanvragen voorkomt onnodige extra Stripe-verificatie.
           transfers: { requested: true },
         },
         metadata: {
