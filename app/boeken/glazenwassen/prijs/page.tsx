@@ -25,7 +25,8 @@ export default function PrijsPage() {
     const prijsPerRaam = gegevens.type === "bedrijf" ? 0 : 3;
     const ramenPrijs = gegevens.type === "bedrijf" || alleenBinnen ? 0 : gegevens.ramen * prijsPerRaam;
     const achterkantPrijs = gegevens.type === "bedrijf" || alleenBinnen || !gegevens.achterkant ? 0 : basisprijs + ramenPrijs;
-    const binnenRamenPrijs = gegevens.type === "bedrijf" ? 0 : (binnenkant || alleenBinnen ? gegevens.ramen * prijsPerRaam : 0);
+    const aantalBinnenRamen = gegevens.ramen * (gegevens.achterkant ? 2 : 1);
+    const binnenRamenPrijs = gegevens.type === "bedrijf" ? 0 : (binnenkant || alleenBinnen ? aantalBinnenRamen * prijsPerRaam : 0);
     const alleenBinnenToeslag = alleenBinnen ? 15 : 0;
     const totaalVoorKorting = gegevens.woningtype === "bedrijfspand" ? bedrijfsPrijs : basisprijs + ramenPrijs + achterkantPrijs + binnenRamenPrijs + alleenBinnenToeslag;
     const kortingPercentage = gegevens.frequentie === "4weken" ? 0.12 : gegevens.frequentie === "8weken" ? 0.1 : gegevens.frequentie === "12weken" ? 0.07 : 0;
@@ -50,6 +51,7 @@ export default function PrijsPage() {
   if (!gegevens || !details) return <main className="flex min-h-screen items-center justify-center bg-[#eef8ff]"><p className="text-[#52779b]">Gegevens laden...</p></main>;
   const offerteOpMaat = gegevens.woningtype === "bedrijfspand" && gegevens.glasOppervlak === "500+";
   const alleenBinnen = Boolean(gegevens.alleenBinnen) || gegevens.type === "binnen";
+  const aantalBinnenRamen = gegevens.ramen * (gegevens.achterkant ? 2 : 1);
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#eaf6ff] to-[#f8fcff] text-[#123c70]">
@@ -66,7 +68,7 @@ export default function PrijsPage() {
                 {gegevens.woningtype === "bedrijfspand" ? <div className="flex items-center justify-between py-3"><span className="text-[#4f708f]">Zakelijke glasprijs</span><strong className="text-[#123c70]">{offerteOpMaat ? "Offerte" : geld(prijs.bedrijfsPrijs)}</strong></div> : <>
                   {!alleenBinnen&&<div className="flex items-center justify-between py-3"><span className="text-[#4f708f]">Buitenzijde ({gegevens.ramen} ramen)</span><strong className="text-[#123c70]">{geld(prijs.basisprijs + prijs.ramenPrijs)}</strong></div>}
                   {prijs.achterkantPrijs > 0&&<div className="flex items-center justify-between py-3"><span className="text-[#4f708f]">Achterkant woning ({gegevens.ramen} ramen)</span><strong>{geld(prijs.achterkantPrijs)}</strong></div>}
-                  {prijs.binnenRamenPrijs > 0&&<div className="flex items-center justify-between py-3"><span className="text-[#4f708f]">Binnenzijde ({gegevens.ramen} ramen)</span><strong>{geld(prijs.binnenRamenPrijs)}</strong></div>}
+                  {prijs.binnenRamenPrijs > 0&&<div className="flex items-center justify-between py-3"><span className="text-[#4f708f]">Binnenzijde ({aantalBinnenRamen} ramen)</span><strong>{geld(prijs.binnenRamenPrijs)}</strong></div>}
                   {prijs.alleenBinnenToeslag > 0&&<div className="flex items-center justify-between py-3"><span className="text-[#4f708f]">Starttoeslag alleen binnen</span><strong>{geld(prijs.alleenBinnenToeslag)}</strong></div>}
                 </>}
                 {prijs.verdiepingToeslag > 0 && <div className="flex items-center justify-between py-3"><span className="text-[#4f708f]">Hoogtetoeslag</span><strong>{geld(prijs.verdiepingToeslag)}</strong></div>}
