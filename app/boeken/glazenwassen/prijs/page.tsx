@@ -24,7 +24,7 @@ export default function PrijsPage() {
     const ramenPrijs = gegevens.type === "bedrijf" ? 0 : gegevens.ramen * prijsPerRaam;
     const totaalVoorKorting = gegevens.woningtype === "bedrijfspand" ? bedrijfsPrijs : basisprijs + ramenPrijs;
     const kortingPercentage = gegevens.frequentie === "4weken" ? 0.12 : gegevens.frequentie === "8weken" ? 0.1 : gegevens.frequentie === "12weken" ? 0.07 : 0;
-    const verdiepingToeslag = gegevens.verdiepingen.includes("4") ? 30 : 0;
+    const verdiepingToeslag = gegevens.verdiepingen.includes("4") ? 15 : 0;
     const bereikToeslag = details.bereikbaar === "nee" ? 15 : 0;
     const kozijnenToeslag = details.kozijnen ? 9.95 + Math.max(0, gegevens.ramen - 10) : 0;
     const subtotaal = totaalVoorKorting + verdiepingToeslag + bereikToeslag + kozijnenToeslag;
