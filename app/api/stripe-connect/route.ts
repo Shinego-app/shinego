@@ -67,10 +67,8 @@ export async function POST(request: Request) {
           },
         },
         capabilities: {
+          card_payments: { requested: true },
           transfers: { requested: true },
-        },
-        tos_acceptance: {
-          service_agreement: "recipient",
         },
         metadata: {
           shinego_professional_id: String(professional.id),
