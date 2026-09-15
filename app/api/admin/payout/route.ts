@@ -59,33 +59,21 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Professional heeft geen Stripe Connect-account." }, { status: 400 });
     }
 
-    const accountStatusResponse = await fetch(
-      `https://api.stripe.com/v2/core/accounts/${encodeURIComponent(professional.stripe_account_id)}?include[0]=configuration.recipient`,
-      {
-        headers: {
-          Authorization: `Bearer ${process.env.STRIPE_SECRET_KEY}`,
-          "Stripe-Version": "2026-07-29.preview",
-        },
-      }
-    );
-
-    const stripeAccount = await accountStatusResponse.json();
-    if (!accountStatusResponse.ok) {
-      return NextResponse.json({ error: "Stripe-accountstatus kon niet worden gecontroleerd." }, { status: 400 });
-    }
-
-    const transferStatus = stripeAccount.configuration?.recipient?.capabilities?.stripe_balance?.stripe_transfers?.status;
-    const payoutsActive = transferStatus === "active";
+    const stripeAccount = await stripe.accounts.retrieve(professional.stripe_account_id);
+    const transfersActive = stripeAccount.capabilities?.transfers === "active";
+    const payoutsEnabled = stripeAccount.payouts_enabled === true;
+    const uitbetalingenActief = transfersActive && payoutsEnabled;
 
     const { error: statusUpdateError } = await supabaseAdmin
       .from("professionals")
-      .update({ uitbetalingen_actief: payoutsActive })
+      .update({ uitbetalingen_actief: uitbetalingenActief })
       .eq("id", professional.id);
 
     if (statusUpdateError) throw statusUpdateError;
 
-    if (!payoutsActive) {
-      return NextResponse.json({ error: `Uitbetalingen zijn in Stripe niet actief (${transferStatus ?? "onbekend"}).` }, { status: 400 });
+    if (!uitbetalingenActief) {
+      const status = transfersActive ? "bankuitbetaling nog niet actief" : stripeAccount.capabilities?.transfers ?? "onbekend";
+      return NextResponse.json({ error: `Uitbetalingen zijn in Stripe niet actief (${status}).` }, { status: 400 });
     }
 
     const amount = Math.round(Number(booking.professional_bedrag || 0) * 100);
