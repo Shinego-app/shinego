@@ -22,7 +22,7 @@ export default function PrijsPage() {
     const alleenBinnen = Boolean(gegevens.alleenBinnen) || gegevens.type === "binnen";
     const binnenkant = Boolean(gegevens.binnenkant) && !alleenBinnen;
     const basisprijs = gegevens.type === "bedrijf" ? bedrijfsPrijs : alleenBinnen ? 0 : gegevens.type === "telewash" ? 29.95 : 19.95;
-    const prijsPerRaam = gegevens.type === "bedrijf" ? 0 : 4;
+    const prijsPerRaam = gegevens.type === "bedrijf" ? 0 : 3;
     const ramenPrijs = gegevens.type === "bedrijf" || alleenBinnen ? 0 : gegevens.ramen * prijsPerRaam;
     const achterkantPrijs = gegevens.type === "bedrijf" || alleenBinnen || !gegevens.achterkant ? 0 : basisprijs + ramenPrijs;
     const binnenRamenPrijs = gegevens.type === "bedrijf" ? 0 : (binnenkant || alleenBinnen ? gegevens.ramen * prijsPerRaam : 0);
