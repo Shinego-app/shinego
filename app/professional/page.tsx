@@ -203,9 +203,14 @@ export default function ProfessionalPage() {
               </div>
             </section>
 
-            <label className="flex cursor-pointer items-start gap-3 border-t pt-7">
-              <input type="checkbox" checked={voorwaarden} onChange={(e) => setVoorwaarden(e.target.checked)} className="mt-1 h-5 w-5" />
-              <span className="text-sm text-gray-600">Ik verklaar dat mijn gegevens correct zijn, dat mijn bedrijfsaansprakelijkheidsverzekering actief is en dekking biedt voor de werkzaamheden die ik via ShineGo uitvoer, dat ShineGo mijn KVK-, btw- en verzekeringsgegevens handmatig mag controleren en ik accepteer de <a href="/professional/voorwaarden" target="_blank" rel="noreferrer" className="font-semibold text-blue-600 underline">voorwaarden voor professionals</a>.</span>
+            <label className={`flex cursor-pointer items-start gap-4 rounded-2xl border p-4 transition ${voorwaarden ? "border-blue-500 bg-blue-50" : "border-gray-300 bg-white"}`}>
+              <input
+                type="checkbox"
+                checked={voorwaarden}
+                onChange={(e) => setVoorwaarden(e.target.checked)}
+                className="mt-0.5 h-6 w-6 shrink-0 cursor-pointer accent-blue-600"
+              />
+              <span className="text-sm leading-6 text-gray-700">Ik verklaar dat mijn gegevens correct zijn, dat mijn bedrijfsaansprakelijkheidsverzekering actief is en dekking biedt voor de werkzaamheden die ik via ShineGo uitvoer, dat ShineGo mijn KVK-, btw- en verzekeringsgegevens handmatig mag controleren en ik accepteer de <a href="/professional/voorwaarden" target="_blank" rel="noreferrer" className="font-semibold text-blue-600 underline">voorwaarden voor professionals</a>.</span>
             </label>
 
             {melding && <div className="rounded-xl bg-red-50 p-4 text-sm font-medium text-red-700">{melding}</div>}
