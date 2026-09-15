@@ -69,6 +69,9 @@ export async function POST(request: Request) {
         capabilities: {
           transfers: { requested: true },
         },
+        tos_acceptance: {
+          service_agreement: "recipient",
+        },
         metadata: {
           shinego_professional_id: String(professional.id),
           kvk_nummer: professional.kvk_nummer || "",
