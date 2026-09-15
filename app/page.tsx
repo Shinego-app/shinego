@@ -123,12 +123,19 @@ export default function Home() {
           </div>
 
           <div className="mt-9 border-t border-white/15 pt-6">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-xs text-[#9fb7cf]">© 2026 ShineGo. Alle rechten voorbehouden.</p>
-              <div className="flex flex-wrap items-center gap-2 text-xs font-bold text-[#d8e8f6]">
-                <span className="rounded-lg border border-white/15 bg-white/10 px-3 py-2">iDEAL</span>
-                <span className="rounded-lg border border-white/15 bg-white/10 px-3 py-2">Wero</span>
-                <span className="rounded-lg border border-white/15 bg-white/10 px-3 py-2">Veilig betalen via Stripe</span>
+              <div className="flex flex-wrap items-center gap-2.5">
+                <span className="flex h-12 min-w-[78px] items-center justify-center rounded-xl border border-white/15 bg-white px-3 shadow-sm">
+                  <span className="text-[15px] font-black tracking-tight text-[#111827]">iDEAL</span>
+                </span>
+                <span className="flex h-12 min-w-[78px] items-center justify-center rounded-xl border border-white/15 bg-[#fff36d] px-3 shadow-sm">
+                  <span className="text-[16px] font-black tracking-tight text-[#111827]">wero</span>
+                </span>
+                <span className="flex h-12 min-w-[92px] items-center justify-center rounded-xl border border-white/15 bg-white px-3 shadow-sm">
+                  <span className="text-[16px] font-black tracking-tight text-[#635bff]">stripe</span>
+                </span>
+                <span className="ml-1 text-[11px] font-semibold text-[#b8cce1]">Veilig online betalen</span>
               </div>
             </div>
           </div>
