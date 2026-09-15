@@ -123,19 +123,18 @@ export default function Home() {
           </div>
 
           <div className="mt-9 border-t border-white/15 pt-6">
-            <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <p className="text-xs text-[#9fb7cf]">© 2026 ShineGo. Alle rechten voorbehouden.</p>
-              <div className="flex flex-wrap items-center gap-2.5">
-                <span className="flex h-12 min-w-[78px] items-center justify-center rounded-xl border border-white/15 bg-white px-3 shadow-sm">
-                  <span className="text-[15px] font-black tracking-tight text-[#111827]">iDEAL</span>
-                </span>
-                <span className="flex h-12 min-w-[78px] items-center justify-center rounded-xl border border-white/15 bg-[#fff36d] px-3 shadow-sm">
-                  <span className="text-[16px] font-black tracking-tight text-[#111827]">wero</span>
-                </span>
-                <span className="flex h-12 min-w-[92px] items-center justify-center rounded-xl border border-white/15 bg-white px-3 shadow-sm">
-                  <span className="text-[16px] font-black tracking-tight text-[#635bff]">stripe</span>
-                </span>
-                <span className="ml-1 text-[11px] font-semibold text-[#b8cce1]">Veilig online betalen</span>
+              <div className="flex flex-col items-start gap-2 sm:items-end">
+                <span className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#9fb7cf]">Veilig betalen met</span>
+                <div className="flex flex-wrap items-center gap-3">
+                  <a href="https://ideal.nl/ideal-wero-branding" target="_blank" rel="noreferrer" className="flex h-12 items-center rounded-xl bg-white px-3 shadow-sm" aria-label="iDEAL | Wero">
+                    <img src="https://www.e-captain.nl/images/ideal-wero-lockup-yellow-horizontal-rgb-half.png" alt="iDEAL | Wero" className="h-8 w-auto" />
+                  </a>
+                  <a href="https://stripe.com" target="_blank" rel="noreferrer" className="flex h-12 items-center rounded-xl bg-white px-3 shadow-sm" aria-label="Powered by Stripe">
+                    <img src="https://images.stripeassets.com/fzn2n1nzq965/4M6d6BSWzlgsrJx8rdZb0I/733f37ef69b5ca1d3d33e127184f4ce4/Powered_by_Stripe.svg?q=80&w=1082" alt="Powered by Stripe" className="h-7 w-auto" />
+                  </a>
+                </div>
               </div>
             </div>
           </div>
