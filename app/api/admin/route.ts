@@ -84,10 +84,15 @@ export async function PATCH(request: Request) {
     } = body;
 
     if (booking_id && booking_status) {
+      const effectieveAnnuleringskosten =
+        geannuleerd_door === "shinego" ? 0 : Math.max(0, Number(annuleringskosten || 0));
+
       const goedgekeurdeVergoeding =
-        vergoeding_goedgekeurd === true && klant_niet_thuis
-          ? Math.min(Number(annuleringskosten || 0), 25)
-          : Number(professional_vergoeding || 0);
+        geannuleerd_door === "shinego"
+          ? 0
+          : vergoeding_goedgekeurd === true && klant_niet_thuis
+            ? Math.min(effectieveAnnuleringskosten, 25)
+            : Number(professional_vergoeding || 0);
 
       const { data: huidigeBoeking } = await supabaseAdmin
         .from("boekingen")
@@ -108,7 +113,7 @@ export async function PATCH(request: Request) {
         .update({
           status: booking_status,
           annuleringsreden,
-          annuleringskosten,
+          annuleringskosten: effectieveAnnuleringskosten,
           professional_vergoeding: goedgekeurdeVergoeding,
           vergoeding_goedgekeurd,
           geannuleerd_door,
