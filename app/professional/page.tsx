@@ -118,13 +118,44 @@ export default function ProfessionalPage() {
       },
     });
 
-    setBezig(false);
-
     if (error || !data.user) {
+      setBezig(false);
       setMelding(error?.message || "Account kon niet worden aangemaakt.");
       return;
     }
 
+    try {
+      const profielResponse = await fetch("/api/professional-register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          user_id: data.user.id,
+          bedrijfsnaam: bedrijfsnaam.trim(),
+          telefoon: telefoon.trim(),
+          postcode: `${schoonPostcode.slice(0, 4)} ${schoonPostcode.slice(4)}`,
+          woonplaats: woonplaats.trim(),
+          kvk_nummer: schoonKvk,
+          btw_nummer: schoonBtw,
+          avb_verzekeraar: verzekeraar.trim(),
+          avb_polisnummer: polisnummer.trim(),
+          diensten,
+          werkgebied_km: Number(werkgebiedKm),
+        }),
+      });
+
+      const profielData = await profielResponse.json();
+      if (!profielResponse.ok) {
+        setBezig(false);
+        setMelding(profielData.details || profielData.error || "Account is aangemaakt, maar het professionalprofiel kon niet worden opgeslagen.");
+        return;
+      }
+    } catch {
+      setBezig(false);
+      setMelding("Account is aangemaakt, maar het professionalprofiel kon niet worden opgeslagen.");
+      return;
+    }
+
+    setBezig(false);
     router.push("/professional/bevestigd");
   }
 
