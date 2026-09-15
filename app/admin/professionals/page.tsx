@@ -12,6 +12,11 @@ type Professional = {
   telefoon?: string;
   postcode?: string;
   woonplaats?: string;
+  kvk_nummer?: string;
+  btw_nummer?: string;
+  avb_verzekeraar?: string;
+  avb_polisnummer?: string;
+  avb_bevestigd?: boolean;
   actief?: boolean;
   geverifieerd?: boolean;
 };
@@ -41,7 +46,22 @@ export default function ProfessionalsBeheerPage() {
     ladenProfessionals();
   }, []);
 
+  function controleCompleet(professional: Professional) {
+    return Boolean(
+      professional.kvk_nummer &&
+      professional.btw_nummer &&
+      professional.avb_verzekeraar &&
+      professional.avb_polisnummer &&
+      professional.avb_bevestigd
+    );
+  }
+
   async function statusBijwerken(professional: Professional, geverifieerd: boolean, actief: boolean) {
+    if (geverifieerd && actief && !controleCompleet(professional)) {
+      setFout("Goedkeuren kan pas nadat KVK, btw en AVB-gegevens compleet zijn.");
+      return;
+    }
+
     setBezigId(professional.id);
     setFout("");
     try {
@@ -90,7 +110,7 @@ export default function ProfessionalsBeheerPage() {
           <div>
             <div className="text-sm font-semibold text-blue-600">ShineGo beheer</div>
             <h1 className="mt-1 text-3xl font-bold text-gray-900">Professionals beheren</h1>
-            <p className="mt-2 text-sm text-gray-600">Goedkeuren, activeren, deactiveren en veilig verwijderen op één pagina.</p>
+            <p className="mt-2 text-sm text-gray-600">Controleer KVK, btw en aansprakelijkheidsverzekering voordat je een professional activeert.</p>
           </div>
           <a href="/admin" className="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50">← Terug naar boekingen</a>
         </div>
@@ -104,41 +124,56 @@ export default function ProfessionalsBeheerPage() {
             <table className="min-w-full text-left text-sm">
               <thead className="border-b bg-gray-50">
                 <tr>
-                  <th className="px-5 py-4 font-semibold text-gray-700">Bedrijf</th>
-                  <th className="px-5 py-4 font-semibold text-gray-700">Naam</th>
-                  <th className="px-5 py-4 font-semibold text-gray-700">Contact</th>
-                  <th className="px-5 py-4 font-semibold text-gray-700">Plaats</th>
+                  <th className="px-5 py-4 font-semibold text-gray-700">Professional</th>
+                  <th className="px-5 py-4 font-semibold text-gray-700">KVK / btw</th>
+                  <th className="px-5 py-4 font-semibold text-gray-700">AVB</th>
                   <th className="px-5 py-4 font-semibold text-gray-700">Status</th>
                   <th className="px-5 py-4 font-semibold text-gray-700">Acties</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
                 {professionals.length === 0 ? (
-                  <tr><td colSpan={6} className="px-5 py-8 text-center text-gray-500">Geen professionals gevonden.</td></tr>
-                ) : professionals.map((professional) => (
-                  <tr key={professional.id} className="hover:bg-gray-50">
-                    <td className="px-5 py-4 font-semibold text-gray-900">{professional.bedrijfsnaam || "-"}</td>
-                    <td className="px-5 py-4 text-gray-700">{`${professional.voornaam || ""} ${professional.achternaam || ""}`.trim() || "-"}</td>
-                    <td className="px-5 py-4 text-gray-600"><div>{professional.email || "-"}</div><div>{professional.telefoon || "-"}</div></td>
-                    <td className="px-5 py-4 text-gray-600">{professional.postcode || "-"} {professional.woonplaats || ""}</td>
-                    <td className="px-5 py-4">
-                      <div className="flex flex-wrap gap-2">
-                        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${professional.geverifieerd ? "bg-green-50 text-green-700" : "bg-yellow-50 text-yellow-700"}`}>{professional.geverifieerd ? "Geverifieerd" : "Controle nodig"}</span>
-                        <span className={`rounded-full px-3 py-1 text-xs font-semibold ${professional.actief ? "bg-blue-50 text-blue-700" : "bg-gray-100 text-gray-600"}`}>{professional.actief ? "Actief" : "Niet actief"}</span>
-                      </div>
-                    </td>
-                    <td className="px-5 py-4">
-                      <div className="flex flex-wrap gap-2">
-                        {(!professional.geverifieerd || !professional.actief) ? (
-                          <button type="button" disabled={bezigId === professional.id} onClick={() => statusBijwerken(professional, true, true)} className="rounded-lg bg-green-600 px-3 py-2 text-sm font-semibold text-white hover:bg-green-700 disabled:opacity-50">Goedkeuren & activeren</button>
-                        ) : (
-                          <button type="button" disabled={bezigId === professional.id} onClick={() => statusBijwerken(professional, true, false)} className="rounded-lg bg-gray-700 px-3 py-2 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-50">Deactiveren</button>
-                        )}
-                        <button type="button" disabled={bezigId === professional.id} onClick={() => professionalVerwijderen(professional)} className="rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50">{bezigId === professional.id ? "Bezig..." : "Verwijderen"}</button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                  <tr><td colSpan={5} className="px-5 py-8 text-center text-gray-500">Geen professionals gevonden.</td></tr>
+                ) : professionals.map((professional) => {
+                  const compleet = controleCompleet(professional);
+                  return (
+                    <tr key={professional.id} className="align-top hover:bg-gray-50">
+                      <td className="px-5 py-4">
+                        <div className="font-semibold text-gray-900">{professional.bedrijfsnaam || "-"}</div>
+                        <div className="mt-1 text-gray-700">{`${professional.voornaam || ""} ${professional.achternaam || ""}`.trim() || "-"}</div>
+                        <div className="mt-1 text-xs text-gray-500">{professional.email || "-"}</div>
+                        <div className="text-xs text-gray-500">{professional.telefoon || "-"}</div>
+                        <div className="text-xs text-gray-500">{professional.postcode || "-"} {professional.woonplaats || ""}</div>
+                      </td>
+                      <td className="px-5 py-4 text-gray-700">
+                        <div><span className="font-semibold">KVK:</span> {professional.kvk_nummer || "Ontbreekt"}</div>
+                        <div className="mt-1"><span className="font-semibold">Btw:</span> {professional.btw_nummer || "Ontbreekt"}</div>
+                      </td>
+                      <td className="px-5 py-4 text-gray-700">
+                        <div><span className="font-semibold">Verzekeraar:</span> {professional.avb_verzekeraar || "Ontbreekt"}</div>
+                        <div className="mt-1"><span className="font-semibold">Polis:</span> {professional.avb_polisnummer || "Ontbreekt"}</div>
+                        <div className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${professional.avb_bevestigd ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>{professional.avb_bevestigd ? "AVB verklaard actief" : "AVB niet bevestigd"}</div>
+                      </td>
+                      <td className="px-5 py-4">
+                        <div className="flex flex-col items-start gap-2">
+                          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${compleet ? "bg-green-50 text-green-700" : "bg-yellow-50 text-yellow-700"}`}>{compleet ? "Gegevens compleet" : "Controle nodig"}</span>
+                          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${professional.geverifieerd ? "bg-green-50 text-green-700" : "bg-yellow-50 text-yellow-700"}`}>{professional.geverifieerd ? "Geverifieerd" : "Niet geverifieerd"}</span>
+                          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${professional.actief ? "bg-blue-50 text-blue-700" : "bg-gray-100 text-gray-600"}`}>{professional.actief ? "Actief" : "Niet actief"}</span>
+                        </div>
+                      </td>
+                      <td className="px-5 py-4">
+                        <div className="flex min-w-44 flex-col gap-2">
+                          {(!professional.geverifieerd || !professional.actief) ? (
+                            <button type="button" disabled={bezigId === professional.id || !compleet} onClick={() => statusBijwerken(professional, true, true)} className="rounded-lg bg-green-600 px-3 py-2 text-sm font-semibold text-white hover:bg-green-700 disabled:cursor-not-allowed disabled:bg-gray-300">Goedkeuren & activeren</button>
+                          ) : (
+                            <button type="button" disabled={bezigId === professional.id} onClick={() => statusBijwerken(professional, true, false)} className="rounded-lg bg-gray-700 px-3 py-2 text-sm font-semibold text-white hover:bg-gray-800 disabled:opacity-50">Deactiveren</button>
+                          )}
+                          <button type="button" disabled={bezigId === professional.id} onClick={() => professionalVerwijderen(professional)} className="rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white hover:bg-red-700 disabled:cursor-not-allowed disabled:opacity-50">{bezigId === professional.id ? "Bezig..." : "Verwijderen"}</button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
