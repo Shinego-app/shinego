@@ -15,22 +15,56 @@ export default function ProfessionalLoginPage() {
   async function inloggen(e: React.FormEvent) {
     e.preventDefault();
 
-    setBezig(true);
-    setMelding("");
+    if (bezig) return;
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email: email.trim().toLowerCase(),
-      password: wachtwoord,
-    });
-
-    if (error) {
-      console.error("Supabase login error:", error);
-      setMelding("E-mailadres of wachtwoord is niet correct.");
-      setBezig(false);
+    const schoonEmail = email.trim().toLowerCase();
+    if (!schoonEmail || !wachtwoord) {
+      setMelding("Vul je e-mailadres en wachtwoord in.");
       return;
     }
 
-    router.push("/professional/dashboard");
+    setBezig(true);
+    setMelding("");
+
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: schoonEmail,
+        password: wachtwoord,
+      });
+
+      if (error) {
+        console.error("Supabase login error:", error);
+
+        const fout = error.message.toLowerCase();
+
+        if (fout.includes("email not confirmed")) {
+          setMelding("Bevestig eerst je e-mailadres via de e-mail van ShineGo en probeer daarna opnieuw.");
+        } else if (
+          fout.includes("invalid login credentials") ||
+          fout.includes("invalid credentials")
+        ) {
+          setMelding("E-mailadres of wachtwoord is niet correct.");
+        } else if (fout.includes("too many requests") || fout.includes("rate limit")) {
+          setMelding("Te veel inlogpogingen. Wacht even en probeer het daarna opnieuw.");
+        } else {
+          setMelding("Inloggen lukt op dit moment niet. Probeer het opnieuw of gebruik ‘Wachtwoord vergeten?’. ");
+        }
+        return;
+      }
+
+      if (!data.session || !data.user) {
+        setMelding("Inloggen is niet volledig afgerond. Probeer het opnieuw.");
+        return;
+      }
+
+      router.replace("/professional/dashboard");
+      router.refresh();
+    } catch (error) {
+      console.error("Onverwachte login fout:", error);
+      setMelding("Er kon geen verbinding worden gemaakt. Controleer je internetverbinding en probeer opnieuw.");
+    } finally {
+      setBezig(false);
+    }
   }
 
   return (
@@ -47,6 +81,7 @@ export default function ProfessionalLoginPage() {
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
               required
               className="mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
@@ -58,6 +93,7 @@ export default function ProfessionalLoginPage() {
               type="password"
               value={wachtwoord}
               onChange={(e) => setWachtwoord(e.target.value)}
+              autoComplete="current-password"
               required
               className="mt-2 w-full rounded-xl border border-gray-300 px-4 py-3 outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100"
             />
@@ -71,7 +107,7 @@ export default function ProfessionalLoginPage() {
             Wachtwoord vergeten?
           </button>
 
-          {melding && <p style={{ marginTop: "16px" }}>{melding}</p>}
+          {melding && <p className="mt-4 text-sm font-medium text-gray-700">{melding}</p>}
 
           <button
             type="submit"
