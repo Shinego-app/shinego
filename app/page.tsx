@@ -80,20 +80,57 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="border-t border-[#d5e9f8] bg-white/90 px-5 py-8">
+      <footer className="border-t border-[#d5e9f8] bg-[#0d2f57] px-5 py-10 text-white">
         <div className="mx-auto max-w-[1180px]">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+          <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             <div>
-              <div className="text-xl font-extrabold tracking-tight text-[#0d3f79]">Shine<span className="text-[#1683f8]">Go</span><span className="ml-1 text-[#1683f8]">✦</span></div>
-              <p className="mt-1 text-sm text-[#7790a8]">Scherp in glaswerk</p>
-              <div className="mt-3 space-y-1 text-xs leading-5 text-[#8aa0b5]">
+              <div className="text-2xl font-extrabold tracking-tight">Shine<span className="text-[#49a6ff]">Go</span><span className="ml-1 text-[#49a6ff]">✦</span></div>
+              <p className="mt-2 text-sm text-[#b8cce1]">Scherp in glaswerk</p>
+              <div className="mt-4 space-y-1 text-xs leading-5 text-[#9fb7cf]">
                 <p>Handelsnaam: ShineGo</p>
-                <p>KvK: 57712913 · btw-id: NL001205368B47</p>
-                <p><a href="mailto:info@shinego.nl" className="hover:text-[#1768b5]">info@shinego.nl</a></p>
+                <p>KvK: 57712913</p>
+                <p>btw-id: NL001205368B47</p>
               </div>
             </div>
-            <nav className="flex flex-wrap gap-x-5 gap-y-3 text-sm font-semibold text-[#52779b]"><a href="/privacy">Privacy</a><a href="/voorwaarden">Algemene voorwaarden</a><a href="/cookies">Cookies</a><a href="/herroepen">Herroepen</a><a href="/contact">Contact</a></nav>
-            <p className="text-xs text-[#8aa0b5]">© 2026 ShineGo</p>
+
+            <div>
+              <h3 className="text-sm font-extrabold uppercase tracking-[.12em] text-[#7fc1ff]">Contact</h3>
+              <div className="mt-4 space-y-3 text-sm font-semibold text-white/90">
+                <a href="mailto:info@shinego.nl" className="block hover:text-[#7fc1ff]">✉ Klantenservice</a>
+                <a href="/contact" className="block hover:text-[#7fc1ff]">💬 Contactformulier</a>
+                <a href="/veelgestelde-vragen" className="block hover:text-[#7fc1ff]">? Veelgestelde vragen</a>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-extrabold uppercase tracking-[.12em] text-[#7fc1ff]">Voor klanten</h3>
+              <div className="mt-4 space-y-3 text-sm font-semibold text-white/90">
+                <a href="/privacy" className="block hover:text-[#7fc1ff]">Privacybeleid</a>
+                <a href="/voorwaarden" className="block hover:text-[#7fc1ff]">Algemene voorwaarden</a>
+                <a href="/cookies" className="block hover:text-[#7fc1ff]">Cookiebeleid</a>
+                <a href="/herroepen" className="block hover:text-[#7fc1ff]">Herroepen</a>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-sm font-extrabold uppercase tracking-[.12em] text-[#7fc1ff]">Voor professionals</h3>
+              <div className="mt-4 space-y-3 text-sm font-semibold text-white/90">
+                <a href="/professional" className="block hover:text-[#7fc1ff]">Aanmelden als glazenwasser</a>
+                <a href="/professional/login" className="block hover:text-[#7fc1ff]">Inloggen professional</a>
+                <a href="/professional/veelgestelde-vragen" className="block hover:text-[#7fc1ff]">Veelgestelde vragen</a>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-9 border-t border-white/15 pt-6">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-xs text-[#9fb7cf]">© 2026 ShineGo. Alle rechten voorbehouden.</p>
+              <div className="flex flex-wrap items-center gap-2 text-xs font-bold text-[#d8e8f6]">
+                <span className="rounded-lg border border-white/15 bg-white/10 px-3 py-2">iDEAL</span>
+                <span className="rounded-lg border border-white/15 bg-white/10 px-3 py-2">Wero</span>
+                <span className="rounded-lg border border-white/15 bg-white/10 px-3 py-2">Veilig betalen via Stripe</span>
+              </div>
+            </div>
           </div>
         </div>
       </footer>
