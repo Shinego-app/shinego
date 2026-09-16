@@ -128,6 +128,9 @@ export async function POST(req: NextRequest) {
       bedrag: Number(booking.totaalprijs),
     });
 
+    const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://shinego.nl").replace(/\/$/, "");
+    const reviewUrl = `${siteUrl}/review/${booking.review_token}`;
+
     const { error: emailError } = await resend.emails.send({
       from: "ShineGo <noreply@shinego.nl>",
       to: booking.email,
@@ -135,6 +138,8 @@ export async function POST(req: NextRequest) {
       html: `
         <p>Beste ${booking.voornaam},</p>
         <p>Je opdracht is afgerond. In de bijlage vind je jouw factuur.</p>
+        <p>Hoe was je ervaring met ${professional.bedrijfsnaam}? Je helpt andere klanten en de professional met een korte beoordeling.</p>
+        <p><a href="${reviewUrl}" style="display:inline-block;background:#2563eb;color:#ffffff;text-decoration:none;padding:12px 18px;border-radius:10px;font-weight:600;">Geef een beoordeling</a></p>
         <p>Bedankt voor het gebruik van ShineGo.</p>
       `,
       attachments: [
