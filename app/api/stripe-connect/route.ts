@@ -34,11 +34,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Professional niet gevonden." }, { status: 404 });
     }
 
-    const email = (professional.email || user.email || "").trim().toLowerCase();
-    if (!email) {
-      return NextResponse.json({ error: "E-mailadres ontbreekt." }, { status: 400 });
-    }
-
     const adresRegel = [professional.straat, professional.huisnummer, professional.toevoeging]
       .filter(Boolean)
       .join(" ")
@@ -47,6 +42,11 @@ export async function POST(request: Request) {
     let accountId: string | null = professional.stripe_account_id;
 
     if (!accountId) {
+      const email = (professional.email || user.email || "").trim().toLowerCase();
+      if (!email) {
+        return NextResponse.json({ error: "E-mailadres ontbreekt." }, { status: 400 });
+      }
+
       const account = await stripe.accounts.create({
         type: "express",
         country: "NL",
@@ -88,8 +88,9 @@ export async function POST(request: Request) {
 
       if (updateError) throw updateError;
     } else {
+      // Voor bestaande Connect-accounts mag ShineGo het Stripe-e-mailadres niet wijzigen.
+      // Alleen velden bijwerken waarvoor het platform wel toestemming heeft.
       await stripe.accounts.update(accountId, {
-        email,
         business_profile: {
           name: professional.bedrijfsnaam || undefined,
           product_description: "Glazenwasservice via ShineGo",
