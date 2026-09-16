@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 
 type Prijs = { basisprijs: number; ramenPrijs: number; verdiepingToeslag: number; bereikToeslag: number; kozijnenToeslag: number; totaal: number; };
+type KlantGegevens = { voornaam?: string; achternaam?: string; email?: string; telefoon?: string; postcode?: string; huisnummer?: string; straat?: string; plaats?: string; gewensteDatum?: string; gewensteTijd?: string; thuisNodig?: string; };
 
 const maandNamen = ["januari", "februari", "maart", "april", "mei", "juni", "juli", "augustus", "september", "oktober", "november", "december"];
 const weekDagen = ["ma", "di", "wo", "do", "vr", "za", "zo"];
@@ -34,7 +35,30 @@ export default function GegevensPage() {
   const [kalenderOpen, setKalenderOpen] = useState(false);
   const [zichtbareMaand, setZichtbareMaand] = useState(() => { const nu = new Date(); return new Date(nu.getFullYear(), nu.getMonth(), 1); });
 
-  useEffect(() => { const opgeslagenPrijs = localStorage.getItem("shinegoPrijs"); if (opgeslagenPrijs) setPrijs(JSON.parse(opgeslagenPrijs)); }, []);
+  useEffect(() => {
+    try {
+      const opgeslagenPrijs = localStorage.getItem("shinegoPrijs");
+      const opgeslagenKlant = localStorage.getItem("shinegoKlantGegevens");
+      if (opgeslagenPrijs) setPrijs(JSON.parse(opgeslagenPrijs));
+      if (opgeslagenKlant) {
+        const klant: KlantGegevens = JSON.parse(opgeslagenKlant);
+        setVoornaam(klant.voornaam || "");
+        setAchternaam(klant.achternaam || "");
+        setEmail(klant.email || "");
+        setTelefoon(klant.telefoon || "");
+        setPostcode(klant.postcode || "");
+        setHuisnummer(klant.huisnummer || "");
+        setStraat(klant.straat || "");
+        setPlaats(klant.plaats || "");
+        setGewenensteDatum(klant.gewensteDatum || "");
+        setGewensteTijd(klant.gewensteTijd || "");
+        setThuisNodig(klant.thuisNodig || "");
+      }
+    } catch (error) {
+      console.error("Opgeslagen klantgegevens laden mislukt:", error);
+    }
+  }, []);
+
   useEffect(() => { async function haalAdresOp() { if (postcode.trim().length < 6 || huisnummer.trim() === "") return; try { const zoekterm = `${postcode} ${huisnummer}`; const response = await fetch(`https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?q=${encodeURIComponent(zoekterm)}&fq=type:adres`); const data = await response.json(); const adres = data.response?.docs?.[0]; if (adres) { setStraat(adres.straatnaam || ""); setPlaats(adres.woonplaatsnaam || ""); } } catch (error) { console.error("Adres ophalen mislukt:", error); } } haalAdresOp(); }, [postcode, huisnummer]);
 
   const vandaag = useMemo(() => { const nu = new Date(); return new Date(nu.getFullYear(), nu.getMonth(), nu.getDate()); }, []);
