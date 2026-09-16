@@ -54,7 +54,7 @@ export default function BevestigenPage() {
       if (bookingId) localStorage.setItem("shinegoLaatsteBoekingId", String(bookingId));
       const betaalResponse = await fetch("/api/stripe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ bookingId }) });
       const betaalData = await betaalResponse.json();
-      if (!betaalResponse.ok || !betaalData.url) throw new Error("Stripe betaling kon niet worden gestart.");
+      if (!betaalResponse.ok || !betaalData.url) throw new Error(betaalData?.error || "Stripe betaling kon niet worden gestart.");
       window.location.href = betaalData.url;
     } catch (error) { setFout(error instanceof Error ? error.message : "Er ging iets mis bij het opslaan van de boeking."); setBezig(false); }
   }
