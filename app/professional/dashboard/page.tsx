@@ -10,6 +10,8 @@ export default function ProfessionalDashboardPage() {
   const [laden, setLaden] = useState(true);
   const [professional, setProfessional] = useState<any>(null);
   const [opdrachten, setOpdrachten] = useState<any[]>([]);
+  const [reviewGemiddelde, setReviewGemiddelde] = useState<number | null>(null);
+  const [reviewAantal, setReviewAantal] = useState(0);
   const [profielBewerken, setProfielBewerken] = useState(false);
   const [profielBezig, setProfielBezig] = useState(false);
   const [profielMelding, setProfielMelding] = useState("");
@@ -93,6 +95,25 @@ export default function ProfessionalDashboardPage() {
           .eq("professional_id", data.id)
           .order("created_at", { ascending: false });
         setOpdrachten(boekingenData || []);
+
+        const { data: reviewData, error: reviewError } = await supabase
+          .from("reviews")
+          .select("rating, boekingen!inner(professional_id)")
+          .eq("boekingen.professional_id", data.id)
+          .eq("zichtbaar", true);
+
+        if (!reviewError && reviewData) {
+          const ratings = reviewData
+            .map((review: any) => Number(review.rating))
+            .filter((rating: number) => Number.isFinite(rating));
+
+          setReviewAantal(ratings.length);
+          setReviewGemiddelde(
+            ratings.length > 0
+              ? ratings.reduce((som: number, rating: number) => som + rating, 0) / ratings.length
+              : null
+          );
+        }
       }
       setLaden(false);
     }
@@ -172,6 +193,19 @@ export default function ProfessionalDashboardPage() {
         </h1>
         <p className="mt-2 text-gray-600">Beheer hier je opdrachten, planning en verdiensten.</p>
         <button onClick={uitloggen} className="mt-4 rounded-xl border border-gray-300 bg-white px-4 py-2 font-semibold text-gray-900">Uitloggen</button>
+
+        <section className="mt-8 rounded-2xl bg-white p-5 shadow-sm sm:p-6">
+          <h2 className="text-xl font-bold text-gray-900">Mijn beoordelingen</h2>
+          {reviewAantal > 0 && reviewGemiddelde != null ? (
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <span className="text-2xl font-bold text-gray-900">{reviewGemiddelde.toFixed(1).replace(".", ",")}</span>
+              <span className="text-xl text-amber-400" aria-label={`${reviewGemiddelde.toFixed(1)} van 5 sterren`}>★★★★★</span>
+              <span className="text-sm text-gray-600">({reviewAantal} {reviewAantal === 1 ? "review" : "reviews"})</span>
+            </div>
+          ) : (
+            <p className="mt-2 text-gray-600">Nog geen beoordelingen ontvangen.</p>
+          )}
+        </section>
 
         <section className="mt-8 rounded-2xl bg-white p-5 shadow-sm sm:p-6">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
