@@ -34,11 +34,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Professional niet gevonden." }, { status: 404 });
     }
 
-    const adresRegel = [professional.straat, professional.huisnummer, professional.toevoeging]
-      .filter(Boolean)
-      .join(" ")
-      .trim();
-
     let accountId: string | null = professional.stripe_account_id;
 
     if (!accountId) {
@@ -51,25 +46,17 @@ export async function POST(request: Request) {
         type: "express",
         country: "NL",
         email,
-        business_type: "company",
+        // ShineGo richt zich bij launch op zzp'ers/eenmanszaken.
+        // Als individual voorkomen we onnodige company-eisen zoals
+        // bestuurders, bedrijfseigenaren en vertegenwoordigers.
+        business_type: "individual",
         business_profile: {
           name: professional.bedrijfsnaam || undefined,
           product_description: "Glazenwasservice via ShineGo",
         },
-        company: {
-          name: professional.bedrijfsnaam || undefined,
-          phone: professional.telefoon || undefined,
-          address: {
-            line1: adresRegel || undefined,
-            postal_code: professional.postcode || undefined,
-            city: professional.woonplaats || undefined,
-            country: "NL",
-          },
-        },
         capabilities: {
           // ShineGo verwerkt klantbetalingen op het platformaccount.
-          // De professional hoeft alleen overschrijvingen/uitbetalingen te ontvangen.
-          // Geen card_payments aanvragen voorkomt onnodige extra Stripe-verificatie.
+          // De professional ontvangt alleen transfers/uitbetalingen.
           transfers: { requested: true },
         },
         metadata: {
