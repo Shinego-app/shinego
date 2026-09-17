@@ -119,7 +119,17 @@ export async function POST(request: Request) {
     const totaalRamen = voorkant + achterkant + zijkant;
     const alleenBinnen = klus.alleenBinnen === true || type === "binnen";
     const binnenkant = klus.binnenkant === true && !alleenBinnen;
-    const telescoop = alleenBinnen ? false : klus.telescoop === true;
+    const appartementBuiten =
+      woningtype === "appartement" &&
+      tekst(klus.appartementToegang, 20) === "buiten" &&
+      !alleenBinnen;
+    const appartementVerdieping = verdiepingen[0] || "";
+    const telescoopVerplicht =
+      type === "telewash" ||
+      (!alleenBinnen && verdiepingen.includes("4")) ||
+      (appartementBuiten && ["2", "3", "4"].includes(appartementVerdieping)) ||
+      (!alleenBinnen && klus.obstakelVoorRamen === true);
+    const telescoop = alleenBinnen ? false : telescoopVerplicht || klus.telescoop === true;
     const kozijnen = details.kozijnen === true;
 
     const glasOppervlak = tekst(klus.glasOppervlak, 20);
