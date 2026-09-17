@@ -1,14 +1,15 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { controleerCheckoutToken } from "@/lib/checkoutToken";
 
 export async function POST(request: Request) {
   try {
-    const { bookingId } = await request.json();
+    const { bookingId, checkoutToken } = await request.json();
 
-    if (!bookingId) {
+    if (!bookingId || typeof checkoutToken !== "string") {
       return NextResponse.json(
-        { error: "Boekingsnummer ontbreekt.", stage: "request" },
+        { error: "Boekingsnummer of betaalautorisatie ontbreekt.", stage: "request" },
         { status: 400 }
       );
     }
@@ -54,6 +55,13 @@ export async function POST(request: Request) {
       );
     }
 
+    if (!controleerCheckoutToken(checkoutToken, booking.id, totaalprijs)) {
+      return NextResponse.json(
+        { error: "Ongeldige of verlopen betaalautorisatie.", stage: "authorization" },
+        { status: 401 }
+      );
+    }
+
     if (!booking.email) {
       return NextResponse.json(
         { error: "E-mailadres ontbreekt bij de boeking.", stage: "booking" },
@@ -73,27 +81,32 @@ export async function POST(request: Request) {
     const stripe = new Stripe(stripeSecretKey);
 
     try {
-      const session = await stripe.checkout.sessions.create({
-        mode: "payment",
-        customer_email: booking.email,
-        line_items: [
-          {
-            price_data: {
-              currency: "eur",
-              product_data: {
-                name: "ShineGo glazenwassen",
+      const session = await stripe.checkout.sessions.create(
+        {
+          mode: "payment",
+          customer_email: booking.email,
+          line_items: [
+            {
+              price_data: {
+                currency: "eur",
+                product_data: {
+                  name: "ShineGo glazenwassen",
+                },
+                unit_amount: Math.round(totaalprijs * 100),
               },
-              unit_amount: Math.round(totaalprijs * 100),
+              quantity: 1,
             },
-            quantity: 1,
+          ],
+          metadata: {
+            bookingId: String(booking.id),
           },
-        ],
-        metadata: {
-          bookingId: String(booking.id),
+          success_url: "https://www.shinego.nl/boeken/glazenwassen/succes?betaling=succes",
+          cancel_url: "https://www.shinego.nl/boeken/glazenwassen/bevestigen?betaling=geannuleerd",
         },
-        success_url: "https://www.shinego.nl/boeken/glazenwassen/succes?betaling=succes",
-        cancel_url: "https://www.shinego.nl/boeken/glazenwassen/bevestigen?betaling=geannuleerd",
-      });
+        {
+          idempotencyKey: `shinego-checkout-booking-${booking.id}`,
+        }
+      );
 
       if (!session.url) {
         console.error("Stripe Checkout - sessie zonder URL:", session.id);
