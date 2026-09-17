@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 
-const ADMIN_EMAIL = "info@shinego.nl";
+const ADMIN_EMAIL = "intercastbv@hotmail.com";
 
 export default function AdminLoginPage() {
   const [bezig, setBezig] = useState(false);
@@ -20,7 +20,7 @@ export default function AdminLoginPage() {
         email: ADMIN_EMAIL,
         options: {
           emailRedirectTo: `${window.location.origin}/admin`,
-          shouldCreateUser: true,
+          shouldCreateUser: false,
         },
       });
 
@@ -29,7 +29,7 @@ export default function AdminLoginPage() {
       setMelding(`Veilige inloglink verzonden naar ${ADMIN_EMAIL}.`);
     } catch (error) {
       console.error("Admin inloglink fout:", error);
-      setMelding("De inloglink kon niet worden verzonden. Probeer het opnieuw.");
+      setMelding("De inloglink kon niet worden verzonden. Controleer of dit beheeraccount in Supabase Authentication bestaat.");
     } finally {
       setBezig(false);
     }
@@ -41,7 +41,7 @@ export default function AdminLoginPage() {
         <div className="text-2xl font-bold text-blue-600">ShineGo</div>
         <h1 className="mt-3 text-2xl font-bold text-gray-900">Beheerder inloggen</h1>
         <p className="mt-3 text-sm leading-6 text-gray-600">
-          Alleen het officiële ShineGo-beheeraccount krijgt toegang tot boekingen,
+          Alleen het bestaande ShineGo-beheeraccount krijgt toegang tot boekingen,
           professionals en betalingen.
         </p>
 
