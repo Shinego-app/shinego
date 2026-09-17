@@ -1,7 +1,12 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "../../../lib/supabaseAdmin";
+import { isAdminRequest } from "@/lib/adminAuth";
 
-export async function GET() {
+export async function GET(request: Request) {
+  if (!(await isAdminRequest(request))) {
+    return NextResponse.json({ error: "Geen toegang." }, { status: 401 });
+  }
+
   try {
     const { data: boekingen, error: boekingenError } = await supabaseAdmin
       .from("boekingen")
@@ -63,6 +68,10 @@ export async function GET() {
 }
 
 export async function PATCH(request: Request) {
+  if (!(await isAdminRequest(request))) {
+    return NextResponse.json({ error: "Geen toegang." }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
     const {
