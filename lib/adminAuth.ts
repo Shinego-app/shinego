@@ -1,9 +1,6 @@
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
-export const ADMIN_EMAIL = (process.env.ADMIN_EMAIL || "info@shinego.nl")
-  .trim()
-  .toLowerCase();
-
+export const ADMIN_EMAIL = "info@shinego.nl";
 export const ADMIN_COOKIE = "shinego_admin_session";
 
 function cookieValue(request: Request, name: string) {
