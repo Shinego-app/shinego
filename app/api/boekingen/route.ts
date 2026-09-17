@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { maakCheckoutToken } from "@/lib/checkoutToken";
 
 function record(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value)
@@ -233,7 +234,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Boeking kon niet worden opgeslagen." }, { status: 500 });
     }
 
-    return NextResponse.json({ booking: data });
+    const checkoutToken = maakCheckoutToken(data.id, Number(data.totaalprijs));
+    return NextResponse.json({ booking: data, checkout_token: checkoutToken });
   } catch (error) {
     console.error("Boeking API fout:", error);
     return NextResponse.json({ error: "Boeking kon niet worden opgeslagen." }, { status: 500 });
