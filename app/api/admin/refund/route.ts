@@ -1,10 +1,15 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { isAdminRequest } from "@/lib/adminAuth";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(request: Request) {
+  if (!(await isAdminRequest(request))) {
+    return NextResponse.json({ error: "Geen toegang." }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
     const bookingId = body?.booking_id;
