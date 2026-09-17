@@ -131,7 +131,7 @@ export async function POST(req: NextRequest) {
     const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://shinego.nl").replace(/\/$/, "");
     const reviewUrl = `${siteUrl}/review/${booking.review_token}`;
 
-    const { error: emailError } = await resend.emails.send({
+    const { error: klantEmailError } = await resend.emails.send({
       from: "ShineGo <noreply@shinego.nl>",
       to: booking.email,
       subject: `Factuur ${factuurnummer} - ShineGo`,
@@ -150,11 +150,47 @@ export async function POST(req: NextRequest) {
       ],
     });
 
-    if (emailError) {
+    if (klantEmailError) {
       return NextResponse.json(
-        { error: "Opdracht is afgerond, maar factuurmail verzenden mislukt" },
+        { error: "Opdracht is afgerond, maar factuurmail naar klant verzenden mislukt" },
         { status: 500 }
       );
+    }
+
+    if (user.email) {
+      const professionalBedrag = Number(booking.professional_bedrag || 0);
+      const uitbetalingTekst = professionalBedrag > 0
+        ? `<p>Jouw bedrag voor deze opdracht is <strong>€${professionalBedrag.toFixed(2).replace(".", ",")}</strong>.</p>`
+        : "";
+
+      const { error: professionalEmailError } = await resend.emails.send({
+        from: "ShineGo <noreply@shinego.nl>",
+        to: user.email,
+        subject: `Factuurkopie ${factuurnummer} - ShineGo`,
+        html: `
+          <p>Beste ${professional.bedrijfsnaam},</p>
+          <p>De opdracht is succesvol afgerond.</p>
+          ${uitbetalingTekst}
+          <p>In de bijlage vind je een factuurkopie voor je administratie.</p>
+          <p>Met vriendelijke groet,<br />ShineGo</p>
+        `,
+        attachments: [
+          {
+            filename: `${factuurnummer}.pdf`,
+            content: Buffer.from(pdfBytes),
+          },
+        ],
+      });
+
+      if (professionalEmailError) {
+        console.error("Factuurmail professional fout:", professionalEmailError);
+        return NextResponse.json(
+          { error: "Opdracht is afgerond en klantmail is verzonden, maar factuurmail naar professional is mislukt" },
+          { status: 500 }
+        );
+      }
+    } else {
+      console.warn("Geen e-mailadres gevonden voor professional:", professional.id);
     }
 
     return NextResponse.json({ success: true });
