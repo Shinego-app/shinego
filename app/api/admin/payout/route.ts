@@ -5,11 +5,16 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { maakFactuurnummer } from "@/lib/factuur";
 import { maakProfessionalAfrekeningPdf } from "@/lib/professionalAfrekening";
 import { magOpdrachtStarten } from "@/lib/opdrachtTijd";
+import { isAdminRequest } from "@/lib/adminAuth";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 const resend = new Resend(process.env.RESEND_API_KEY!);
 
 export async function POST(request: Request) {
+  if (!(await isAdminRequest(request))) {
+    return NextResponse.json({ error: "Geen toegang." }, { status: 401 });
+  }
+
   try {
     const body = await request.json();
     const bookingId = body?.booking_id;
