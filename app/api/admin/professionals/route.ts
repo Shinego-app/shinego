@@ -1,12 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "../../../../lib/supabaseAdmin";
-import { isAdminRequest } from "@/lib/adminAuth";
 
 export async function DELETE(request: Request) {
-  if (!(await isAdminRequest(request))) {
-    return NextResponse.json({ error: "Geen toegang." }, { status: 401 });
-  }
-
   try {
     const body = await request.json();
     const professionalId = body?.professional_id;
