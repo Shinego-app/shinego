@@ -57,6 +57,22 @@ export default function ProfessionalLoginPage() {
         return;
       }
 
+      const profielResponse = await fetch("/api/professional-register", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${data.session.access_token}`,
+        },
+      });
+
+      if (!profielResponse.ok) {
+        const profielData = await profielResponse.json().catch(() => ({}));
+        setMelding(
+          profielData.error ||
+            "Inloggen is gelukt, maar je professionalprofiel kon niet worden geladen."
+        );
+        return;
+      }
+
       router.replace("/professional/dashboard");
       router.refresh();
     } catch (error) {
