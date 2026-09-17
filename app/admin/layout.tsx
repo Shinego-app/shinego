@@ -6,7 +6,7 @@ import { usePathname, useRouter } from "next/navigation";
 import type { Session } from "@supabase/supabase-js";
 import { supabase } from "@/lib/supabase";
 
-const ADMIN_EMAIL = "info@shinego.nl";
+const ADMIN_EMAIL = "intercastbv@hotmail.com";
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
