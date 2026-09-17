@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { boekingOpslaan } from "../../../../lib/boekingopslaan";
 
 type GlazenwassenGegevens = { woningtype: string; verdiepingen: string[]; ramen: number; telescoop: boolean; type: string; frequentie: string; };
 type GlazenwassenDetails = { bereikbaar: string; extraVuil?: boolean; kozijnen: boolean; opmerking: string; };
@@ -40,18 +39,25 @@ export default function BevestigenPage() {
     if (!akkoordStartBedenktijd) { setFout("Geef toestemming voor start binnen de wettelijke bedenktijd indien nodig."); return; }
     setBezig(true); setFout("");
     try {
-      const nieuweBoeking = await boekingOpslaan({
-        voornaam: klant.voornaam, achternaam: klant.achternaam, email: klant.email, telefoon: klant.telefoon,
-        postcode: klant.postcode, huisnummer: klant.huisnummer, toevoeging: klant.toevoeging || "", straat: klant.straat, plaats: klant.plaats,
-        dienst: "glazenwassen", woningtype: klus.woningtype, telescoop: klus.telescoop, verdiepingen: klus.verdiepingen, aantal_ramen: klus.ramen,
-        glasbewassing_type: klus.type, frequentie: klus.frequentie, bereikbaar: details.bereikbaar, kozijnen: details.kozijnen, opmerking: details.opmerking,
-        basisprijs: prijs.basisprijs, ramen_prijs: prijs.ramenPrijs, verdieping_toeslag: prijs.verdiepingToeslag, bereik_toeslag: prijs.bereikToeslag,
-        kozijnen_toeslag: prijs.kozijnenToeslag, korting_percentage: prijs.kortingPercentage, korting_bedrag: prijs.kortingBedrag, totaalprijs: prijs.totaal,
-        gewenste_datum: klant.gewensteDatum, gewenste_tijd: klant.gewensteTijd, thuis_nodig: klant.thuisNodig,
-        akkoord_voorwaarden: akkoordVoorwaarden, akkoord_start_binnen_bedenktijd: akkoordStartBedenktijd, professional_id: null,
+      const boekingResponse = await fetch("/api/boekingen", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          klus,
+          details,
+          klant,
+          akkoordVoorwaarden,
+          akkoordStartBedenktijd,
+          verwachteTotaalprijs: prijs.totaal,
+        }),
       });
-      const bookingId = nieuweBoeking?.[0]?.id;
-      if (bookingId) localStorage.setItem("shinegoLaatsteBoekingId", String(bookingId));
+      const boekingData = await boekingResponse.json();
+      if (!boekingResponse.ok) throw new Error(boekingData?.error || "Boeking kon niet worden opgeslagen.");
+
+      const bookingId = boekingData?.booking?.id;
+      if (!bookingId) throw new Error("Boekingsnummer ontbreekt na het opslaan.");
+
+      localStorage.setItem("shinegoLaatsteBoekingId", String(bookingId));
       const betaalResponse = await fetch("/api/stripe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ bookingId }) });
       const betaalData = await betaalResponse.json();
       if (!betaalResponse.ok || !betaalData.url) throw new Error(betaalData?.error || "Stripe betaling kon niet worden gestart.");
