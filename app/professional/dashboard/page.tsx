@@ -96,23 +96,22 @@ export default function ProfessionalDashboardPage() {
           .order("created_at", { ascending: false });
         setOpdrachten(boekingenData || []);
 
-        const { data: reviewData, error: reviewError } = await supabase
-          .from("reviews")
-          .select("rating, boekingen!inner(professional_id)")
-          .eq("boekingen.professional_id", data.id)
-          .eq("zichtbaar", true);
+        if (token) {
+          const reviewResponse = await fetch("/api/professional-reviews", {
+            method: "GET",
+            headers: { Authorization: `Bearer ${token}` },
+            cache: "no-store",
+          });
 
-        if (!reviewError && reviewData) {
-          const ratings = reviewData
-            .map((review: any) => Number(review.rating))
-            .filter((rating: number) => Number.isFinite(rating));
-
-          setReviewAantal(ratings.length);
-          setReviewGemiddelde(
-            ratings.length > 0
-              ? ratings.reduce((som: number, rating: number) => som + rating, 0) / ratings.length
-              : null
-          );
+          if (reviewResponse.ok) {
+            const reviewResult = await reviewResponse.json();
+            setReviewAantal(Number(reviewResult.aantal) || 0);
+            setReviewGemiddelde(
+              reviewResult.gemiddelde == null ? null : Number(reviewResult.gemiddelde)
+            );
+          } else {
+            console.error("Beoordelingen laden mislukt:", await reviewResponse.text());
+          }
         }
       }
       setLaden(false);
