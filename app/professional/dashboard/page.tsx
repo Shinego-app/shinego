@@ -27,6 +27,9 @@ export default function ProfessionalDashboardPage() {
     toevoeging: "",
     kvk_nummer: "",
     btw_nummer: "",
+    avb_verzekeraar: "",
+    avb_polisnummer: "",
+    avb_bevestigd: false,
     werkgebied_km: "25",
   });
 
@@ -43,6 +46,9 @@ export default function ProfessionalDashboardPage() {
       toevoeging: data?.toevoeging || "",
       kvk_nummer: data?.kvk_nummer || "",
       btw_nummer: data?.btw_nummer || "",
+      avb_verzekeraar: data?.avb_verzekeraar || "",
+      avb_polisnummer: data?.avb_polisnummer || "",
+      avb_bevestigd: data?.avb_bevestigd === true,
       werkgebied_km: String(data?.werkgebied_km || 25),
     });
   }
@@ -210,7 +216,7 @@ export default function ProfessionalDashboardPage() {
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <h2 className="text-xl font-bold text-gray-900">Mijn gegevens</h2>
-              <p className="mt-1 text-sm text-gray-600">Controleer en wijzig je bedrijfs-, contact- en werkgebiedgegevens.</p>
+              <p className="mt-1 text-sm text-gray-600">Controleer en wijzig je bedrijfs-, contact-, werkgebied- en verzekeringsgegevens.</p>
             </div>
             {!profielBewerken && (
               <button onClick={() => { setProfielMelding(""); setProfielBewerken(true); }} className="rounded-xl border border-blue-600 bg-white px-4 py-2 font-semibold text-blue-600">Gegevens wijzigen</button>
@@ -228,6 +234,10 @@ export default function ProfessionalDashboardPage() {
               <p><strong>Werkgebied:</strong> {professional?.werkgebied_km ? `${professional.werkgebied_km} km rondom jouw adres` : "Niet ingesteld"}</p>
               <p><strong>KVK:</strong> {professional?.kvk_nummer || "-"}</p>
               <p><strong>BTW:</strong> {professional?.btw_nummer || "Niet ingevuld"}</p>
+              <p><strong>AVB:</strong> {professional?.avb_bevestigd ? "Aangegeven als actief" : "Nog niet aangegeven"}</p>
+              <p><strong>Verzekeraar:</strong> {professional?.avb_verzekeraar || "Nog niet ingevuld"}</p>
+              <p><strong>Polisnummer:</strong> {professional?.avb_polisnummer || "Nog niet ingevuld"}</p>
+              <p className="sm:col-span-2 text-xs text-gray-500">Je kunt je account zonder polisgegevens gebruiken. Voor je eerste opdracht moet ShineGo je AVB-gegevens wel kunnen controleren.</p>
             </div>
           ) : (
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
@@ -237,6 +247,31 @@ export default function ProfessionalDashboardPage() {
                   <input value={(profielForm as any)[key]} onChange={(e) => setProfielForm((prev) => ({ ...prev, [key]: e.target.value }))} className="w-full rounded-xl border border-gray-300 px-3 py-2 text-gray-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100" />
                 </label>
               ))}
+
+              <div className="sm:col-span-2 rounded-2xl border border-gray-200 bg-gray-50 p-4">
+                <div className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    checked={profielForm.avb_bevestigd}
+                    onChange={(e) => setProfielForm((prev) => ({ ...prev, avb_bevestigd: e.target.checked }))}
+                    className="mt-0.5 h-5 w-5 accent-blue-600"
+                  />
+                  <div>
+                    <p className="font-semibold text-gray-900">Ik heb een actieve bedrijfsaansprakelijkheidsverzekering (AVB)</p>
+                    <p className="mt-1 text-xs text-gray-600">Je kunt deze gegevens later aanvullen. Ze moeten compleet zijn voordat ShineGo je vrijgeeft voor je eerste opdracht.</p>
+                  </div>
+                </div>
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                  <label className="block">
+                    <span className="mb-1 block text-sm font-medium text-gray-800">Verzekeraar</span>
+                    <input value={profielForm.avb_verzekeraar} onChange={(e) => setProfielForm((prev) => ({ ...prev, avb_verzekeraar: e.target.value }))} className="w-full rounded-xl border border-gray-300 px-3 py-2 text-gray-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100" />
+                  </label>
+                  <label className="block">
+                    <span className="mb-1 block text-sm font-medium text-gray-800">Polisnummer</span>
+                    <input value={profielForm.avb_polisnummer} onChange={(e) => setProfielForm((prev) => ({ ...prev, avb_polisnummer: e.target.value }))} className="w-full rounded-xl border border-gray-300 px-3 py-2 text-gray-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100" />
+                  </label>
+                </div>
+              </div>
 
               <label className="block">
                 <span className="mb-1 block text-sm font-medium text-gray-800">Werkgebied</span>

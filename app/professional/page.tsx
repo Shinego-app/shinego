@@ -19,8 +19,7 @@ export default function ProfessionalPage() {
   const [toevoeging, setToevoeging] = useState("");
   const [kvkNummer, setKvkNummer] = useState("");
   const [btwNummer, setBtwNummer] = useState("");
-  const [verzekeraar, setVerzekeraar] = useState("");
-  const [polisnummer, setPolisnummer] = useState("");
+  const [heeftAvb, setHeeftAvb] = useState<boolean | null>(null);
   const [werkgebiedKm, setWerkgebiedKm] = useState("25");
   const [telewash, setTelewash] = useState(false);
   const [bedrijfspanden, setBedrijfspanden] = useState(false);
@@ -37,9 +36,14 @@ export default function ProfessionalPage() {
       !bedrijfsnaam.trim() || !voornaam.trim() || !achternaam.trim() ||
       !email.trim() || !wachtwoord || !telefoon.trim() || !postcode.trim() ||
       !woonplaats.trim() || !straat.trim() || !huisnummer.trim() ||
-      !kvkNummer.trim() || !btwNummer.trim() || !verzekeraar.trim() || !polisnummer.trim()
+      !kvkNummer.trim() || !btwNummer.trim()
     ) {
       setMelding("Vul alle verplichte gegevens in.");
+      return;
+    }
+
+    if (heeftAvb === null) {
+      setMelding("Geef aan of je een bedrijfsaansprakelijkheidsverzekering hebt.");
       return;
     }
 
@@ -108,9 +112,7 @@ export default function ProfessionalPage() {
           toevoeging: toevoeging.trim() || null,
           kvk_nummer: schoonKvk,
           btw_nummer: schoonBtw,
-          avb_verzekeraar: verzekeraar.trim(),
-          avb_polisnummer: polisnummer.trim(),
-          avb_bevestigd: true,
+          avb_bevestigd: heeftAvb === true,
           controle_status: "handmatig_te_controleren",
           diensten,
           werkgebied_km: Number(werkgebiedKm),
@@ -173,7 +175,7 @@ export default function ProfessionalPage() {
 
         <form onSubmit={aanmelden} className="rounded-3xl border border-gray-200 bg-white p-5 shadow-sm sm:p-9">
           <h2 className="text-2xl font-bold text-gray-900">Aanmelden als professional</h2>
-          <p className="mt-2 text-gray-600">ShineGo controleert je KVK-, btw- en verzekeringsgegevens handmatig. Bankrekening en betaalverificatie regel je daarna apart vanuit je dashboard.</p>
+          <p className="mt-2 text-gray-600">ShineGo controleert je KVK- en btw-gegevens handmatig. Je verzekering kun je later vanuit je dashboard aanvullen; bankrekening en betaalverificatie regel je daar ook apart.</p>
 
           <div className="mt-8 space-y-7">
             <section>
@@ -188,10 +190,16 @@ export default function ProfessionalPage() {
 
             <section className="border-t pt-7">
               <h3 className="mb-2 text-lg font-bold text-gray-900">Bedrijfsaansprakelijkheidsverzekering</h3>
-              <p className="mb-4 text-sm text-gray-600">Een actieve AVB met dekking voor je werkzaamheden is verplicht. We vragen alleen de gegevens; geen polisupload.</p>
-              <div className="grid gap-5 sm:grid-cols-2">
-                <div><label className="mb-2 block font-medium text-gray-800">Verzekeraar *</label><input value={verzekeraar} onChange={(e) => setVerzekeraar(e.target.value)} className={inputClass} /></div>
-                <div><label className="mb-2 block font-medium text-gray-800">Polisnummer *</label><input value={polisnummer} onChange={(e) => setPolisnummer(e.target.value)} className={inputClass} /></div>
+              <p className="mb-4 text-sm text-gray-600">Voor aanmelden hoef je geen polisgegevens of document te uploaden. Geef alleen aan of je nu een AVB hebt. Heb je die nog niet, dan kun je dit later vanuit je dashboard aanvullen voordat je je eerste opdracht aanneemt.</p>
+              <div className="grid gap-3 sm:grid-cols-2">
+                <label className={`flex cursor-pointer items-center gap-3 rounded-xl border p-4 ${heeftAvb === true ? "border-blue-500 bg-blue-50" : "border-gray-200 bg-white"}`}>
+                  <input type="radio" name="avb" checked={heeftAvb === true} onChange={() => setHeeftAvb(true)} className="h-5 w-5 accent-blue-600" />
+                  <span className="font-semibold text-gray-900">Ja, ik heb een AVB</span>
+                </label>
+                <label className={`flex cursor-pointer items-center gap-3 rounded-xl border p-4 ${heeftAvb === false ? "border-blue-500 bg-blue-50" : "border-gray-200 bg-white"}`}>
+                  <input type="radio" name="avb" checked={heeftAvb === false} onChange={() => setHeeftAvb(false)} className="h-5 w-5 accent-blue-600" />
+                  <span className="font-semibold text-gray-900">Nee, nog niet</span>
+                </label>
               </div>
             </section>
 
@@ -235,7 +243,7 @@ export default function ProfessionalPage() {
                 onChange={(e) => setVoorwaarden(e.target.checked)}
                 className="mt-0.5 h-6 w-6 shrink-0 cursor-pointer accent-blue-600"
               />
-              <span className="text-sm leading-6 text-gray-700">Ik verklaar dat mijn gegevens correct zijn, dat mijn bedrijfsaansprakelijkheidsverzekering actief is en dekking biedt voor de werkzaamheden die ik via ShineGo uitvoer, dat ShineGo mijn KVK-, btw- en verzekeringsgegevens handmatig mag controleren en ik accepteer de <a href="/professional/voorwaarden" target="_blank" rel="noreferrer" className="font-semibold text-blue-600 underline">voorwaarden voor professionals</a>.</span>
+              <span className="text-sm leading-6 text-gray-700">Ik verklaar dat mijn gegevens correct zijn, dat ShineGo mijn KVK-, btw- en eventuele verzekeringsgegevens handmatig mag controleren en ik accepteer de <a href="/professional/voorwaarden" target="_blank" rel="noreferrer" className="font-semibold text-blue-600 underline">voorwaarden voor professionals</a>.</span>
             </label>
 
             {melding && <div className="rounded-xl bg-red-50 p-4 text-sm font-medium text-red-700">{melding}</div>}
@@ -244,7 +252,7 @@ export default function ProfessionalPage() {
           </div>
         </form>
 
-        <p className="mt-6 text-center text-sm text-gray-500">Je profiel wordt pas geactiveerd nadat ShineGo de bedrijfs- en verzekeringsgegevens heeft gecontroleerd.</p>
+        <p className="mt-6 text-center text-sm text-gray-500">Aanmelden kan zonder polisgegevens. Voordat je je eerste opdracht kunt aannemen, moeten je bedrijfsgegevens en AVB-controle compleet zijn.</p>
       </section>
     </main>
   );

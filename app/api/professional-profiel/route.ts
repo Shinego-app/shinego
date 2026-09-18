@@ -39,6 +39,9 @@ export async function POST(request: Request) {
     const toevoeging = String(body.toevoeging || "").trim();
     const kvkNummer = String(body.kvk_nummer || "").replace(/\D/g, "");
     const btwNummer = String(body.btw_nummer || "").replace(/[\s.\-]/g, "").toUpperCase();
+    const avbVerzekeraar = String(body.avb_verzekeraar || "").trim();
+    const avbPolisnummer = String(body.avb_polisnummer || "").trim();
+    const avbBevestigd = body.avb_bevestigd === true;
     const werkgebiedKm = Number(body.werkgebied_km);
     const diensten = normaliseerDiensten(body.diensten);
 
@@ -86,6 +89,9 @@ export async function POST(request: Request) {
         toevoeging: toevoeging || null,
         kvk_nummer: kvkNummer,
         btw_nummer: btwNummer || null,
+        avb_verzekeraar: avbVerzekeraar || null,
+        avb_polisnummer: avbPolisnummer || null,
+        avb_bevestigd: avbBevestigd,
         werkgebied_km: werkgebiedKm,
         diensten,
       })
@@ -103,6 +109,9 @@ export async function POST(request: Request) {
         ...bestaandeMetadata,
         diensten,
         werkgebied_km: werkgebiedKm,
+        avb_verzekeraar: avbVerzekeraar || null,
+        avb_polisnummer: avbPolisnummer || null,
+        avb_bevestigd: avbBevestigd,
       },
     });
 

@@ -65,9 +65,7 @@ export async function POST(request: Request) {
       !postcode ||
       !woonplaats ||
       !/^\d{8}$/.test(kvkNummer) ||
-      !/^NL\d{9}B\d{2}$/.test(btwNummer) ||
-      !avbVerzekeraar ||
-      !avbPolisnummer
+      !/^NL\d{9}B\d{2}$/.test(btwNummer)
     ) {
       return NextResponse.json(
         { error: "De registratiegegevens in het geverifieerde account zijn onvolledig." },
@@ -96,8 +94,8 @@ export async function POST(request: Request) {
         toevoeging: String(metadata.toevoeging || "").trim() || null,
         kvk_nummer: kvkNummer,
         btw_nummer: btwNummer,
-        avb_verzekeraar: avbVerzekeraar,
-        avb_polisnummer: avbPolisnummer,
+        avb_verzekeraar: avbVerzekeraar || null,
+        avb_polisnummer: avbPolisnummer || null,
         avb_bevestigd: metadata.avb_bevestigd === true,
         diensten: normaliseerDiensten(metadata.diensten),
         werkgebied_km: veiligeWerkafstand,
