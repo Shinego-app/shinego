@@ -12,6 +12,7 @@ type Gegevens = {
   ramenAchterkant?: number;
   ramenZijkant?: number;
   glasOppervlak: string;
+  binnenGlasOppervlak?: string;
   telescoop: boolean;
   type: string;
   frequentie: string;
@@ -25,7 +26,7 @@ type Gegevens = {
 const keuzes: Record<string, Gegevens> = {
   woning: { woningtype: "", verdiepingen: ["1"], ramen: 0, ramenVoorkant: 0, ramenAchterkant: 0, ramenZijkant: 0, glasOppervlak: "", telescoop: false, type: "buiten", frequentie: "eenmalig" },
   appartement: { woningtype: "appartement", verdiepingen: [], ramen: 0, ramenVoorkant: 0, ramenAchterkant: 0, ramenZijkant: 0, glasOppervlak: "", telescoop: false, type: "buiten", frequentie: "eenmalig", appartementToegang: undefined },
-  bedrijf: { woningtype: "bedrijfspand", verdiepingen: ["1"], ramen: 0, glasOppervlak: "", telescoop: false, type: "bedrijf", frequentie: "eenmalig" },
+  bedrijf: { woningtype: "bedrijfspand", verdiepingen: ["1"], ramen: 0, glasOppervlak: "", binnenGlasOppervlak: "", telescoop: false, type: "bedrijf", frequentie: "eenmalig" },
   telewash: { woningtype: "tussenwoning", verdiepingen: ["1"], ramen: 0, ramenVoorkant: 0, ramenAchterkant: 0, ramenZijkant: 0, glasOppervlak: "", telescoop: true, type: "telewash", frequentie: "eenmalig" },
 };
 
@@ -37,6 +38,7 @@ export default function DetailsPage() {
   const [ramenZijkant, setRamenZijkant] = useState(0);
   const [verdiepingen, setVerdiepingen] = useState<string[]>(["1"]);
   const [glasOppervlak, setGlasOppervlak] = useState("");
+  const [binnenGlasOppervlak, setBinnenGlasOppervlak] = useState("");
   const [telescoop, setTelescoop] = useState(false);
   const [kozijnen, setKozijnen] = useState(false);
   const [frequentie, setFrequentie] = useState("eenmalig");
@@ -61,6 +63,7 @@ export default function DetailsPage() {
     setRamenZijkant(heeftNieuweVerdeling ? data.ramenZijkant || 0 : 0);
     setVerdiepingen(data.verdiepingen?.length ? data.verdiepingen : data.woningtype === "appartement" ? [] : ["1"]);
     setGlasOppervlak(data.glasOppervlak || "");
+    setBinnenGlasOppervlak(data.binnenGlasOppervlak || "");
     setTelescoop(Boolean(data.telescoop) || Boolean(data.verdiepingen?.includes("4")) || Boolean(data.obstakelVoorRamen));
     if (data.type === "telewash") {
       setTelescoop(true);
@@ -87,7 +90,7 @@ export default function DetailsPage() {
   const kanVerder = Boolean(gegevens) &&
     (!woning || woningtype !== "") &&
     (bedrijf
-      ? glasOppervlak !== ""
+      ? (alleenBinnen || glasOppervlak !== "") && (reiniging === "buiten" || binnenGlasOppervlak !== "")
       : appartement
         ? ramen > 0 && (alleenBinnen || (appartementToegang !== "" && (appartementToegang === "balkon" || verdiepingen.length === 1)))
         : ramen > 0 && (alleenBinnen || verdiepingen.length > 0));
@@ -144,7 +147,8 @@ export default function DetailsPage() {
       ramenAchterkant,
       ramenZijkant,
       verdiepingen: appartement && appartementToegang === "balkon" ? [] : verdiepingen,
-      glasOppervlak,
+      glasOppervlak: bedrijf && alleenBinnen ? "" : glasOppervlak,
+      binnenGlasOppervlak: bedrijf && reiniging !== "buiten" ? binnenGlasOppervlak : undefined,
       telescoop: alleenBinnen ? false : telescoop,
       frequentie,
       appartementToegang: appartement ? appartementToegang || undefined : undefined,
@@ -155,7 +159,7 @@ export default function DetailsPage() {
     };
     localStorage.setItem("shinegoGlazenwassen", JSON.stringify(bijgewerkt));
     localStorage.setItem("shinegoGlazenwassenDetails", JSON.stringify({ bereikbaar: "ja", kozijnen, opmerking: "" }));
-    if (bedrijf && glasOppervlak === "500+") { window.location.href = "/contact?offerte=500plus"; return; }
+    if (bedrijf && (glasOppervlak === "500+" || binnenGlasOppervlak === "500+")) { window.location.href = "/contact?offerte=500plus"; return; }
     window.location.href = "/boeken/glazenwassen/prijs";
   }
 
@@ -168,7 +172,11 @@ export default function DetailsPage() {
       <section className="mx-auto mt-5 max-w-[860px] rounded-[24px] border border-[#d5e9f8] bg-white/95 px-5 py-6 shadow-[0_12px_35px_rgba(44,95,135,.08)] sm:px-7 sm:py-7 lg:mt-7 lg:px-9 lg:py-8">
         <h1 className="text-[30px] font-extrabold leading-tight tracking-[-.035em] text-[#0b3d75] sm:text-[38px]">Jouw situatie</h1><p className="mt-1 text-sm font-medium text-[#537797] sm:text-base">Geef aan wat van toepassing is.</p>
         {!gegevens?<p className="mt-8 text-[#6d89a4]">Gegevens laden...</p>:<>
-          {bedrijf?<div className="mt-6"><label className="text-sm font-extrabold text-[#123c70]">Hoeveel m² glas?</label><div className="mt-3 grid gap-2 sm:grid-cols-2">{[["0-15","Tot 15 m²"],["16-30","16 - 30 m²"],["31-50","31 - 50 m²"],["51-100","51 - 100 m²"],["101-200","101 - 200 m²"],["201-500","201 - 500 m²"],["500+","Meer dan 500 m²"]].map(([waarde,label])=><button key={waarde} type="button" onClick={()=>setGlasOppervlak(waarde)} className={`rounded-xl border px-4 py-3 text-left text-sm font-semibold transition ${glasOppervlak===waarde?"border-[#1683f8] bg-[#eaf6ff] text-[#0f66b6]":"border-[#cfe3f4] bg-white text-[#4f708f]"}`}>{label}</button>)}</div></div>:<>
+          {bedrijf?<div className="mt-6 space-y-5">
+            <div className="border-b border-[#dcecf8] pb-5"><div className="text-sm font-extrabold text-[#123c70]">Wat wil je laten reinigen?</div><div className="mt-3 grid gap-2 sm:grid-cols-3">{[["buiten","Alleen buiten"],["binnen-buiten","Binnen + buiten"],["binnen","Alleen binnen"]].map(([waarde,label])=><button key={waarde} type="button" onClick={()=>kiesReiniging(waarde as Reiniging)} className={`rounded-xl border px-4 py-3 text-left text-sm font-semibold transition ${reiniging===waarde?"border-[#1683f8] bg-[#eaf6ff] text-[#0f66b6]":"border-[#cfe3f4] bg-white text-[#5f7e9c]"}`}>{label}</button>)}</div></div>
+            {!alleenBinnen&&<div><label className="text-sm font-extrabold text-[#123c70]">Hoeveel m² glas buiten?</label><div className="mt-3 grid gap-2 sm:grid-cols-2">{[["0-15","Tot 15 m²"],["16-30","16 - 30 m²"],["31-50","31 - 50 m²"],["51-100","51 - 100 m²"],["101-200","101 - 200 m²"],["201-500","201 - 500 m²"],["500+","Meer dan 500 m²"]].map(([waarde,label])=><button key={waarde} type="button" onClick={()=>setGlasOppervlak(waarde)} className={`rounded-xl border px-4 py-3 text-left text-sm font-semibold transition ${glasOppervlak===waarde?"border-[#1683f8] bg-[#eaf6ff] text-[#0f66b6]":"border-[#cfe3f4] bg-white text-[#4f708f]"}`}>{label}</button>)}</div></div>}
+            {reiniging!=="buiten"&&<div><label className="text-sm font-extrabold text-[#123c70]">Hoeveel m² glas binnen?</label><div className="mt-3 grid gap-2 sm:grid-cols-2">{[["0-15","Tot 15 m²"],["16-30","16 - 30 m²"],["31-50","31 - 50 m²"],["51-100","51 - 100 m²"],["101-200","101 - 200 m²"],["201-500","201 - 500 m²"],["500+","Meer dan 500 m²"]].map(([waarde,label])=><button key={waarde} type="button" onClick={()=>setBinnenGlasOppervlak(waarde)} className={`rounded-xl border px-4 py-3 text-left text-sm font-semibold transition ${binnenGlasOppervlak===waarde?"border-[#1683f8] bg-[#eaf6ff] text-[#0f66b6]":"border-[#cfe3f4] bg-white text-[#4f708f]"}`}>{label}</button>)}</div><div className="mt-2 text-xs font-semibold text-[#537797]">De binnenzijde wordt apart berekend. Telescoopsteel telt alleen voor de buitenzijde.</div></div>}
+          </div>:<>
             {woning&&<div className="mt-6 border-b border-[#dcecf8] pb-5"><div className="text-sm font-extrabold text-[#123c70]">Type woning</div><div className="mt-3 flex flex-wrap gap-2">{[["Rijtjeshuis","Rijtjeshuis"],["Twee-onder-een-kap","Twee-onder-een-kap"],["Vrijstaande woning","Vrijstaande woning"],["Villa","Villa"]].map(([waarde,label])=><button key={waarde} type="button" onClick={()=>setWoningtype(waarde)} className={`rounded-xl border px-4 py-2.5 text-sm font-semibold transition ${woningtype===waarde?"border-[#1683f8] bg-[#eaf6ff] text-[#0f66b6]":"border-[#cfe3f4] bg-white text-[#5f7e9c]"}`}>{label}</button>)}</div></div>}
 
             {!telewash&&<div className="mt-5 border-b border-[#dcecf8] pb-5"><div className="text-sm font-extrabold text-[#123c70]">Welke zijde wil je laten reinigen?</div><div className="mt-3 grid gap-2 sm:grid-cols-3">{[["buiten","Alleen buiten"],["binnen-buiten","Binnen + buiten"],["binnen","Alleen binnen"]].map(([waarde,label])=><button key={waarde} type="button" onClick={()=>kiesReiniging(waarde as Reiniging)} className={`rounded-xl border px-4 py-3 text-left text-sm font-semibold transition ${reiniging===waarde?"border-[#1683f8] bg-[#eaf6ff] text-[#0f66b6]":"border-[#cfe3f4] bg-white text-[#5f7e9c]"}`}>{label}</button>)}</div>{alleenBinnen&&<div className="mt-2 text-xs font-semibold text-[#537797]">Bij alleen binnen geldt €15 starttoeslag. Hoogte en telescoopsteel tellen niet mee.</div>}</div>}
