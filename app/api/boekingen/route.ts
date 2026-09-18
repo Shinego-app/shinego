@@ -132,7 +132,9 @@ export async function POST(request: Request) {
     const telescoop = alleenBinnen ? false : telescoopVerplicht || klus.telescoop === true;
     const kozijnen = details.kozijnen === true;
 
+    const bedrijf = type === "bedrijf" || woningtype === "bedrijfspand";
     const glasOppervlak = tekst(klus.glasOppervlak, 20);
+    const binnenGlasOppervlak = tekst(klus.binnenGlasOppervlak, 20);
     const bedrijfsPrijzen: Record<string, [number, number]> = {
       "0-15": [49, 69],
       "16-30": [69, 99],
@@ -141,33 +143,45 @@ export async function POST(request: Request) {
       "101-200": [349, 469],
       "201-500": [749, 999],
     };
+    const zakelijkBuitenNodig = bedrijf && !alleenBinnen;
+    const zakelijkBinnenNodig = bedrijf && (binnenkant || alleenBinnen);
 
-    if (type === "bedrijf" || woningtype === "bedrijfspand") {
-      if (glasOppervlak === "500+") {
+    if (bedrijf) {
+      if (
+        (zakelijkBuitenNodig && glasOppervlak === "500+") ||
+        (zakelijkBinnenNodig && binnenGlasOppervlak === "500+")
+      ) {
         return NextResponse.json(
           { error: "Voor meer dan 500 m² is een offerte nodig." },
           { status: 400 }
         );
       }
-      if (!bedrijfsPrijzen[glasOppervlak]) {
-        return NextResponse.json({ error: "Ongeldige zakelijke glasoppervlakte." }, { status: 400 });
+      if (zakelijkBuitenNodig && !bedrijfsPrijzen[glasOppervlak]) {
+        return NextResponse.json({ error: "Ongeldige zakelijke glasoppervlakte buiten." }, { status: 400 });
+      }
+      if (zakelijkBinnenNodig && !bedrijfsPrijzen[binnenGlasOppervlak]) {
+        return NextResponse.json({ error: "Ongeldige zakelijke glasoppervlakte binnen." }, { status: 400 });
       }
     } else if (totaalRamen <= 0 || totaalRamen > 300) {
       return NextResponse.json({ error: "Ongeldig totaal aantal ramen." }, { status: 400 });
     }
 
-    const bedrijfsPrijs = bedrijfsPrijzen[glasOppervlak]
+    const bedrijfsBuitenPrijs = zakelijkBuitenNodig
       ? bedrijfsPrijzen[glasOppervlak][telescoop ? 1 : 0]
       : 0;
+    const bedrijfsBinnenPrijs = zakelijkBinnenNodig
+      ? bedrijfsPrijzen[binnenGlasOppervlak][0]
+      : 0;
+    const bedrijfsPrijs = bedrijfsBuitenPrijs + bedrijfsBinnenPrijs;
     const basisprijs =
-      type === "bedrijf" || woningtype === "bedrijfspand"
+      bedrijf
         ? bedrijfsPrijs
         : alleenBinnen
           ? 0
           : type === "telewash"
             ? 29.95
             : 19.95;
-    const prijsPerRaam = type === "bedrijf" || woningtype === "bedrijfspand" ? 0 : 3;
+    const prijsPerRaam = bedrijf ? 0 : 3;
     const ramenPrijs = alleenBinnen ? 0 : totaalRamen * prijsPerRaam;
     const binnenRamenPrijs = binnenkant || alleenBinnen ? totaalRamen * prijsPerRaam : 0;
     const alleenBinnenToeslag = alleenBinnen ? 15 : 0;
@@ -178,12 +192,22 @@ export async function POST(request: Request) {
       frequentie === "4weken" ? 0.12 : frequentie === "8weken" ? 0.1 : frequentie === "12weken" ? 0.07 : 0;
 
     const totaalVoorKorting =
-      type === "bedrijf" || woningtype === "bedrijfspand"
+      bedrijf
         ? bedrijfsPrijs
         : basisprijs + ramenPrijs + binnenRamenPrijs + alleenBinnenToeslag;
     const subtotaal = totaalVoorKorting + verdiepingToeslag + kozijnenToeslag;
     const kortingBedrag = subtotaal * kortingPercentage;
     const totaalprijs = geld(subtotaal - kortingBedrag);
+
+    const klantOpmerking = tekst(details.opmerking, 1000);
+    const zakelijkeOmschrijving = bedrijf
+      ? alleenBinnen
+        ? `Zakelijke reiniging: alleen binnen. Binnen: ${binnenGlasOppervlak} m².`
+        : binnenkant
+          ? `Zakelijke reiniging: binnen + buiten. Buiten: ${glasOppervlak} m². Binnen: ${binnenGlasOppervlak} m².`
+          : `Zakelijke reiniging: alleen buiten. Buiten: ${glasOppervlak} m².`
+      : "";
+    const opgeslagenOpmerking = [zakelijkeOmschrijving, klantOpmerking].filter(Boolean).join("\n");
 
     const verwachteTotaalprijs = Number(body.verwachteTotaalprijs);
     if (
@@ -213,11 +237,11 @@ export async function POST(request: Request) {
         verdiepingen,
         aantal_ramen: totaalRamen,
         telescoop,
-        glasbewassing_type: alleenBinnen ? "binnen" : type,
+        glasbewassing_type: bedrijf ? "bedrijf" : alleenBinnen ? "binnen" : type,
         frequentie,
         bereikbaar: tekst(details.bereikbaar, 30) || "ja",
         kozijnen,
-        opmerking: tekst(details.opmerking, 1000) || null,
+        opmerking: opgeslagenOpmerking || null,
         basisprijs: geld(basisprijs),
         ramen_prijs: geld(ramenPrijs),
         verdieping_toeslag: geld(verdiepingToeslag),
