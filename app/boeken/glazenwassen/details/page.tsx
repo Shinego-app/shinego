@@ -159,7 +159,7 @@ export default function DetailsPage() {
     };
     localStorage.setItem("shinegoGlazenwassen", JSON.stringify(bijgewerkt));
     localStorage.setItem("shinegoGlazenwassenDetails", JSON.stringify({ bereikbaar: "ja", kozijnen, opmerking: "" }));
-    if (bedrijf && (glasOppervlak === "500+" || binnenGlasOppervlak === "500+")) { window.location.href = "/contact?offerte=500plus"; return; }
+    if (bedrijf && ((!alleenBinnen && glasOppervlak === "500+") || (reiniging !== "buiten" && binnenGlasOppervlak === "500+"))) { window.location.href = "/contact?offerte=500plus"; return; }
     window.location.href = "/boeken/glazenwassen/prijs";
   }
 
