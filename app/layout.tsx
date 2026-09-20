@@ -22,9 +22,6 @@ export const metadata: Metadata = {
     "Boek eenvoudig een glazenwasser via ShineGo. Bekijk vooraf je prijs, kies een geschikt moment en betaal veilig online.",
   applicationName: "ShineGo",
   metadataBase: new URL("https://www.shinego.nl"),
-  alternates: {
-    canonical: "/",
-  },
   openGraph: {
     title: "ShineGo | Glazenwasser eenvoudig geregeld",
     description:
