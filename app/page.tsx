@@ -73,7 +73,7 @@ export default function Home() {
           <div className="grid gap-7 md:grid-cols-[1fr_auto] md:items-center">
             <div><div className="text-sm font-extrabold uppercase tracking-[.16em] text-[#1683f8]">Voor glazenwassers</div><h2 className="mt-2 text-2xl font-extrabold tracking-tight text-[#0b3d75] sm:text-3xl">Meer opdrachten. Jij bepaalt wanneer.</h2><p className="mt-3 max-w-2xl text-sm leading-6 text-[#6685a1] sm:text-base">Ontvang opdrachten in jouw regio en kies zelf welke opdrachten je aanneemt.</p><div className="mt-5 flex flex-wrap gap-3"><span className="rounded-full bg-white/90 px-4 py-2 text-sm font-bold text-[#315f88] shadow-sm">✓ Opdrachten in jouw regio</span><span className="rounded-full bg-white/90 px-4 py-2 text-sm font-bold text-[#315f88] shadow-sm">✓ Zelf kiezen</span><span className="rounded-full bg-white/90 px-4 py-2 text-sm font-bold text-[#315f88] shadow-sm">✓ Wekelijkse uitbetaling</span></div></div>
             <div className="flex flex-col gap-3">
-              <a href="/professional" className="rounded-2xl bg-[#1683f8] px-7 py-4 text-center text-sm font-extrabold text-white shadow-[0_12px_28px_rgba(22,131,248,.28)] transition hover:bg-[#0874df] sm:text-base">Aanmelden als glazenwasser →</a>
+              <a href="/glazenwasser-worden" className="rounded-2xl bg-[#1683f8] px-7 py-4 text-center text-sm font-extrabold text-white shadow-[0_12px_28px_rgba(22,131,248,.28)] transition hover:bg-[#0874df] sm:text-base">Aanmelden als glazenwasser →</a>
               <a href="/professional/veelgestelde-vragen" className="rounded-2xl border border-[#78b9ee] bg-white px-7 py-4 text-center text-sm font-extrabold text-[#1768b5] transition hover:bg-[#f7fbff] sm:text-base">Veelgestelde vragen voor glazenwassers</a>
             </div>
           </div>
@@ -115,7 +115,7 @@ export default function Home() {
             <div>
               <h3 className="text-sm font-extrabold uppercase tracking-[.12em] text-[#7fc1ff]">Voor professionals</h3>
               <div className="mt-4 space-y-3 text-sm font-semibold text-white/90">
-                <a href="/professional" className="block hover:text-[#7fc1ff]">Aanmelden als glazenwasser</a>
+                <a href="/glazenwasser-worden" className="block hover:text-[#7fc1ff]">Glazenwasser worden</a>
                 <a href="/professional/login" className="block hover:text-[#7fc1ff]">Inloggen professional</a>
                 <a href="/professional/veelgestelde-vragen" className="block hover:text-[#7fc1ff]">Veelgestelde vragen</a>
               </div>
