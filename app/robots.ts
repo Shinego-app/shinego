@@ -9,7 +9,6 @@ export default function robots(): MetadataRoute.Robots {
         "/admin/",
         "/api/",
         "/betalingen/",
-        "/boeken/",
         "/professional/dashboard/",
         "/professional/login/",
         "/professional/bevestigd/",
