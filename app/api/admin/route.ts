@@ -1,5 +1,17 @@
 import { NextResponse } from "next/server";
+import { Resend } from "resend";
 import { supabaseAdmin } from "../../../lib/supabaseAdmin";
+
+const resend = new Resend(process.env.RESEND_API_KEY!);
+
+function escapeHtml(value: unknown) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
 
 export async function GET() {
   try {
@@ -172,7 +184,7 @@ export async function PATCH(request: Request) {
 
     const { data: huidigeProfessional, error: professionalError } = await supabaseAdmin
       .from("professionals")
-      .select("id, user_id, kvk_nummer, btw_nummer, avb_verzekeraar, avb_polisnummer, avb_bevestigd")
+      .select("id, user_id, email, bedrijfsnaam, voornaam, actief, geverifieerd, kvk_nummer, btw_nummer, avb_verzekeraar, avb_polisnummer, avb_bevestigd")
       .eq("id", id)
       .single();
 
@@ -183,10 +195,12 @@ export async function PATCH(request: Request) {
     let avbVerzekeraar = huidigeProfessional.avb_verzekeraar || null;
     let avbPolisnummer = huidigeProfessional.avb_polisnummer || null;
     let avbBevestigd = huidigeProfessional.avb_bevestigd === true;
+    let authEmail: string | null = null;
 
     if (huidigeProfessional.user_id) {
       const { data: userData } = await supabaseAdmin.auth.admin.getUserById(huidigeProfessional.user_id);
       const metadata = userData?.user?.user_metadata ?? {};
+      authEmail = userData?.user?.email || null;
       avbVerzekeraar = avbVerzekeraar || metadata.avb_verzekeraar || null;
       avbPolisnummer = avbPolisnummer || metadata.avb_polisnummer || null;
       avbBevestigd = avbBevestigd || metadata.avb_bevestigd === true;
@@ -225,7 +239,52 @@ export async function PATCH(request: Request) {
       );
     }
 
-    return NextResponse.json({ professional: data });
+    const zojuistGeactiveerd =
+      geverifieerd === true &&
+      actief === true &&
+      (huidigeProfessional.geverifieerd !== true || huidigeProfessional.actief !== true);
+
+    let goedkeuringsmailVerzonden = false;
+    if (zojuistGeactiveerd) {
+      const ontvanger = huidigeProfessional.email || authEmail;
+
+      if (ontvanger) {
+        try {
+          const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.shinego.nl").replace(/\/$/, "");
+          const aanspreeknaam =
+            huidigeProfessional.voornaam || huidigeProfessional.bedrijfsnaam || "professional";
+
+          const { error: emailError } = await resend.emails.send({
+            from: "ShineGo <noreply@shinego.nl>",
+            to: ontvanger,
+            subject: "Je ShineGo-profiel is goedgekeurd en actief",
+            html: `
+              <p>Beste ${escapeHtml(aanspreeknaam)},</p>
+              <p>Goed nieuws: je ShineGo-profiel is gecontroleerd, goedgekeurd en nu actief.</p>
+              <p>Je kunt vanaf nu beschikbare opdrachten bekijken die passen bij je diensten en werkgebied.</p>
+              <p>Controleer in je dashboard ook je werkgebied, diensten en uitbetalingsinstellingen.</p>
+              <p><a href="${siteUrl}/professional/dashboard" style="display:inline-block;background:#2563eb;color:#ffffff;text-decoration:none;padding:12px 18px;border-radius:10px;font-weight:600;">Naar mijn dashboard</a></p>
+              <p>Met vriendelijke groet,<br />ShineGo</p>
+            `,
+          });
+
+          if (emailError) {
+            console.error("Goedkeuringsmail professional mislukt:", emailError);
+          } else {
+            goedkeuringsmailVerzonden = true;
+          }
+        } catch (emailError) {
+          console.error("Goedkeuringsmail professional fout:", emailError);
+        }
+      } else {
+        console.warn("Geen e-mailadres voor goedkeuringsmail professional:", huidigeProfessional.id);
+      }
+    }
+
+    return NextResponse.json({
+      professional: data,
+      goedkeuringsmail_verzonden: goedkeuringsmailVerzonden,
+    });
   } catch (error) {
     console.error("Admin PATCH fout:", error);
     return NextResponse.json({ error: "Er is een onverwachte fout opgetreden." }, { status: 500 });
