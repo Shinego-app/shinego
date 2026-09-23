@@ -237,7 +237,7 @@ export default function ProfessionalDashboardPage() {
               <p><strong>AVB:</strong> {professional?.avb_bevestigd ? "Aangegeven als actief" : "Nog niet aangegeven"}</p>
               <p><strong>Verzekeraar:</strong> {professional?.avb_verzekeraar || "Nog niet ingevuld"}</p>
               <p><strong>Polisnummer:</strong> {professional?.avb_polisnummer || "Nog niet ingevuld"}</p>
-              <p className="sm:col-span-2 text-xs text-gray-500">Je kunt je account zonder polisgegevens gebruiken. Voor je eerste opdracht moet ShineGo je AVB-gegevens wel kunnen controleren.</p>
+              <p className="sm:col-span-2 text-xs text-gray-500">AVB-gegevens zijn optioneel en blokkeren je account niet. Als zelfstandig ondernemer ben je zelf verantwoordelijk voor passende verzekeringen en voor schade die volgens de wet aan jouw handelen of nalaten kan worden toegerekend.</p>
             </div>
           ) : (
             <div className="mt-5 grid gap-4 sm:grid-cols-2">
@@ -258,7 +258,7 @@ export default function ProfessionalDashboardPage() {
                   />
                   <div>
                     <p className="font-semibold text-gray-900">Ik heb een actieve bedrijfsaansprakelijkheidsverzekering (AVB)</p>
-                    <p className="mt-1 text-xs text-gray-600">Je kunt deze gegevens later aanvullen. Ze moeten compleet zijn voordat ShineGo je vrijgeeft voor je eerste opdracht.</p>
+                    <p className="mt-1 text-xs text-gray-600">Deze gegevens zijn optioneel. ShineGo gebruikt het ontbreken van verzekeraar of polisnummer niet als blokkade voor activering.</p>
                   </div>
                 </div>
                 <div className="mt-4 grid gap-4 sm:grid-cols-2">
