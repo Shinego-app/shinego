@@ -39,7 +39,7 @@ const vragen = [
       "Je beoordeelt zelf of de weersomstandigheden een verantwoorde uitvoering toelaten. Als uitstel nodig is, stem je dit met de klant en ShineGo af zodat de afspraak opnieuw kan worden gepland.",
   },
   {
-    vraag: "Welke opdrachtinformatie krijg ik te zien?",
+    vraag: "Welke informatie zie ik bij een glazenwasser-opdracht?",
     antwoord:
       "Bij een toegewezen opdracht zie je onder andere de locatie, gewenste datum en tijd, woning- of pandtype, aantal ramen, verdiepingen, telescoopsteel, kozijnen, bereikbaarheid, frequentie en jouw vergoeding voor zover deze gegevens voor de boeking beschikbaar zijn.",
   },
@@ -59,12 +59,12 @@ const vragen = [
       "Ja. Via de opdracht kun je annuleren en een reden opgeven. De opdracht wordt daarna weer beschikbaar gemaakt voor een andere professional. Annuleer zo vroeg mogelijk wanneer je weet dat je de opdracht niet kunt uitvoeren.",
   },
   {
-    vraag: "Hoe werken periodieke opdrachten?",
+    vraag: "Hoe werken periodieke glazenwasser-opdrachten?",
     antwoord:
       "Klanten kunnen kiezen voor eenmalig of iedere 4, 8 of 12 weken. ShineGo probeert bij periodieke opdrachten waar mogelijk continuiteit te bieden, maar beschikbaarheid en planning blijven bepalend.",
   },
   {
-    vraag: "Hoeveel ontvangt de professional?",
+    vraag: "Hoeveel ontvangt een zzp-glazenwasser per opdracht?",
     antwoord:
       "Bij de standaard ShineGo-verdeling is 85% van het bedrag voor de professional en 15% platformcommissie voor ShineGo, tenzij voor een specifieke opdracht schriftelijk iets anders is afgesproken. Je ziet jouw vergoeding bij de opdracht.",
   },
@@ -108,8 +108,25 @@ const vragen = [
 export default function ProfessionalVeelgesteldeVragenPage() {
   const [openVraag, setOpenVraag] = useState<number | null>(null);
 
+  const faqStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: vragen.map((item) => ({
+      "@type": "Question",
+      name: item.vraag,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.antwoord,
+      },
+    })),
+  };
+
   return (
     <main className="min-h-screen bg-gray-50 px-4 py-8 sm:px-6">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqStructuredData) }}
+      />
       <div className="mx-auto w-full max-w-4xl">
         <a
           href="/professional/dashboard"
@@ -120,10 +137,19 @@ export default function ProfessionalVeelgesteldeVragenPage() {
 
         <section className="mt-5 rounded-3xl bg-white p-6 shadow-sm sm:p-8">
           <p className="text-sm font-bold uppercase tracking-wider text-blue-600">ShineGo professionals</p>
-          <h1 className="mt-2 text-3xl font-extrabold text-gray-900 sm:text-4xl">Veelgestelde vragen</h1>
+          <h1 className="mt-2 text-3xl font-extrabold text-gray-900 sm:text-4xl">Veelgestelde vragen voor zzp-glazenwassers</h1>
           <p className="mt-3 max-w-2xl leading-7 text-gray-600">
-            Praktische informatie over opdrachten, osmosewater, telescoopwerk, veiligheid, betalingen en werken via ShineGo.
+            Praktische informatie voor zelfstandige en zzp-glazenwassers over opdrachten, osmosewater, telescoopwerk, veiligheid, vergoedingen, uitbetalingen en werken via ShineGo.
           </p>
+
+          <div className="mt-6 flex flex-wrap gap-3">
+            <a href="/glazenwasser-worden" className="rounded-full border border-blue-200 bg-blue-50 px-4 py-2 text-sm font-bold text-blue-700">
+              ZZP glazenwasser opdrachten
+            </a>
+            <a href="/professional" className="rounded-full border border-gray-200 bg-white px-4 py-2 text-sm font-bold text-gray-700">
+              Aanmelden als glazenwasser
+            </a>
+          </div>
 
           <div className="mt-8 space-y-3">
             {vragen.map((item, index) => {
