@@ -1,3 +1,31 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Glazenwasser Boeken | Snel & Duidelijke Prijs | ShineGo",
+  description:
+    "Boek eenvoudig een professionele glazenwasser in jouw regio via ShineGo. Bekijk vooraf de prijs, kies je glasbewassing en plan een afspraak wanneer het jou uitkomt.",
+  keywords: [
+    "glazenwasser boeken",
+    "glazenwasser",
+    "ramen laten wassen",
+    "glazenwasser in de buurt",
+    "professionele glazenwasser",
+    "glasbewassing",
+  ],
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    title: "Glazenwasser Boeken | ShineGo",
+    description:
+      "Boek eenvoudig een professionele glazenwasser in jouw regio. Duidelijke prijs vooraf en snel geregeld via ShineGo.",
+    url: "https://www.shinego.nl/",
+    siteName: "ShineGo",
+    locale: "nl_NL",
+    type: "website",
+  },
+};
+
 export default function Home() {
   const diensten = [
     { icon: "🏠", titel: "Woning", tekst: "Van rijtjeshuis tot villa", href: "/boeken/glazenwassen/details?type=woning" },
@@ -8,6 +36,24 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#eaf6ff] to-[#f8fcff] text-[#123c70]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            name: "ShineGo",
+            url: "https://www.shinego.nl/",
+            description:
+              "Online platform voor het boeken van professionele glasbewassing en voor zelfstandige glazenwassers die opdrachten zoeken.",
+            areaServed: {
+              "@type": "Country",
+              name: "Nederland",
+            },
+          }),
+        }}
+      />
+
       <header className="border-b border-[#d7eaf8] bg-white/90 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-8">
           <a href="/" className="text-[29px] font-extrabold tracking-tight text-[#0d3f79]">Shine<span className="text-[#1683f8]">Go</span><span className="ml-1 text-[#1683f8]">✦</span></a>
@@ -23,8 +69,8 @@ export default function Home() {
         <div className="relative mx-auto max-w-[1480px] overflow-hidden rounded-[32px] border border-white bg-white shadow-[0_24px_70px_rgba(46,79,119,.14)]">
           <div className="grid lg:grid-cols-[1.2fr_1.2fr]">
             <div className="relative z-20 order-2 px-6 pb-10 pt-9 sm:px-10 sm:py-12 lg:order-1 lg:flex lg:min-h-[650px] lg:flex-col lg:justify-center lg:px-14">
-              <div className="inline-flex w-fit rounded-full bg-[#e7f4ff] px-4 py-2 text-xs font-bold text-[#1678d4] sm:text-sm">Professionele glazenwassers, wanneer jij het nodig hebt</div>
-              <h1 className="mt-5 max-w-2xl text-[44px] font-extrabold leading-[.96] tracking-[-.045em] text-[#112f58] sm:text-[68px]">Een glazenwasser,<br /><span className="text-[#1683f8]">zo geregeld.</span></h1>
+              <div className="inline-flex w-fit rounded-full bg-[#e7f4ff] px-4 py-2 text-xs font-bold text-[#1678d4] sm:text-sm">Glazenwasser boeken in jouw regio</div>
+              <h1 className="mt-5 max-w-2xl text-[44px] font-extrabold leading-[.96] tracking-[-.045em] text-[#112f58] sm:text-[68px]">Een glazenwasser boeken,<br /><span className="text-[#1683f8]">zo geregeld.</span></h1>
               <p className="mt-6 max-w-xl text-[16px] leading-7 text-[#607b98] sm:text-[20px] sm:leading-8">Boek eenvoudig en snel een professionele glazenwasser bij jou in de buurt. Vaste prijzen en betrouwbare vakmensen.</p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <a href="#diensten" className="rounded-xl bg-[#1683f8] px-8 py-4 text-center text-base font-extrabold text-white shadow-[0_10px_25px_rgba(22,131,248,.25)] transition hover:bg-[#0874df]">Direct boeken →</a>
