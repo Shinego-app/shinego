@@ -25,6 +25,7 @@ export default function BeschikbareOpdrachten() {
   const [zoeken, setZoeken] = useState("");
   const [afstand, setAfstand] = useState("25");
   const [werkgebiedKm, setWerkgebiedKm] = useState(25);
+  const [werkgebiedSelectie, setWerkgebiedSelectie] = useState("25");
   const [typeFilter, setTypeFilter] = useState("alle");
   const [diensten, setDiensten] = useState<string[]>(["glazenwasser"]);
   const [voorkeurBezig, setVoorkeurBezig] = useState(false);
@@ -61,6 +62,7 @@ export default function BeschikbareOpdrachten() {
     if (data.werkgebied_km) {
       const nieuwWerkgebied = Number(data.werkgebied_km);
       setWerkgebiedKm(nieuwWerkgebied);
+      setWerkgebiedSelectie(String(nieuwWerkgebied));
       setAfstand(String(nieuwWerkgebied));
     }
     if (Array.isArray(data.diensten)) setDiensten(data.diensten);
@@ -91,7 +93,7 @@ export default function BeschikbareOpdrachten() {
       return;
     }
 
-    const meldingsAfstand = Number(afstand);
+    const meldingsAfstand = Number(werkgebiedSelectie);
     const response = await fetch("/api/professional-voorkeuren", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
@@ -106,7 +108,11 @@ export default function BeschikbareOpdrachten() {
     }
 
     setDiensten(data.professional?.diensten || diensten);
-    setVoorkeurMelding("Diensten en meldingsafstand opgeslagen.");
+    const opgeslagenWerkgebied = Number(data.professional?.werkgebied_km || meldingsAfstand);
+    setWerkgebiedKm(opgeslagenWerkgebied);
+    setWerkgebiedSelectie(String(opgeslagenWerkgebied));
+    setAfstand(String(opgeslagenWerkgebied));
+    setVoorkeurMelding("Diensten en werkgebied opgeslagen.");
     await ladenOpdrachten();
   }
 
@@ -183,7 +189,7 @@ export default function BeschikbareOpdrachten() {
           <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-200 bg-white p-3"><input type="checkbox" checked={diensten.includes("binnen")} onChange={(e) => wisselDienst("binnen", e.target.checked)} className="h-5 w-5" /><span className="text-sm font-semibold text-gray-800">Binnenramen</span></label>
         </div>
         <div className="mt-4">
-          <label className="block max-w-xs"><span className="mb-1 block text-xs font-bold uppercase tracking-wide text-gray-700">Werkgebied</span><select value={afstand} onChange={(e) => setAfstand(e.target.value)} className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900"><option value="10">10 km</option><option value="15">15 km</option><option value="25">25 km</option><option value="35">35 km</option><option value="50">50 km</option><option value="75">75 km</option><option value="100">100 km</option></select></label>
+          <label className="block max-w-xs"><span className="mb-1 block text-xs font-bold uppercase tracking-wide text-gray-700">Werkgebied</span><select value={werkgebiedSelectie} onChange={(e) => setWerkgebiedSelectie(e.target.value)} className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900"><option value="10">10 km</option><option value="15">15 km</option><option value="25">25 km</option><option value="35">35 km</option><option value="50">50 km</option><option value="75">75 km</option><option value="100">100 km</option></select><span className="mt-1 block text-xs text-gray-500">Dit is de maximale afstand waarop je opdrachten kunt zien en aannemen.</span></label>
           <div className="mt-4 flex justify-end">
             <button type="button" onClick={voorkeurenOpslaan} disabled={voorkeurBezig} className="w-full rounded-xl bg-gray-900 px-5 py-3 text-sm font-bold text-white disabled:opacity-50 sm:w-auto">{voorkeurBezig ? "Opslaan..." : "Voorkeuren opslaan"}</button>
           </div>
