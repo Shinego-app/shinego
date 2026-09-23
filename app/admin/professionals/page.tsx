@@ -19,6 +19,7 @@ type Professional = {
   avb_bevestigd?: boolean;
   actief?: boolean;
   geverifieerd?: boolean;
+  werkgebied_km?: number;
 };
 
 export default function ProfessionalsBeheerPage() {
@@ -141,6 +142,7 @@ export default function ProfessionalsBeheerPage() {
                         <div className="mt-1 text-xs text-gray-500">{professional.email || "-"}</div>
                         <div className="text-xs text-gray-500">{professional.telefoon || "-"}</div>
                         <div className="text-xs text-gray-500">{professional.postcode || "-"} {professional.woonplaats || ""}</div>
+                        <div className="mt-1 text-xs font-semibold text-blue-700">Werkgebied: {professional.werkgebied_km || 25} km</div>
                       </td>
                       <td className="px-5 py-4 text-gray-700">
                         <div><span className="font-semibold">KVK:</span> {professional.kvk_nummer || "Ontbreekt"}</div>
