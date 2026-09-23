@@ -153,6 +153,7 @@ export default function Home() {
               <div className="mt-4 space-y-3 text-sm font-semibold text-white/90">
                 <a href="/glazenwasser-woning" className="block hover:text-[#7fc1ff]">Glazenwasser woning</a>
                 <a href="/glazenwasser-appartement" className="block hover:text-[#7fc1ff]">Glazenwasser appartement</a>
+                <a href="/glazenwasser-appartementencomplex-vve" className="block hover:text-[#7fc1ff]">Glasbewassing appartementencomplex / VvE</a>
                 <a href="/glazenwasser-bedrijf" className="block hover:text-[#7fc1ff]">Glazenwasser bedrijfspand</a>
                 <a href="/telescoopsteel-glazenwasser" className="block hover:text-[#7fc1ff]">Glas wassen met telescoopsteel</a>
                 <a href="/privacy" className="block hover:text-[#7fc1ff]">Privacybeleid</a>
