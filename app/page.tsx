@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Glazenwasser Boeken | Snel & Duidelijke Prijs | ShineGo",
+  title: "Glazenwasser Boeken | Snel & Duidelijke Prijs",
   description:
     "Boek eenvoudig een professionele glazenwasser in jouw regio via ShineGo. Bekijk vooraf de prijs, kies je glasbewassing en plan een afspraak wanneer het jou uitkomt.",
   keywords: [
@@ -31,7 +31,7 @@ export default function Home() {
     { icon: "🏠", titel: "Woning", tekst: "Van rijtjeshuis tot villa", href: "/boeken/glazenwassen/details?type=woning" },
     { icon: "🏢", titel: "Appartement / flat", tekst: "Snel en vakkundig", href: "/boeken/glazenwassen/details?type=appartement" },
     { icon: "🏬", titel: "Winkel / bedrijfspand", tekst: "Een verzorgde uitstraling", href: "/boeken/glazenwassen/details?type=bedrijf" },
-    { icon: "🏙️", titel: "Telewash – hoog & groot glas", tekst: "Met telescoopsteel voor hoge en grote glaspartijen", href: "/boeken/glazenwassen/details?type=telewash" },
+    { icon: "🏙️", titel: "Telescoopsteel – hoog & groot glas", tekst: "Voor hoge en grote glaspartijen", href: "/boeken/glazenwassen/details?type=telewash" },
   ];
 
   return (
@@ -151,6 +151,10 @@ export default function Home() {
             <div>
               <h3 className="text-sm font-extrabold uppercase tracking-[.12em] text-[#7fc1ff]">Voor klanten</h3>
               <div className="mt-4 space-y-3 text-sm font-semibold text-white/90">
+                <a href="/glazenwasser-woning" className="block hover:text-[#7fc1ff]">Glazenwasser woning</a>
+                <a href="/glazenwasser-appartement" className="block hover:text-[#7fc1ff]">Glazenwasser appartement</a>
+                <a href="/glazenwasser-bedrijf" className="block hover:text-[#7fc1ff]">Glazenwasser bedrijfspand</a>
+                <a href="/telescoopsteel-glazenwasser" className="block hover:text-[#7fc1ff]">Glas wassen met telescoopsteel</a>
                 <a href="/privacy" className="block hover:text-[#7fc1ff]">Privacybeleid</a>
                 <a href="/voorwaarden" className="block hover:text-[#7fc1ff]">Algemene voorwaarden</a>
                 <a href="/cookies" className="block hover:text-[#7fc1ff]">Cookiebeleid</a>
