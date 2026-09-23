@@ -49,16 +49,13 @@ export default function ProfessionalsBeheerPage() {
   function controleCompleet(professional: Professional) {
     return Boolean(
       professional.kvk_nummer &&
-      professional.btw_nummer &&
-      professional.avb_verzekeraar &&
-      professional.avb_polisnummer &&
-      professional.avb_bevestigd
+      professional.btw_nummer
     );
   }
 
   async function statusBijwerken(professional: Professional, geverifieerd: boolean, actief: boolean) {
     if (geverifieerd && actief && !controleCompleet(professional)) {
-      setFout("Goedkeuren kan pas nadat KVK, btw en AVB-gegevens compleet zijn.");
+      setFout("Goedkeuren kan pas nadat KVK- en btw-gegevens compleet zijn.");
       return;
     }
 
@@ -110,7 +107,7 @@ export default function ProfessionalsBeheerPage() {
           <div>
             <div className="text-sm font-semibold text-blue-600">ShineGo beheer</div>
             <h1 className="mt-1 text-3xl font-bold text-gray-900">Professionals beheren</h1>
-            <p className="mt-2 text-sm text-gray-600">Controleer KVK, btw en aansprakelijkheidsverzekering voordat je een professional activeert.</p>
+            <p className="mt-2 text-sm text-gray-600">Controleer KVK en btw voordat je een professional activeert. AVB-gegevens zijn optioneel en blokkeren activering niet.</p>
           </div>
           <a href="/admin" className="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50">← Terug naar boekingen</a>
         </div>
@@ -152,7 +149,7 @@ export default function ProfessionalsBeheerPage() {
                       <td className="px-5 py-4 text-gray-700">
                         <div><span className="font-semibold">Verzekeraar:</span> {professional.avb_verzekeraar || "Ontbreekt"}</div>
                         <div className="mt-1"><span className="font-semibold">Polis:</span> {professional.avb_polisnummer || "Ontbreekt"}</div>
-                        <div className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${professional.avb_bevestigd ? "bg-green-50 text-green-700" : "bg-red-50 text-red-700"}`}>{professional.avb_bevestigd ? "AVB verklaard actief" : "AVB niet bevestigd"}</div>
+                        <div className={`mt-2 inline-flex rounded-full px-2.5 py-1 text-xs font-semibold ${professional.avb_bevestigd ? "bg-green-50 text-green-700" : "bg-gray-100 text-gray-600"}`}>{professional.avb_bevestigd ? "AVB door professional aangegeven" : "AVB niet opgegeven"}</div>
                       </td>
                       <td className="px-5 py-4">
                         <div className="flex flex-col items-start gap-2">
