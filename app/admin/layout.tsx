@@ -17,6 +17,12 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           >
             Professionals beheren
           </a>
+          <a
+            href="/api/admin-auth/logout"
+            className="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50"
+          >
+            Uitloggen
+          </a>
         </div>
       </div>
       {children}
