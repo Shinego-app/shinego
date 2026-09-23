@@ -23,20 +23,9 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  let body: { password?: string };
-  try {
-    body = await request.json();
-  } catch {
-    return NextResponse.json({ error: "Ongeldige aanvraag." }, { status: 400 });
-  }
-
-  if (!body.password || body.password !== adminPassword) {
-    return NextResponse.json(
-      { error: "Het adminwachtwoord is onjuist." },
-      { status: 401 }
-    );
-  }
-
+  // ADMIN_PASSWORD wordt uitsluitend server-side gebruikt om de tijdelijke
+  // codes en sessiecookies cryptografisch te ondertekenen. De beheerder
+  // hoeft dit geheim niet te kennen of in te voeren.
   const adminEmail = (process.env.ADMIN_LOGIN_EMAIL || "info@shinego.nl")
     .trim()
     .toLowerCase();
@@ -62,7 +51,7 @@ export async function POST(request: NextRequest) {
       <p>Je eenmalige inlogcode is:</p>
       <p style="font-size:30px;font-weight:800;letter-spacing:6px;margin:20px 0;">${code}</p>
       <p>Deze code is 10 minuten geldig.</p>
-      <p>Heb je dit niet zelf aangevraagd? Deel de code dan niet en wijzig het adminwachtwoord.</p>
+      <p>Heb je dit niet zelf aangevraagd? Deel deze code dan niet. Zonder toegang tot deze mailbox kan niemand de beheeromgeving openen.</p>
     `,
   });
 
