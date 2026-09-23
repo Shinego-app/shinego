@@ -3,6 +3,7 @@ type LandingProps = {
   title: string;
   intro: string;
   ctaHref: string;
+  ctaLabel?: string;
   bullets: string[];
   uitleg: string;
 };
@@ -12,6 +13,7 @@ export default function ServiceLandingPage({
   title,
   intro,
   ctaHref,
+  ctaLabel = "Prijs berekenen & boeken →",
   bullets,
   uitleg,
 }: LandingProps) {
@@ -46,7 +48,7 @@ export default function ServiceLandingPage({
                 href={ctaHref}
                 className="rounded-xl bg-[#1683f8] px-8 py-4 text-center text-base font-extrabold text-white shadow-[0_10px_25px_rgba(22,131,248,.25)] transition hover:bg-[#0874df]"
               >
-                Prijs berekenen & boeken →
+                {ctaLabel}
               </a>
               <a
                 href="/prijzen"
