@@ -43,7 +43,7 @@ export default function ProfessionalPage() {
     }
 
     if (heeftAvb === null) {
-      setMelding("Geef aan of je een bedrijfsaansprakelijkheidsverzekering hebt.");
+      setMelding("Geef aan of je momenteel een bedrijfsaansprakelijkheidsverzekering hebt.");
       return;
     }
 
@@ -190,7 +190,7 @@ export default function ProfessionalPage() {
 
             <section className="border-t pt-7">
               <h3 className="mb-2 text-lg font-bold text-gray-900">Bedrijfsaansprakelijkheidsverzekering</h3>
-              <p className="mb-4 text-sm text-gray-600">Voor aanmelden hoef je geen polisgegevens of document te uploaden. Geef alleen aan of je nu een AVB hebt. Heb je die nog niet, dan kun je dit later vanuit je dashboard aanvullen voordat je je eerste opdracht aanneemt.</p>
+              <p className="mb-4 text-sm text-gray-600">Een AVB is geen voorwaarde om je ShineGo-profiel te activeren. Geef alleen aan of je er momenteel een hebt. Eventuele verzekeringsgegevens kun je later vrijwillig in je dashboard aanvullen.</p>
               <div className="grid gap-3 sm:grid-cols-2">
                 <label className={`flex cursor-pointer items-center gap-3 rounded-xl border p-4 ${heeftAvb === true ? "border-blue-500 bg-blue-50" : "border-gray-200 bg-white"}`}>
                   <input type="radio" name="avb" checked={heeftAvb === true} onChange={() => setHeeftAvb(true)} className="h-5 w-5 accent-blue-600" />
@@ -243,7 +243,7 @@ export default function ProfessionalPage() {
                 onChange={(e) => setVoorwaarden(e.target.checked)}
                 className="mt-0.5 h-6 w-6 shrink-0 cursor-pointer accent-blue-600"
               />
-              <span className="text-sm leading-6 text-gray-700">Ik verklaar dat mijn gegevens correct zijn, dat ShineGo mijn KVK-, btw- en eventuele verzekeringsgegevens handmatig mag controleren en ik accepteer de <a href="/professional/voorwaarden" target="_blank" rel="noreferrer" className="font-semibold text-blue-600 underline">voorwaarden voor professionals</a>.</span>
+              <span className="text-sm leading-6 text-gray-700">Ik verklaar dat mijn gegevens correct zijn, accepteer de <a href="/professional/voorwaarden" target="_blank" rel="noreferrer" className="font-semibold text-blue-600 underline">voorwaarden voor professionals</a> en begrijp dat ik als zelfstandig ondernemer zelf verantwoordelijk ben voor mijn verzekeringen, mijn werkwijze en schade die volgens de wet aan mijn handelen of nalaten kan worden toegerekend.</span>
             </label>
 
             {melding && <div className="rounded-xl bg-red-50 p-4 text-sm font-medium text-red-700">{melding}</div>}
@@ -252,7 +252,7 @@ export default function ProfessionalPage() {
           </div>
         </form>
 
-        <p className="mt-6 text-center text-sm text-gray-500">Aanmelden kan zonder polisgegevens. Voordat je je eerste opdracht kunt aannemen, moeten je bedrijfsgegevens en AVB-controle compleet zijn.</p>
+        <p className="mt-6 text-center text-sm text-gray-500">Aanmelden en activeren kan zonder polisgegevens. ShineGo controleert KVK- en btw-gegevens; de professional blijft zelf verantwoordelijk voor passende verzekeringen en de uitvoering van opdrachten.</p>
       </section>
     </main>
   );
