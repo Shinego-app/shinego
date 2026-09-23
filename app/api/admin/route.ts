@@ -195,13 +195,10 @@ export async function PATCH(request: Request) {
     if (geverifieerd === true && actief === true) {
       if (
         !huidigeProfessional.kvk_nummer ||
-        !huidigeProfessional.btw_nummer ||
-        !avbVerzekeraar ||
-        !avbPolisnummer ||
-        !avbBevestigd
+        !huidigeProfessional.btw_nummer
       ) {
         return NextResponse.json(
-          { error: "Goedkeuren kan pas nadat KVK, btw en AVB-gegevens compleet zijn." },
+          { error: "Goedkeuren kan pas nadat KVK- en btw-gegevens compleet zijn." },
           { status: 400 }
         );
       }
