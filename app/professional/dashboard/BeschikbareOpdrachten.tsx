@@ -24,6 +24,7 @@ export default function BeschikbareOpdrachten() {
   const [bezigId, setBezigId] = useState<string | number | null>(null);
   const [zoeken, setZoeken] = useState("");
   const [afstand, setAfstand] = useState("25");
+  const [werkgebiedKm, setWerkgebiedKm] = useState(25);
   const [typeFilter, setTypeFilter] = useState("alle");
   const [diensten, setDiensten] = useState<string[]>(["glazenwasser"]);
   const [voorkeurBezig, setVoorkeurBezig] = useState(false);
@@ -57,7 +58,11 @@ export default function BeschikbareOpdrachten() {
     }
 
     setOpdrachten(data.opdrachten || []);
-    if (data.werkgebied_km) setAfstand(String(data.werkgebied_km));
+    if (data.werkgebied_km) {
+      const nieuwWerkgebied = Number(data.werkgebied_km);
+      setWerkgebiedKm(nieuwWerkgebied);
+      setAfstand(String(nieuwWerkgebied));
+    }
     if (Array.isArray(data.diensten)) setDiensten(data.diensten);
     if (data.melding) setMelding(data.melding);
   }
@@ -86,7 +91,7 @@ export default function BeschikbareOpdrachten() {
       return;
     }
 
-    const meldingsAfstand = afstand === "all" ? 100 : Number(afstand);
+    const meldingsAfstand = Number(afstand);
     const response = await fetch("/api/professional-voorkeuren", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
@@ -107,7 +112,7 @@ export default function BeschikbareOpdrachten() {
 
   const zichtbareOpdrachten = useMemo(() => {
     const zoekterm = zoeken.trim().toLowerCase();
-    const maxAfstand = afstand === "all" ? null : Number(afstand);
+    const maxAfstand = Number(afstand);
 
     return opdrachten.filter((opdracht) => {
       const matchZoeken =
@@ -116,8 +121,7 @@ export default function BeschikbareOpdrachten() {
         String(opdracht.postcode || "").replace(/\s/g, "").toLowerCase().includes(zoekterm.replace(/\s/g, ""));
 
       const matchAfstand =
-        maxAfstand == null ||
-        (opdracht.afstand_km != null && Number(opdracht.afstand_km) <= maxAfstand);
+        opdracht.afstand_km != null && Number(opdracht.afstand_km) <= maxAfstand;
 
       const matchType = typeFilter === "alle" || opdracht.vereiste_dienst === typeFilter;
 
@@ -162,7 +166,7 @@ export default function BeschikbareOpdrachten() {
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-xl font-bold text-gray-900">Beschikbare opdrachten</h2>
-          <p className="mt-1 text-sm text-gray-600">Bekijk open betaalde opdrachten en bepaal zelf hoe ver je wilt zoeken. Klantgegevens blijven verborgen tot je een opdracht aanneemt.</p>
+          <p className="mt-1 text-sm text-gray-600">Bekijk open betaalde opdrachten binnen jouw ingestelde werkgebied. Klantgegevens blijven verborgen tot je een opdracht aanneemt.</p>
         </div>
         <button type="button" onClick={ladenOpdrachten} disabled={laden} className="rounded-xl border border-blue-200 bg-white px-4 py-2 text-sm font-semibold text-blue-700 disabled:opacity-50">
           {laden ? "Laden..." : "Vernieuwen"}
@@ -179,7 +183,7 @@ export default function BeschikbareOpdrachten() {
           <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-gray-200 bg-white p-3"><input type="checkbox" checked={diensten.includes("binnen")} onChange={(e) => wisselDienst("binnen", e.target.checked)} className="h-5 w-5" /><span className="text-sm font-semibold text-gray-800">Binnenramen</span></label>
         </div>
         <div className="mt-4">
-          <label className="block max-w-xs"><span className="mb-1 block text-xs font-bold uppercase tracking-wide text-gray-700">Voorkeursafstand meldingen</span><select value={afstand === "all" ? "100" : afstand} onChange={(e) => setAfstand(e.target.value)} className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900"><option value="10">10 km</option><option value="15">15 km</option><option value="25">25 km</option><option value="35">35 km</option><option value="50">50 km</option><option value="75">75 km</option><option value="100">100 km</option></select></label>
+          <label className="block max-w-xs"><span className="mb-1 block text-xs font-bold uppercase tracking-wide text-gray-700">Werkgebied</span><select value={afstand} onChange={(e) => setAfstand(e.target.value)} className="w-full rounded-xl border border-gray-300 bg-white px-3 py-2.5 text-sm text-gray-900"><option value="10">10 km</option><option value="15">15 km</option><option value="25">25 km</option><option value="35">35 km</option><option value="50">50 km</option><option value="75">75 km</option><option value="100">100 km</option></select></label>
           <div className="mt-4 flex justify-end">
             <button type="button" onClick={voorkeurenOpslaan} disabled={voorkeurBezig} className="w-full rounded-xl bg-gray-900 px-5 py-3 text-sm font-bold text-white disabled:opacity-50 sm:w-auto">{voorkeurBezig ? "Opslaan..." : "Voorkeuren opslaan"}</button>
           </div>
@@ -195,7 +199,9 @@ export default function BeschikbareOpdrachten() {
         <label className="block">
           <span className="mb-1 block text-xs font-bold uppercase tracking-wide text-blue-800">Zoekafstand</span>
           <select value={afstand} onChange={(e) => setAfstand(e.target.value)} className="w-full rounded-xl border border-blue-100 bg-white px-3 py-2.5 text-sm text-gray-900 outline-none focus:border-blue-400">
-            <option value="10">Tot 10 km</option><option value="15">Tot 15 km</option><option value="25">Tot 25 km</option><option value="35">Tot 35 km</option><option value="50">Tot 50 km</option><option value="75">Tot 75 km</option><option value="100">Tot 100 km</option><option value="all">Heel Nederland</option>
+            {[10, 15, 25, 35, 50, 75, 100].filter((km) => km <= werkgebiedKm).map((km) => (
+              <option key={km} value={String(km)}>Tot {km} km</option>
+            ))}
           </select>
         </label>
         <label className="block">
@@ -207,7 +213,7 @@ export default function BeschikbareOpdrachten() {
       </div>
 
       {melding && <div className="mt-4 rounded-xl bg-amber-50 p-3 text-sm font-medium text-amber-800">{melding}</div>}
-      {!laden && zichtbareOpdrachten.length === 0 && !melding && <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">Geen opdrachten gevonden met deze filters. Vergroot de afstand of kies <strong>Heel Nederland</strong> om verder te kijken.</div>}
+      {!laden && zichtbareOpdrachten.length === 0 && !melding && <div className="mt-4 rounded-xl border border-gray-200 bg-gray-50 p-4 text-sm text-gray-600">Geen opdrachten gevonden met deze filters binnen jouw werkgebied van <strong>{werkgebiedKm} km</strong>.</div>}
 
       <div className="mt-4 grid gap-4">
         {zichtbareOpdrachten.map((opdracht) => (
