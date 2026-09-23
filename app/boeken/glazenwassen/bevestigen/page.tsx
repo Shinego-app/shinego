@@ -18,6 +18,7 @@ export default function BevestigenPage() {
   const [akkoordStartBedenktijd, setAkkoordStartBedenktijd] = useState(false);
   const [bezig, setBezig] = useState(false);
   const [fout, setFout] = useState("");
+  const [regioNietBeschikbaar, setRegioNietBeschikbaar] = useState(false);
 
   useEffect(() => {
     try {
@@ -37,7 +38,7 @@ export default function BevestigenPage() {
     if (!klant.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(klant.email.trim())) { setFout("Vul een geldig e-mailadres in."); return; }
     if (!akkoordVoorwaarden) { setFout("Ga akkoord met de algemene voorwaarden en het annuleringsbeleid."); return; }
     if (!akkoordStartBedenktijd) { setFout("Geef toestemming voor start binnen de wettelijke bedenktijd indien nodig."); return; }
-    setBezig(true); setFout("");
+    setBezig(true); setFout(""); setRegioNietBeschikbaar(false);
     try {
       const boekingResponse = await fetch("/api/boekingen", {
         method: "POST",
@@ -52,7 +53,12 @@ export default function BevestigenPage() {
         }),
       });
       const boekingData = await boekingResponse.json();
-      if (!boekingResponse.ok) throw new Error(boekingData?.error || "Boeking kon niet worden opgeslagen.");
+      if (!boekingResponse.ok) {
+        if (boekingData?.code === "REGIO_NOG_NIET_BESCHIKBAAR") {
+          setRegioNietBeschikbaar(true);
+        }
+        throw new Error(boekingData?.error || "Boeking kon niet worden opgeslagen.");
+      }
 
       const bookingId = boekingData?.booking?.id;
       const checkoutToken = boekingData?.checkout_token;
@@ -105,7 +111,20 @@ export default function BevestigenPage() {
           </div>
           <div className="mt-5 flex items-center justify-between rounded-2xl bg-[#eaf6ff] px-5 py-4"><div><span className="text-xs font-bold uppercase tracking-wider text-[#537797]">Totaalprijs</span><div className="mt-1 text-sm font-semibold text-[#4f708f]">{soort}</div></div><strong className="text-3xl font-extrabold text-[#0b3d75]">€ {prijs.totaal.toFixed(2).replace(".", ",")}</strong></div>
           <div className="mt-5 space-y-3"><label className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 ${akkoordVoorwaarden?"border-[#1683f8] bg-[#eef8ff]":"border-[#d5e9f8] bg-white"}`}><input type="checkbox" checked={akkoordVoorwaarden} onChange={(e)=>setAkkoordVoorwaarden(e.target.checked)} className="mt-1" /><span className="text-xs leading-5 text-[#5f7e9c]">Ik ga akkoord met de <a href="/voorwaarden" target="_blank" className="font-bold text-[#1683f8] underline">algemene voorwaarden</a> en het annuleringsbeleid.</span></label><label className={`flex cursor-pointer items-start gap-3 rounded-xl border p-4 ${akkoordStartBedenktijd?"border-[#1683f8] bg-[#eef8ff]":"border-[#d5e9f8] bg-white"}`}><input type="checkbox" checked={akkoordStartBedenktijd} onChange={(e)=>setAkkoordStartBedenktijd(e.target.checked)} className="mt-1" /><span className="text-xs leading-5 text-[#5f7e9c]">Ik verzoek ShineGo om de dienstverlening, indien nodig, binnen de wettelijke bedenktijd te laten starten.</span></label></div>
-          {fout && <div className="mt-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{fout}</div>}
+          {fout && (
+            regioNietBeschikbaar ? (
+              <div className="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">
+                <strong>Nog niet actief in jouw regio.</strong>
+                <p className="mt-1">{fout}</p>
+                <p className="mt-2">
+                  Wil je dat we je regio meenemen bij de uitbreiding? Neem dan contact op via{" "}
+                  <a href="mailto:info@shinego.nl" className="font-bold underline">info@shinego.nl</a>.
+                </p>
+              </div>
+            ) : (
+              <div className="mt-5 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{fout}</div>
+            )
+          )}
         </>}
         <div className="mt-6 flex items-center justify-between border-t border-[#dcecf8] pt-4"><a href="/boeken/glazenwassen/gegevens" className="px-2 py-3 text-sm font-bold text-[#537797]">← Terug</a><button type="button" onClick={bevestigBoeking} disabled={bezig || !klus || !details || !prijs || !klant} className={`min-w-48 rounded-xl px-7 py-3.5 text-sm font-extrabold text-white ${bezig?"cursor-not-allowed bg-[#bfd3e5]":"bg-[#1683f8] shadow-[0_8px_20px_rgba(22,131,248,.24)]"}`}>{bezig?"Betaling starten...":"Boeken en betalen →"}</button></div>
       </section>
