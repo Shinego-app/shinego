@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { maakCheckoutToken } from "@/lib/checkoutToken";
+import { heeftBenodigdeDienst, ligtBinnenWerkgebied } from "@/lib/opdrachtMatching";
 
 function record(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value)
@@ -216,6 +217,68 @@ export async function POST(request: Request) {
     ) {
       return NextResponse.json(
         { error: "De prijs is gewijzigd. Ga terug naar de prijspagina en controleer de boeking opnieuw." },
+        { status: 409 }
+      );
+    }
+
+    const matchingBoeking = {
+      postcode,
+      huisnummer,
+      woningtype,
+      telescoop,
+      glasbewassing_type: bedrijf ? "bedrijf" : alleenBinnen ? "binnen" : type,
+    };
+
+    const { data: actieveProfessionals, error: professionalsError } = await supabaseAdmin
+      .from("professionals")
+      .select("id, postcode, huisnummer, werkgebied_km, diensten, actief, geverifieerd")
+      .eq("actief", true)
+      .eq("geverifieerd", true);
+
+    if (professionalsError) {
+      console.error("Beschikbaarheid professionals controleren mislukt:", professionalsError);
+      return NextResponse.json(
+        {
+          code: "BESCHIKBAARHEID_CONTROLE_MISLUKT",
+          error: "De beschikbaarheid kon tijdelijk niet worden gecontroleerd. Probeer het later opnieuw.",
+        },
+        { status: 503 }
+      );
+    }
+
+    const professionalsMetJuisteDienst = (actieveProfessionals || []).filter((professional) =>
+      heeftBenodigdeDienst(professional, matchingBoeking)
+    );
+
+    const dekking = await Promise.all(
+      professionalsMetJuisteDienst.map(async (professional) => ({
+        professional_id: professional.id,
+        ...(await ligtBinnenWerkgebied(professional, matchingBoeking)),
+      }))
+    );
+
+    const heeftDekking = dekking.some((resultaat) => resultaat.binnen === true);
+    if (!heeftDekking) {
+      const afstandKonWordenBepaald =
+        professionalsMetJuisteDienst.length === 0 ||
+        dekking.some((resultaat) => resultaat.afstand_km != null);
+
+      if (!afstandKonWordenBepaald) {
+        return NextResponse.json(
+          {
+            code: "BESCHIKBAARHEID_CONTROLE_MISLUKT",
+            error: "De beschikbaarheid kon tijdelijk niet worden gecontroleerd. Probeer het later opnieuw.",
+          },
+          { status: 503 }
+        );
+      }
+
+      return NextResponse.json(
+        {
+          code: "REGIO_NOG_NIET_BESCHIKBAAR",
+          error:
+            "We zijn voor deze opdracht nog niet actief in jouw regio. Je wordt niet naar betaling doorgestuurd.",
+        },
         { status: 409 }
       );
     }
