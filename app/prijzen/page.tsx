@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Glazenwasser Kosten & Prijzen | ShineGo",
+  title: "Glazenwasser Kosten & Prijzen",
   description:
     "Bekijk hoe de prijs voor glazenwassen wordt berekend. Lees meer over woningtype, aantal ramen, verdiepingen, kozijnen, telescoopsteel en periodieke korting bij ShineGo.",
   keywords: [
