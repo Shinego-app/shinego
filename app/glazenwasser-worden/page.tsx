@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "ZZP Glazenwasser Opdrachten | Meer Werk via ShineGo",
+  title: "ZZP Glazenwasser Opdrachten | Meer Werk",
   description:
     "Ben je zzp-glazenwasser? Ontvang glazenwasopdrachten in jouw regio, kies zelf welke opdrachten je aanneemt en vul je agenda via ShineGo.",
   keywords: [
