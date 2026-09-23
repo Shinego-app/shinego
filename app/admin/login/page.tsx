@@ -3,14 +3,12 @@
 import { FormEvent, useState } from "react";
 
 export default function AdminLoginPage() {
-  const [stap, setStap] = useState<"password" | "code">("password");
-  const [password, setPassword] = useState("");
+  const [stap, setStap] = useState<"request" | "code">("request");
   const [code, setCode] = useState("");
   const [bezig, setBezig] = useState(false);
   const [melding, setMelding] = useState("");
 
-  async function verstuurCode(event: FormEvent) {
-    event.preventDefault();
+  async function verstuurCode() {
     setBezig(true);
     setMelding("");
 
@@ -18,20 +16,19 @@ export default function AdminLoginPage() {
       const response = await fetch("/api/admin-auth/request-code", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ password }),
+        body: JSON.stringify({}),
       });
       const data = await response.json();
 
       if (!response.ok) {
-        setMelding(data.error || "Inloggen mislukt.");
+        setMelding(data.error || "De inlogcode kon niet worden verstuurd.");
         return;
       }
 
       setStap("code");
-      setPassword("");
-      setMelding("Er is een 6-cijferige code verstuurd naar het beheer-e-mailadres.");
+      setMelding("Er is een 6-cijferige inlogcode verstuurd naar het beheer-e-mailadres.");
     } catch {
-      setMelding("Inloggen mislukt. Probeer het opnieuw.");
+      setMelding("De inlogcode kon niet worden verstuurd. Probeer het opnieuw.");
     } finally {
       setBezig(false);
     }
@@ -73,36 +70,29 @@ export default function AdminLoginPage() {
             <p className="text-sm font-semibold text-blue-600">Beveiligde beheeromgeving</p>
             <h1 className="mt-1 text-2xl font-bold text-gray-900">Admin inloggen</h1>
             <p className="mt-2 text-sm leading-6 text-gray-600">
-              De beheeromgeving gebruikt tweestapsverificatie: je adminwachtwoord en daarna een eenmalige code via e-mail.
+              Toegang tot de beheeromgeving wordt bevestigd met een eenmalige code via het vaste ShineGo-beheer-e-mailadres.
             </p>
           </div>
 
-          {stap === "password" ? (
-            <form onSubmit={verstuurCode}>
-              <label className="block">
-                <span className="mb-2 block text-sm font-semibold text-gray-800">Adminwachtwoord</span>
-                <input
-                  type="password"
-                  autoComplete="current-password"
-                  value={password}
-                  onChange={(event) => setPassword(event.target.value)}
-                  className="w-full rounded-xl border border-gray-300 px-4 py-3 text-gray-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
-                  required
-                />
-              </label>
+          {stap === "request" ? (
+            <div>
+              <div className="rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-900">
+                De inlogcode wordt alleen naar het ingestelde beheer-e-mailadres gestuurd en is 10 minuten geldig.
+              </div>
 
               <button
-                type="submit"
-                disabled={bezig || !password}
+                type="button"
+                onClick={verstuurCode}
+                disabled={bezig}
                 className="mt-5 w-full rounded-xl bg-blue-600 px-5 py-3 font-bold text-white hover:bg-blue-700 disabled:bg-gray-300"
               >
-                {bezig ? "Code versturen..." : "Verder →"}
+                {bezig ? "Code versturen..." : "Stuur inlogcode →"}
               </button>
-            </form>
+            </div>
           ) : (
             <form onSubmit={controleerCode}>
               <label className="block">
-                <span className="mb-2 block text-sm font-semibold text-gray-800">Verificatiecode</span>
+                <span className="mb-2 block text-sm font-semibold text-gray-800">6-cijferige inlogcode</span>
                 <input
                   inputMode="numeric"
                   autoComplete="one-time-code"
@@ -111,6 +101,7 @@ export default function AdminLoginPage() {
                   onChange={(event) => setCode(event.target.value.replace(/\D/g, "").slice(0, 6))}
                   className="w-full rounded-xl border border-gray-300 px-4 py-3 text-center text-2xl font-bold tracking-[0.35em] text-gray-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100"
                   required
+                  autoFocus
                 />
               </label>
 
@@ -125,13 +116,13 @@ export default function AdminLoginPage() {
               <button
                 type="button"
                 onClick={() => {
-                  setStap("password");
+                  setStap("request");
                   setCode("");
                   setMelding("");
                 }}
                 className="mt-3 w-full px-4 py-2 text-sm font-semibold text-gray-600"
               >
-                ← Opnieuw beginnen
+                ← Nieuwe code aanvragen
               </button>
             </form>
           )}
