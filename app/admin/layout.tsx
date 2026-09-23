@@ -1,6 +1,14 @@
+"use client";
+
 import type { ReactNode } from "react";
+import { usePathname } from "next/navigation";
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
+  const pathname = usePathname();
+  const isLogin = pathname === "/admin/login";
+
+  if (isLogin) return <>{children}</>;
+
   return (
     <>
       <div className="border-b bg-white px-4 py-3 sm:px-6">
