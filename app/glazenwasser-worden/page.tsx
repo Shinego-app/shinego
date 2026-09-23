@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Glazenwasser worden | Extra opdrachten via ShineGo",
+  title: "ZZP Glazenwasser Opdrachten | Meer Werk via ShineGo",
   description:
-    "Ben je zelfstandig glazenwasser? Ontvang via ShineGo opdrachten in jouw regio, kies zelf welke opdrachten je aanneemt en vul je agenda aan.",
+    "Ben je zzp-glazenwasser? Ontvang glazenwasopdrachten in jouw regio, kies zelf welke opdrachten je aanneemt en vul je agenda via ShineGo.",
   keywords: [
     "glazenwasser opdrachten",
     "zzp glazenwasser opdrachten",
@@ -16,9 +16,9 @@ export const metadata: Metadata = {
     canonical: "/glazenwasser-worden",
   },
   openGraph: {
-    title: "Glazenwasser worden bij ShineGo",
+    title: "ZZP Glazenwasser Opdrachten | ShineGo",
     description:
-      "Ontvang opdrachten in jouw regio en kies zelf welke opdrachten je aanneemt.",
+      "Ontvang glazenwasopdrachten in jouw regio en kies zelf welke opdrachten je aanneemt.",
     url: "https://www.shinego.nl/glazenwasser-worden",
     siteName: "ShineGo",
     locale: "nl_NL",
@@ -88,7 +88,7 @@ export default function GlazenwasserWordenPage() {
         <div className="mx-auto grid max-w-[1180px] gap-8 overflow-hidden rounded-[32px] border border-white bg-white p-7 shadow-[0_24px_70px_rgba(46,79,119,.14)] sm:p-10 lg:grid-cols-[1.15fr_.85fr] lg:items-center lg:p-14">
           <div>
             <div className="inline-flex rounded-full bg-[#e7f4ff] px-4 py-2 text-sm font-extrabold text-[#1678d4]">
-              Voor zelfstandige glazenwassers
+              Voor zzp'ers en zelfstandige glazenwassers
             </div>
             <h1 className="mt-5 text-[40px] font-extrabold leading-[1.02] tracking-[-.04em] text-[#112f58] sm:text-[58px]">
               Meer glazenwasopdrachten.
@@ -96,8 +96,8 @@ export default function GlazenwasserWordenPage() {
               <span className="text-[#1683f8]">Jij bepaalt wanneer.</span>
             </h1>
             <p className="mt-6 max-w-2xl text-base leading-7 text-[#607b98] sm:text-lg sm:leading-8">
-              ShineGo brengt klanten en zelfstandige glazenwassers bij elkaar.
-              Ontvang opdrachten in jouw regio, kies zelf wat bij je agenda past
+              ShineGo brengt klanten en zzp-glazenwassers bij elkaar. Ontvang
+              glazenwasopdrachten in jouw regio, kies zelf wat bij je agenda past
               en bouw verder aan je bedrijf.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
