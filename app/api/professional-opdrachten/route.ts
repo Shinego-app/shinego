@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-import { berekenAfstandTotBoeking, heeftBenodigdeDienst, vereisteDienst } from "@/lib/opdrachtMatching";
+import { heeftBenodigdeDienst, ligtBinnenWerkgebied, vereisteDienst } from "@/lib/opdrachtMatching";
 
 function vandaagNederland() {
   return new Intl.DateTimeFormat("en-CA", {
@@ -81,29 +81,36 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: "Beschikbare opdrachten konden niet worden geladen." }, { status: 500 });
     }
 
-    const opdrachten = await Promise.all(
+    const gematchteOpdrachten = await Promise.all(
       (boekingen || []).map(async (boeking) => {
-        const afstandKm = await berekenAfstandTotBoeking(professional, boeking);
+        const werkgebied = await ligtBinnenWerkgebied(professional, boeking);
         return {
-          id: boeking.id,
-          plaats: boeking.plaats,
-          postcode: boeking.postcode,
-          woningtype: boeking.woningtype,
-          glasbewassing_type: boeking.glasbewassing_type,
-          telescoop: boeking.telescoop,
-          aantal_ramen: boeking.aantal_ramen,
-          verdiepingen: boeking.verdiepingen,
-          kozijnen: boeking.kozijnen,
-          lastig_bereikbaar: boeking.bereikbaar === "nee",
-          gewenste_datum: boeking.gewenste_datum,
-          gewenste_tijd: boeking.gewenste_tijd,
-          professional_bedrag: boeking.professional_bedrag,
-          vereiste_dienst: vereisteDienst(boeking),
-          dienst_match: heeftBenodigdeDienst(professional, boeking),
-          afstand_km: afstandKm,
+          binnen_werkgebied: werkgebied.binnen,
+          opdracht: {
+            id: boeking.id,
+            plaats: boeking.plaats,
+            postcode: boeking.postcode,
+            woningtype: boeking.woningtype,
+            glasbewassing_type: boeking.glasbewassing_type,
+            telescoop: boeking.telescoop,
+            aantal_ramen: boeking.aantal_ramen,
+            verdiepingen: boeking.verdiepingen,
+            kozijnen: boeking.kozijnen,
+            lastig_bereikbaar: boeking.bereikbaar === "nee",
+            gewenste_datum: boeking.gewenste_datum,
+            gewenste_tijd: boeking.gewenste_tijd,
+            professional_bedrag: boeking.professional_bedrag,
+            vereiste_dienst: vereisteDienst(boeking),
+            dienst_match: heeftBenodigdeDienst(professional, boeking),
+            afstand_km: werkgebied.afstand_km,
+          },
         };
       })
     );
+
+    const opdrachten = gematchteOpdrachten
+      .filter((item) => item.binnen_werkgebied)
+      .map((item) => item.opdracht);
 
     return NextResponse.json({
       opdrachten,
@@ -155,6 +162,21 @@ export async function POST(request: Request) {
 
     if (!heeftBenodigdeDienst(professional, boeking)) {
       return NextResponse.json({ error: "Deze opdracht vraagt een dienst of materiaal dat niet in je profiel staat." }, { status: 403 });
+    }
+
+    const werkgebied = await ligtBinnenWerkgebied(professional, boeking);
+    if (werkgebied.afstand_km == null) {
+      return NextResponse.json(
+        { error: "De afstand tot deze opdracht kon niet betrouwbaar worden gecontroleerd. Probeer het later opnieuw." },
+        { status: 503 }
+      );
+    }
+
+    if (!werkgebied.binnen) {
+      return NextResponse.json(
+        { error: `Deze opdracht valt buiten je ingestelde werkgebied van ${Number(professional.werkgebied_km || 25)} km.` },
+        { status: 403 }
+      );
     }
 
     const { data: aangenomen, error: updateError } = await supabaseAdmin
