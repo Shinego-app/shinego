@@ -1,3 +1,31 @@
+import type { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "Glazenwasser FAQ | Kosten, Boeken & Telescoopsteel",
+  description:
+    "Veelgestelde vragen over glazenwassers, kosten, ramen laten wassen, telescoopsteel, binnen- en buitenreiniging, periodieke glasbewassing, betaling en annuleren via ShineGo.",
+  keywords: [
+    "glazenwasser kosten",
+    "ramen laten wassen",
+    "hoe vaak ramen wassen",
+    "glazenwasser telescoopsteel",
+    "glazenwasser binnen en buiten",
+    "periodieke glasbewassing",
+  ],
+  alternates: {
+    canonical: "/veelgestelde-vragen",
+  },
+  openGraph: {
+    title: "Veelgestelde vragen over glazenwassers | ShineGo",
+    description:
+      "Antwoorden over kosten, ramen laten wassen, bereikbaarheid, telescoopsteel, periodieke afspraken, betaling en annuleren.",
+    url: "https://www.shinego.nl/veelgestelde-vragen",
+    siteName: "ShineGo",
+    locale: "nl_NL",
+    type: "website",
+  },
+};
+
 const vragen = [
   {
     vraag: "Welke glasbewassing kan ik via ShineGo boeken?",
@@ -35,14 +63,14 @@ const vragen = [
       "Dit geldt bijvoorbeeld voor ramen boven een serre, schuin dak of een andere situatie waarbij extra bereik nodig is. Geef dit tijdens het boeken aan zodat de professional vooraf weet wat hij kan verwachten.",
   },
   {
-    vraag: "Hoe wordt de prijs bepaald?",
+    vraag: "Wat kost een glazenwasser en hoe wordt de prijs bepaald?",
     antwoord:
       "De prijs wordt vooraf berekend op basis van het type woning of pand, het aantal ramen of glasoppervlak, verdiepingen, bereikbaarheid en gekozen extra opties. Voor zeer grote zakelijke opdrachten kan een offerte nodig zijn.",
   },
   {
-    vraag: "Kan ik een terugkerende glasbewassing kiezen?",
+    vraag: "Hoe vaak kan ik mijn ramen laten wassen?",
     antwoord:
-      "Ja. Naast een eenmalige afspraak kun je kiezen voor iedere 4, 8 of 12 weken. De korting wordt direct in de boekingsflow verwerkt.",
+      "Ja. Naast een eenmalige afspraak kun je kiezen om de ramen iedere 4, 8 of 12 weken te laten wassen. De bijbehorende periodieke korting wordt direct in de boekingsflow verwerkt.",
   },
   {
     vraag: "Wanneer betaal ik?",
@@ -82,8 +110,25 @@ const vragen = [
 ];
 
 export default function VeelgesteldeVragenPage() {
+  const faqStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: vragen.map((item) => ({
+      "@type": "Question",
+      name: item.vraag,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: item.antwoord,
+      },
+    })),
+  };
+
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#eaf6ff] to-[#f8fcff] text-[#123c70]">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqStructuredData) }}
+      />
       <header className="border-b border-[#d7eaf8] bg-white/90 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-8">
           <a href="/" className="text-[29px] font-extrabold tracking-tight text-[#0d3f79]">
@@ -103,6 +148,14 @@ export default function VeelgesteldeVragenPage() {
             <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-[#6b86a0]">
               Alles wat je wilt weten over boeken, prijzen, bereikbaarheid, betaling en annuleren via ShineGo.
             </p>
+          </div>
+
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <a href="/prijzen" className="rounded-full border border-[#cfe3f4] bg-white px-4 py-2 text-sm font-bold text-[#3971a4]">Glazenwasser kosten & prijzen</a>
+            <a href="/glazenwasser-woning" className="rounded-full border border-[#cfe3f4] bg-white px-4 py-2 text-sm font-bold text-[#3971a4]">Glazenwasser voor woning</a>
+            <a href="/glazenwasser-appartement" className="rounded-full border border-[#cfe3f4] bg-white px-4 py-2 text-sm font-bold text-[#3971a4]">Glazenwasser appartement</a>
+            <a href="/glazenwasser-bedrijf" className="rounded-full border border-[#cfe3f4] bg-white px-4 py-2 text-sm font-bold text-[#3971a4]">Zakelijke glasbewassing</a>
+            <a href="/telescoopsteel-glazenwasser" className="rounded-full border border-[#cfe3f4] bg-white px-4 py-2 text-sm font-bold text-[#3971a4]">Glas wassen met telescoopsteel</a>
           </div>
 
           <div className="mt-10 space-y-3">
