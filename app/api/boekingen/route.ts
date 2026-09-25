@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { maakCheckoutToken } from "@/lib/checkoutToken";
 import { heeftBenodigdeDienst, ligtBinnenWerkgebied } from "@/lib/opdrachtMatching";
+import { checkRateLimit, clientIp } from "@/lib/rateLimit";
 
 function record(value: unknown): Record<string, unknown> {
   return value && typeof value === "object" && !Array.isArray(value)
@@ -24,6 +25,17 @@ function geld(value: number) {
 }
 
 export async function POST(request: Request) {
+  const rate = checkRateLimit(`booking:${clientIp(request)}`, 12, 10 * 60 * 1000);
+  if (!rate.toegestaan) {
+    return NextResponse.json(
+      { error: "Te veel boekingspogingen in korte tijd. Probeer het later opnieuw." },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rate.retryAfterSeconds) },
+      }
+    );
+  }
+
   try {
     const body = record(await request.json());
     const klus = record(body.klus);
