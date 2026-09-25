@@ -62,7 +62,7 @@ export default function ProfessionalDashboardPage() {
     async function laadProfessional() {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) {
-        setLaden(false);
+        router.replace("/professional/login");
         return;
       }
 
@@ -91,8 +91,13 @@ export default function ProfessionalDashboardPage() {
         window.history.replaceState({}, "", "/professional/dashboard");
       }
 
+      if (!data) {
+        router.replace("/professional");
+        return;
+      }
+
       setProfessional(data);
-      if (data) vulProfielForm(data);
+      vulProfielForm(data);
 
       if (data) {
         const { data: boekingenData } = await supabase
@@ -124,7 +129,7 @@ export default function ProfessionalDashboardPage() {
     }
 
     laadProfessional();
-  }, []);
+  }, [router]);
 
   async function profielOpslaan() {
     setProfielMelding("");
