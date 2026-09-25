@@ -14,6 +14,9 @@ type Boeking = {
   uitbetaald?: boolean;
   professional_id?: string | number | null;
   professional_bedrag?: number;
+  professional_vergoeding?: number;
+  geannuleerde_professional_id?: string | number | null;
+  geannuleerd_door?: string | null;
   annuleringskosten?: number;
   stripe_payment_id?: string | null;
   stripe_transfer_id?: string | null;
@@ -134,7 +137,20 @@ export default function AdminBetalingenPage() {
                 {boekingen.length === 0 ? (
                   <tr><td colSpan={7} className="px-5 py-8 text-center text-gray-500">Geen betaalde boekingen gevonden.</td></tr>
                 ) : boekingen.map((boeking) => {
-                  const kanUitbetalen = boeking.status === "afgerond" && !!boeking.professional_id && !boeking.uitbetaald;
+                  const isAnnuleringsvergoeding =
+                    boeking.status === "geannuleerd" &&
+                    Number(boeking.professional_vergoeding || 0) > 0 &&
+                    !!boeking.geannuleerde_professional_id;
+                  const kanUitbetalen =
+                    !boeking.uitbetaald &&
+                    (
+                      (boeking.status === "afgerond" && !!boeking.professional_id) ||
+                      (
+                        isAnnuleringsvergoeding &&
+                        boeking.vergoeding_goedgekeurd === true &&
+                        boeking.terugbetaald === true
+                      )
+                    );
                   const noShowWachtOpBewijs =
                     boeking.klant_niet_thuis === true &&
                     boeking.vergoeding_goedgekeurd !== true;
@@ -151,7 +167,27 @@ export default function AdminBetalingenPage() {
                       <td className="px-5 py-4 text-gray-700"><div>{`${boeking.voornaam || ""} ${boeking.achternaam || ""}`.trim() || "-"}</div><div className="text-xs text-gray-500">{boeking.email || "-"}</div></td>
                       <td className="px-5 py-4 font-semibold">{euro(boeking.totaalprijs)}</td>
                       <td className="px-5 py-4"><div>{euro(boeking.annuleringskosten)}</div>{boeking.status === "geannuleerd" && <div className="mt-1 text-xs text-gray-500">Terug: {euro(terugBedrag)}</div>}</td>
-                      <td className="px-5 py-4"><div>{euro(boeking.professional_bedrag)}</div><div className="mt-1 text-xs text-gray-500">{boeking.uitbetaald ? "Uitbetaald" : boeking.professional_id ? "Nog niet uitbetaald" : "Niet toegewezen"}</div></td>
+                      <td className="px-5 py-4">
+                        <div>{euro(isAnnuleringsvergoeding ? boeking.professional_vergoeding : boeking.professional_bedrag)}</div>
+                        <div className="mt-1 text-xs text-gray-500">
+                          {boeking.uitbetaald
+                            ? "Uitbetaald"
+                            : isAnnuleringsvergoeding
+                              ? boeking.vergoeding_goedgekeurd
+                                ? boeking.terugbetaald
+                                  ? "Annuleringsvergoeding klaar voor wekelijkse uitbetaling"
+                                  : "Wacht op klantterugbetaling"
+                                : "Annuleringsvergoeding wacht op goedkeuring"
+                              : boeking.professional_id
+                                ? "Nog niet uitbetaald"
+                                : "Niet toegewezen"}
+                        </div>
+                        {isAnnuleringsvergoeding && (
+                          <div className="mt-1 text-xs font-medium text-blue-700">
+                            85% van annuleringskosten; ShineGo 15%
+                          </div>
+                        )}
+                      </td>
                       <td className="px-5 py-4"><div className="font-medium">{boeking.status || "-"}</div>{boeking.terugbetaald && <div className="mt-1 text-xs font-semibold text-green-700">Terugbetaald {euro(boeking.terugbetaald_bedrag)}</div>}</td>
                       <td className="px-5 py-4">
                         <div className="flex min-w-48 flex-col gap-2">
