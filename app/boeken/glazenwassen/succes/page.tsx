@@ -41,7 +41,7 @@ export default function SuccesPage() {
           {prijs && <><span className="mt-2 font-bold text-[#0b3d75]">Totaalbedrag</span><strong className="mt-2 text-xl font-extrabold text-[#0b3d75]">€ {prijs.totaal.toFixed(2).replace(".", ",")}</strong></>}
         </div>
 
-        <div className="mt-6 flex flex-wrap gap-3"><a href="/" className="rounded-xl border border-[#cfe3f4] bg-white px-5 py-3 text-sm font-bold text-[#537797]">Naar home</a><a href="/" className="rounded-xl bg-[#1683f8] px-7 py-3.5 text-sm font-extrabold text-white shadow-[0_8px_20px_rgba(22,131,248,.24)]">Mijn boeking →</a></div>
+        <div className="mt-6 flex flex-wrap gap-3"><a href="/" className="rounded-xl border border-[#cfe3f4] bg-white px-5 py-3 text-sm font-bold text-[#537797]">Naar home</a><a href="/#diensten" className="rounded-xl bg-[#1683f8] px-7 py-3.5 text-sm font-extrabold text-white shadow-[0_8px_20px_rgba(22,131,248,.24)]">Nog een boeking →</a></div>
       </section>
     </div>
   </main>;
