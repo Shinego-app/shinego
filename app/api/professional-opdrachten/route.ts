@@ -160,6 +160,7 @@ export async function GET(request: Request) {
       .filter(
         (item) =>
           item.binnen_werkgebied &&
+          item.opdracht.dienst_match === true &&
           !tijdvakVerlopen(
             item.opdracht.gewenste_datum,
             item.opdracht.gewenste_tijd
