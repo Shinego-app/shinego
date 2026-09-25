@@ -156,12 +156,33 @@ export async function PATCH(request: Request) {
     }
 
     if (booking_id && professional_id) {
+      const { data: gekozenProfessional, error: gekozenProfessionalError } = await supabaseAdmin
+        .from("professionals")
+        .select("id, email, bedrijfsnaam, voornaam, actief, geverifieerd")
+        .eq("id", professional_id)
+        .single();
+
+      if (
+        gekozenProfessionalError ||
+        !gekozenProfessional ||
+        gekozenProfessional.actief !== true ||
+        gekozenProfessional.geverifieerd !== true
+      ) {
+        return NextResponse.json(
+          { error: "Kies een actieve en geverifieerde professional." },
+          { status: 400 }
+        );
+      }
+
       const { data: booking, error: bookingError } = await supabaseAdmin
         .from("boekingen")
         .update({ professional_id, status: "toegewezen" })
         .eq("id", booking_id)
         .eq("betaald", true)
-        .select("*");
+        .eq("status", "nieuw")
+        .is("professional_id", null)
+        .select("*")
+        .maybeSingle();
 
       if (bookingError) {
         console.error("Fout bij koppelen professional:", bookingError);
@@ -171,8 +192,64 @@ export async function PATCH(request: Request) {
         );
       }
 
-      if (!booking || booking.length === 0) {
-        return NextResponse.json({ error: "Alleen betaalde boekingen kunnen worden toegewezen." }, { status: 400 });
+      if (!booking) {
+        return NextResponse.json(
+          { error: "Deze boeking is niet meer beschikbaar voor toewijzing." },
+          { status: 409 }
+        );
+      }
+
+      try {
+        const professionalNaam =
+          gekozenProfessional.bedrijfsnaam || gekozenProfessional.voornaam || "de professional";
+        const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.shinego.nl").replace(/\/$/, "");
+
+        const meldingen: Promise<unknown>[] = [];
+
+        if (booking.email) {
+          meldingen.push(
+            resend.emails.send(
+              {
+                from: "ShineGo <noreply@shinego.nl>",
+                to: booking.email,
+                subject: `Professional gekoppeld - ShineGo boeking ${booking.id}`,
+                html: `
+                  <p>Beste ${escapeHtml(booking.voornaam || "klant")},</p>
+                  <p><strong>${escapeHtml(professionalNaam)}</strong> is aan je ShineGo-opdracht gekoppeld.</p>
+                  <p><strong>Datum:</strong> ${escapeHtml(booking.gewenste_datum || "-")}<br>
+                  <strong>Tijd:</strong> ${escapeHtml(booking.gewenste_tijd || "-")}</p>
+                  <p>De boeking en betaling blijven via ShineGo beheerd.</p>
+                `,
+              },
+              { idempotencyKey: `admin-assignment-customer/${booking.id}/${professional_id}` }
+            )
+          );
+        }
+
+        if (gekozenProfessional.email) {
+          meldingen.push(
+            resend.emails.send(
+              {
+                from: "ShineGo <noreply@shinego.nl>",
+                to: gekozenProfessional.email,
+                subject: `ShineGo-opdracht toegewezen (#${booking.id})`,
+                html: `
+                  <p>Beste ${escapeHtml(gekozenProfessional.voornaam || gekozenProfessional.bedrijfsnaam || "professional")},</p>
+                  <p>ShineGo heeft opdracht <strong>#${booking.id}</strong> aan je gekoppeld.</p>
+                  <p><strong>Datum:</strong> ${escapeHtml(booking.gewenste_datum || "-")}<br>
+                  <strong>Tijd:</strong> ${escapeHtml(booking.gewenste_tijd || "-")}<br>
+                  <strong>Regio:</strong> ${escapeHtml(booking.postcode || "")} ${escapeHtml(booking.plaats || "")}</p>
+                  <p><a href="${siteUrl}/professional/dashboard/opdracht/${booking.id}">Open opdracht in je dashboard</a></p>
+                `,
+              },
+              { idempotencyKey: `admin-assignment-professional/${booking.id}/${professional_id}` }
+            )
+          );
+        }
+
+        await Promise.allSettled(meldingen);
+      } catch (mailError) {
+        console.error("Melding na handmatige toewijzing mislukt:", mailError);
       }
 
       return NextResponse.json({ booking });
