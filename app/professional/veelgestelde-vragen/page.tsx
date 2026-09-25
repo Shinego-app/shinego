@@ -112,7 +112,8 @@ export default function ProfessionalVeelgesteldeVragenPage() {
     try {
       if (
         document.referrer &&
-        new URL(document.referrer).origin === window.location.origin
+        new URL(document.referrer).origin === window.location.origin &&
+        new URL(document.referrer).pathname !== window.location.pathname
       ) {
         window.history.back();
         return;
