@@ -15,7 +15,7 @@ export async function POST(request: Request) {
 
     const { data: booking, error: bookingError } = await supabaseAdmin
       .from("boekingen")
-      .select("id, status, totaalprijs, annuleringskosten, betaald, uitbetaald, stripe_payment_id, stripe_refund_id, terugbetaald, terugbetaald_bedrag")
+      .select("id, status, totaalprijs, annuleringskosten, betaald, uitbetaald, stripe_payment_id, stripe_refund_id, terugbetaald, terugbetaald_bedrag, klant_niet_thuis, vergoeding_goedgekeurd")
       .eq("id", bookingId)
       .single();
 
@@ -33,6 +33,13 @@ export async function POST(request: Request) {
 
     if (booking.uitbetaald === true) {
       return NextResponse.json({ error: "Deze boeking is al aan de professional uitbetaald. Refund eerst handmatig beoordelen." }, { status: 409 });
+    }
+
+    if (booking.klant_niet_thuis === true && booking.vergoeding_goedgekeurd !== true) {
+      return NextResponse.json(
+        { error: "Keur eerst het no-showbewijs goed voordat je de terugbetaling uitvoert." },
+        { status: 409 }
+      );
     }
 
     if (!booking.stripe_payment_id) {
