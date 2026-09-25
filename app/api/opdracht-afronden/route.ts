@@ -8,6 +8,15 @@ import { berekenKlantBtwRegels } from "@/lib/btw";
 
 const resend = new Resend(process.env.RESEND_API_KEY!);
 
+function escapeHtml(value: unknown) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 const FREQUENTIE_DAGEN: Record<string, number> = {
   "4weken": 28,
   "8weken": 56,
@@ -210,14 +219,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (booking.status === "afgerond") {
-      return NextResponse.json(
-        { error: "Opdracht is al afgerond" },
-        { status: 400 }
-      );
-    }
+    const alAfgerond = booking.status === "afgerond";
 
-    if (booking.status !== "onderweg") {
+    if (!alAfgerond && booking.status !== "onderweg") {
       return NextResponse.json(
         { error: "Alleen een gestarte opdracht kan worden afgerond" },
         { status: 400 }
@@ -227,21 +231,32 @@ export async function POST(req: NextRequest) {
     const factuurnummer =
       booking.factuurnummer ?? maakFactuurnummer(Number(booking.id));
 
-    const { error: updateError } = await supabaseAdmin
-      .from("boekingen")
-      .update({
-        status: "afgerond",
-        factuurnummer,
-      })
-      .eq("id", booking.id)
-      .eq("professional_id", professional.id)
-      .eq("status", "onderweg");
+    if (!alAfgerond) {
+      const { data: bijgewerkt, error: updateError } = await supabaseAdmin
+        .from("boekingen")
+        .update({
+          status: "afgerond",
+          factuurnummer,
+        })
+        .eq("id", booking.id)
+        .eq("professional_id", professional.id)
+        .eq("status", "onderweg")
+        .select("id")
+        .maybeSingle();
 
-    if (updateError) {
-      return NextResponse.json(
-        { error: "Opdracht afronden mislukt" },
-        { status: 500 }
-      );
+      if (updateError) {
+        return NextResponse.json(
+          { error: "Opdracht afronden mislukt" },
+          { status: 500 }
+        );
+      }
+
+      if (!bijgewerkt) {
+        return NextResponse.json(
+          { error: "De opdrachtstatus is intussen gewijzigd. Vernieuw de pagina." },
+          { status: 409 }
+        );
+      }
     }
 
     let vervolgInfo: Awaited<ReturnType<typeof maakVervolgBoeking>> = null;
@@ -277,14 +292,15 @@ export async function POST(req: NextRequest) {
     const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://shinego.nl").replace(/\/$/, "");
     const reviewUrl = `${siteUrl}/review/${booking.review_token}`;
 
-    const { error: klantEmailError } = await resend.emails.send({
+    const { error: klantEmailError } = await resend.emails.send(
+      {
       from: "ShineGo <noreply@shinego.nl>",
       to: booking.email,
       subject: `Factuur ${factuurnummer} - ShineGo`,
       html: `
-        <p>Beste ${booking.voornaam},</p>
+        <p>Beste ${escapeHtml(booking.voornaam)},</p>
         <p>Je opdracht is afgerond. In de bijlage vind je jouw factuur.</p>
-        <p>Hoe was je ervaring met ${professional.bedrijfsnaam}? Je helpt andere klanten en de professional met een korte beoordeling.</p>
+        <p>Hoe was je ervaring met ${escapeHtml(professional.bedrijfsnaam)}? Je helpt andere klanten en de professional met een korte beoordeling.</p>
         <p><a href="${reviewUrl}" style="display:inline-block;background:#2563eb;color:#ffffff;text-decoration:none;padding:12px 18px;border-radius:10px;font-weight:600;">Geef een beoordeling</a></p>
         ${vervolgInfo ? `
           <hr style="border:0;border-top:1px solid #e5e7eb;margin:28px 0;">
@@ -303,7 +319,11 @@ export async function POST(req: NextRequest) {
           content: Buffer.from(pdfBytes),
         },
       ],
-    });
+      },
+      {
+        idempotencyKey: `completion-customer-invoice/${booking.id}/${factuurnummer}`,
+      }
+    );
 
     if (klantEmailError) {
       return NextResponse.json(
@@ -318,12 +338,13 @@ export async function POST(req: NextRequest) {
         ? `<p>Jouw bedrag voor deze opdracht is <strong>€${professionalBedrag.toFixed(2).replace(".", ",")}</strong>.</p>`
         : "";
 
-      const { error: professionalEmailError } = await resend.emails.send({
+      const { error: professionalEmailError } = await resend.emails.send(
+        {
         from: "ShineGo <noreply@shinego.nl>",
         to: user.email,
         subject: `Factuurkopie ${factuurnummer} - ShineGo`,
         html: `
-          <p>Beste ${professional.bedrijfsnaam},</p>
+          <p>Beste ${escapeHtml(professional.bedrijfsnaam)},</p>
           <p>De opdracht is succesvol afgerond.</p>
           ${uitbetalingTekst}
           <p>In de bijlage vind je een factuurkopie voor je administratie.</p>
@@ -335,7 +356,11 @@ export async function POST(req: NextRequest) {
             content: Buffer.from(pdfBytes),
           },
         ],
-      });
+        },
+        {
+          idempotencyKey: `completion-professional-copy/${booking.id}/${factuurnummer}`,
+        }
+      );
 
       if (professionalEmailError) {
         console.error("Factuurmail professional fout:", professionalEmailError);
