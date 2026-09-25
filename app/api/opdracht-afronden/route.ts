@@ -3,8 +3,140 @@ import { Resend } from "resend";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { maakFactuurPdf, maakFactuurnummer } from "@/lib/factuur";
 import { magOpdrachtStarten } from "@/lib/opdrachtTijd";
+import { maakCheckoutToken } from "@/lib/checkoutToken";
 
 const resend = new Resend(process.env.RESEND_API_KEY!);
+
+const FREQUENTIE_DAGEN: Record<string, number> = {
+  "4weken": 28,
+  "8weken": 56,
+  "12weken": 84,
+};
+
+function telDagenBijDatum(datum: string, dagen: number) {
+  const match = String(datum || "").match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return null;
+  const waarde = new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3]), 12));
+  waarde.setUTCDate(waarde.getUTCDate() + dagen);
+  return waarde.toISOString().slice(0, 10);
+}
+
+function zonderInterneMarkeringen(value: unknown) {
+  return String(value || "")
+    .split("\n")
+    .filter((regel) => !regel.trim().startsWith("[[shinego-"))
+    .join("\n")
+    .trim();
+}
+
+function formatDatumNl(value: string) {
+  const datum = new Date(`${value}T12:00:00`);
+  if (Number.isNaN(datum.getTime())) return value;
+  return datum.toLocaleDateString("nl-NL", {
+    weekday: "long",
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+  });
+}
+
+async function maakVervolgBoeking(
+  booking: Record<string, any>,
+  voorkeurProfessionalId: string | number
+) {
+  const dagen = FREQUENTIE_DAGEN[String(booking.frequentie || "")];
+  if (!dagen || !booking.gewenste_datum) return null;
+
+  const volgendeDatum = telDagenBijDatum(String(booking.gewenste_datum), dagen);
+  if (!volgendeDatum) return null;
+
+  const vervolgMarker = `[[shinego-vervolg-van:${booking.id}]]`;
+  const voorkeurMarker = `[[shinego-voorkeur-professional:${voorkeurProfessionalId}]]`;
+
+  const { data: bestaand, error: bestaandError } = await supabaseAdmin
+    .from("boekingen")
+    .select("id, totaalprijs, gewenste_datum, betaald")
+    .like("opmerking", `%${vervolgMarker}%`)
+    .maybeSingle();
+
+  if (bestaandError) throw bestaandError;
+
+  let vervolg = bestaand;
+
+  if (!vervolg) {
+    const klantOpmerking = zonderInterneMarkeringen(booking.opmerking);
+    const opmerking = [klantOpmerking, vervolgMarker, voorkeurMarker]
+      .filter(Boolean)
+      .join("\n");
+
+    const { data: aangemaakt, error: insertError } = await supabaseAdmin
+      .from("boekingen")
+      .insert({
+        voornaam: booking.voornaam,
+        achternaam: booking.achternaam,
+        email: booking.email,
+        telefoon: booking.telefoon || null,
+        postcode: booking.postcode,
+        huisnummer: booking.huisnummer,
+        toevoeging: booking.toevoeging || null,
+        straat: booking.straat,
+        plaats: booking.plaats,
+        dienst: booking.dienst || "glazenwassen",
+        woningtype: booking.woningtype || null,
+        verdiepingen: booking.verdiepingen || [],
+        aantal_ramen: booking.aantal_ramen,
+        telescoop: booking.telescoop === true,
+        glasbewassing_type: booking.glasbewassing_type,
+        frequentie: booking.frequentie,
+        bereikbaar: booking.bereikbaar || "ja",
+        kozijnen: booking.kozijnen === true,
+        opmerking: opmerking || null,
+        basisprijs: Number(booking.basisprijs || 0),
+        ramen_prijs: Number(booking.ramen_prijs || 0),
+        verdieping_toeslag: Number(booking.verdieping_toeslag || 0),
+        bereik_toeslag: Number(booking.bereik_toeslag || 0),
+        kozijnen_toeslag: Number(booking.kozijnen_toeslag || 0),
+        korting_percentage: Number(booking.korting_percentage || 0),
+        korting_bedrag: Number(booking.korting_bedrag || 0),
+        totaalprijs: Number(booking.totaalprijs),
+        status: "nieuw",
+        betaalstatus: "open",
+        betaald: false,
+        gewenste_datum: volgendeDatum,
+        gewenste_tijd: booking.gewenste_tijd,
+        thuis_nodig: booking.thuis_nodig || null,
+        akkoord_voorwaarden: true,
+        akkoord_start_binnen_bedenktijd: true,
+        professional_id: null,
+      })
+      .select("id, totaalprijs, gewenste_datum, betaald")
+      .single();
+
+    if (insertError || !aangemaakt) {
+      throw insertError || new Error("Vervolgboeking kon niet worden aangemaakt.");
+    }
+    vervolg = aangemaakt;
+  }
+
+  if (vervolg.betaald === true) return null;
+
+  const token = maakCheckoutToken(
+    vervolg.id,
+    Number(vervolg.totaalprijs),
+    120 * 24 * 60 * 60 * 1000
+  );
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.shinego.nl").replace(/\/$/, "");
+  const betaalUrl =
+    `${siteUrl}/boeken/glazenwassen/vervolg?booking=${encodeURIComponent(String(vervolg.id))}&token=${encodeURIComponent(token)}`;
+
+  return {
+    id: vervolg.id,
+    datum: String(vervolg.gewenste_datum || volgendeDatum),
+    bedrag: Number(vervolg.totaalprijs),
+    betaalUrl,
+  };
+}
+
 
 export async function POST(req: NextRequest) {
   try {
@@ -111,6 +243,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    let vervolgInfo: Awaited<ReturnType<typeof maakVervolgBoeking>> = null;
+    try {
+      vervolgInfo = await maakVervolgBoeking(booking, professional.id);
+    } catch (vervolgError) {
+      console.error("Vervolgboeking aanmaken mislukt:", vervolgError);
+    }
+
     const pdfBytes = await maakFactuurPdf({
       factuurnummer,
       datum: new Date().toLocaleDateString("nl-NL"),
@@ -140,6 +279,15 @@ export async function POST(req: NextRequest) {
         <p>Je opdracht is afgerond. In de bijlage vind je jouw factuur.</p>
         <p>Hoe was je ervaring met ${professional.bedrijfsnaam}? Je helpt andere klanten en de professional met een korte beoordeling.</p>
         <p><a href="${reviewUrl}" style="display:inline-block;background:#2563eb;color:#ffffff;text-decoration:none;padding:12px 18px;border-radius:10px;font-weight:600;">Geef een beoordeling</a></p>
+        ${vervolgInfo ? `
+          <hr style="border:0;border-top:1px solid #e5e7eb;margin:28px 0;">
+          <h3 style="color:#0b3d75;">Je volgende glasbewassing staat klaar</h3>
+          <p>Je koos voor een terugkerende afspraak. De volgende beurt is gepland voor <strong>${formatDatumNl(vervolgInfo.datum)}</strong>.</p>
+          <p>Er wordt <strong>niet automatisch afgeschreven</strong>. De volgende afspraak wordt pas definitief nadat je deze afzonderlijk hebt betaald.</p>
+          <p><strong>Bedrag:</strong> €${vervolgInfo.bedrag.toFixed(2).replace(".", ",")}</p>
+          <p><a href="${vervolgInfo.betaalUrl}" style="display:inline-block;background:#1683f8;color:#ffffff;text-decoration:none;padding:12px 18px;border-radius:10px;font-weight:700;">Volgende afspraak betalen →</a></p>
+          <p style="font-size:13px;color:#64748b;">ShineGo houdt waar mogelijk rekening met dezelfde glazenwasser, maar de professional blijft vrij om een opdracht wel of niet aan te nemen.</p>
+        ` : ""}
         <p>Bedankt voor het gebruik van ShineGo.</p>
       `,
       attachments: [
