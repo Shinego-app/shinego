@@ -108,6 +108,22 @@ const vragen = [
 export default function ProfessionalVeelgesteldeVragenPage() {
   const [openVraag, setOpenVraag] = useState<number | null>(null);
 
+  function gaTerug() {
+    try {
+      if (
+        document.referrer &&
+        new URL(document.referrer).origin === window.location.origin
+      ) {
+        window.history.back();
+        return;
+      }
+    } catch {
+      // Gebruik de veilige fallback hieronder.
+    }
+
+    window.location.href = "/glazenwasser-worden";
+  }
+
   const faqStructuredData = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
@@ -128,12 +144,13 @@ export default function ProfessionalVeelgesteldeVragenPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqStructuredData) }}
       />
       <div className="mx-auto w-full max-w-4xl">
-        <a
-          href="/professional/dashboard"
+        <button
+          type="button"
+          onClick={gaTerug}
           className="inline-flex rounded-xl border border-gray-300 bg-white px-4 py-2 font-semibold text-gray-900"
         >
-          ← Terug naar dashboard
-        </a>
+          ← Terug
+        </button>
 
         <section className="mt-5 rounded-3xl bg-white p-6 shadow-sm sm:p-8">
           <p className="text-sm font-bold uppercase tracking-wider text-blue-600">ShineGo professionals</p>
