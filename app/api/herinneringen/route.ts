@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
+import { maakCheckoutToken } from "@/lib/checkoutToken";
 
 const resend = new Resend(process.env.RESEND_API_KEY!);
 
-function datumMorgenAmsterdam() {
+function datumOverDagenAmsterdam(dagen: number) {
   const formatter = new Intl.DateTimeFormat("en-CA", {
     timeZone: "Europe/Amsterdam",
     year: "numeric",
@@ -13,8 +14,12 @@ function datumMorgenAmsterdam() {
   });
 
   const nu = new Date();
-  const morgen = new Date(nu.getTime() + 24 * 60 * 60 * 1000);
-  return formatter.format(morgen);
+  const doel = new Date(nu.getTime() + dagen * 24 * 60 * 60 * 1000);
+  return formatter.format(doel);
+}
+
+function datumMorgenAmsterdam() {
+  return datumOverDagenAmsterdam(1);
 }
 
 function formatDatum(value: string | null | undefined) {
@@ -49,6 +54,66 @@ export async function GET(request: NextRequest) {
   }
 
   const morgen = datumMorgenAmsterdam();
+  const overZevenDagen = datumOverDagenAmsterdam(7);
+
+  const { data: vervolgBetalingen, error: vervolgBetalingenError } = await supabaseAdmin
+    .from("boekingen")
+    .select("id, voornaam, email, gewenste_datum, gewenste_tijd, totaalprijs, opmerking")
+    .eq("gewenste_datum", overZevenDagen)
+    .eq("betaald", false)
+    .eq("status", "nieuw")
+    .like("opmerking", "%[[shinego-vervolg-van:%");
+
+  if (vervolgBetalingenError) {
+    console.error("Vervolg-betaalherinneringen ophalen mislukt:", vervolgBetalingenError);
+  }
+
+  let vervolgBetaalHerinneringen = 0;
+
+  for (const vervolg of vervolgBetalingen || []) {
+    if (!vervolg.email) continue;
+
+    try {
+      const token = maakCheckoutToken(
+        vervolg.id,
+        Number(vervolg.totaalprijs),
+        14 * 24 * 60 * 60 * 1000
+      );
+      const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.shinego.nl").replace(/\/$/, "");
+      const betaalUrl =
+        `${siteUrl}/boeken/glazenwassen/vervolg?booking=${encodeURIComponent(String(vervolg.id))}&token=${encodeURIComponent(token)}`;
+
+      const { error: reminderError } = await resend.emails.send(
+        {
+          from: "ShineGo <noreply@shinego.nl>",
+          to: vervolg.email,
+          subject: `Bevestig je volgende ShineGo-afspraak (#${vervolg.id})`,
+          html: `
+            <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111827">
+              <h2 style="color:#2563eb">Je volgende afspraak is over een week</h2>
+              <p>Beste ${escapeHtml(vervolg.voornaam || "klant")},</p>
+              <p>Je volgende glasbewassing staat gepland voor <strong>${formatDatum(vervolg.gewenste_datum)}</strong> om <strong>${escapeHtml(vervolg.gewenste_tijd || "-")}</strong>.</p>
+              <p>Er wordt niets automatisch afgeschreven. Betaal deze afspraak afzonderlijk om hem definitief te bevestigen.</p>
+              <p><strong>Bedrag:</strong> €${Number(vervolg.totaalprijs || 0).toFixed(2).replace(".", ",")}</p>
+              <p><a href="${betaalUrl}" style="display:inline-block;background:#1683f8;color:#ffffff;text-decoration:none;padding:12px 18px;border-radius:10px;font-weight:700">Afspraak betalen en bevestigen →</a></p>
+              <p style="font-size:13px;color:#64748b">Als je deze volgende beurt niet wilt bevestigen, hoef je niets te doen.</p>
+            </div>
+          `,
+        },
+        {
+          idempotencyKey: `repeat-payment-reminder/${vervolg.id}`,
+        }
+      );
+
+      if (reminderError) {
+        console.error(`Vervolg-betaalherinnering ${vervolg.id} mislukt:`, reminderError);
+      } else {
+        vervolgBetaalHerinneringen += 1;
+      }
+    } catch (error) {
+      console.error(`Vervolg-betaalherinnering ${vervolg.id} fout:`, error);
+    }
+  }
 
   const { data: boekingen, error: boekingenError } = await supabaseAdmin
     .from("boekingen")
@@ -253,6 +318,7 @@ export async function GET(request: NextRequest) {
     klant_verzonden: klantVerzonden,
     professional_verzonden: professionalVerzonden,
     niet_gekoppeld: nietGekoppeld,
+    vervolg_betaalherinneringen: vervolgBetaalHerinneringen,
     fouten,
   });
 }
