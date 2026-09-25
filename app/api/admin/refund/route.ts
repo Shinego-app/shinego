@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
+import { Resend } from "resend";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+const resend = new Resend(process.env.RESEND_API_KEY!);
 
 export async function POST(request: Request) {
   try {
@@ -15,7 +17,7 @@ export async function POST(request: Request) {
 
     const { data: booking, error: bookingError } = await supabaseAdmin
       .from("boekingen")
-      .select("id, status, totaalprijs, annuleringskosten, betaald, uitbetaald, stripe_payment_id, stripe_refund_id, terugbetaald, terugbetaald_bedrag, klant_niet_thuis, vergoeding_goedgekeurd")
+      .select("id, voornaam, email, status, totaalprijs, annuleringskosten, betaald, uitbetaald, stripe_payment_id, stripe_refund_id, terugbetaald, terugbetaald_bedrag, klant_niet_thuis, vergoeding_goedgekeurd")
       .eq("id", bookingId)
       .single();
 
@@ -80,6 +82,37 @@ export async function POST(request: Request) {
       .eq("terugbetaald", false);
 
     if (updateError) throw updateError;
+
+    if (booking.email) {
+      try {
+        const { error: emailError } = await resend.emails.send(
+          {
+            from: "ShineGo <noreply@shinego.nl>",
+            to: booking.email,
+            subject: `Terugbetaling ShineGo-boeking #${booking.id}`,
+            html: `
+              <p>Beste ${String(booking.voornaam || "klant")
+                .replaceAll("&", "&amp;")
+                .replaceAll("<", "&lt;")
+                .replaceAll(">", "&gt;")},</p>
+              <p>De terugbetaling voor je ShineGo-boeking is uitgevoerd.</p>
+              <p><strong>Terugbetaald bedrag:</strong> €${terugTeBetalen.toFixed(2).replace(".", ",")}</p>
+              <p>De verwerkingstijd op je rekening hangt af van je bank en betaalmethode.</p>
+              <p>Met vriendelijke groet,<br>ShineGo</p>
+            `,
+          },
+          {
+            idempotencyKey: `refund-confirmation/${booking.id}/${refund.id}`,
+          }
+        );
+
+        if (emailError) {
+          console.error("Refundbevestiging e-mail mislukt:", emailError);
+        }
+      } catch (emailError) {
+        console.error("Refundbevestiging verzenden fout:", emailError);
+      }
+    }
 
     return NextResponse.json({
       success: true,
