@@ -160,7 +160,7 @@ export default function Home() {
                 <a href="/privacy" className="block hover:text-[#7fc1ff]">Privacybeleid</a>
                 <a href="/voorwaarden" className="block hover:text-[#7fc1ff]">Algemene voorwaarden</a>
                 <a href="/cookies" className="block hover:text-[#7fc1ff]">Cookiebeleid</a>
-                <a href="/herroepen" className="block hover:text-[#7fc1ff]">Herroepen</a>
+                <a href="/herroepen" className="block hover:text-[#7fc1ff]">Overeenkomst herroepen</a>
               </div>
             </div>
 
