@@ -176,6 +176,17 @@ export async function POST(request: Request) {
     const kozijnen = details.kozijnen === true;
 
     const bedrijf = type === "bedrijf" || woningtype === "bedrijfspand";
+    const opgeslagenGlasbewassingType = bedrijf
+      ? alleenBinnen
+        ? "bedrijf-binnen"
+        : binnenkant
+          ? "bedrijf-binnen-buiten"
+          : "bedrijf"
+      : alleenBinnen
+        ? "binnen"
+        : binnenkant
+          ? "binnen-buiten"
+          : type;
     const glasOppervlak = tekst(klus.glasOppervlak, 20);
     const binnenGlasOppervlak = tekst(klus.binnenGlasOppervlak, 20);
     const bedrijfsPrijzen: Record<string, [number, number]> = {
@@ -268,7 +279,7 @@ export async function POST(request: Request) {
       huisnummer,
       woningtype,
       telescoop,
-      glasbewassing_type: bedrijf ? "bedrijf" : alleenBinnen ? "binnen" : type,
+      glasbewassing_type: opgeslagenGlasbewassingType,
     };
 
     const { data: actieveProfessionals, error: professionalsError } = await supabaseAdmin
@@ -342,7 +353,7 @@ export async function POST(request: Request) {
         verdiepingen,
         aantal_ramen: totaalRamen,
         telescoop,
-        glasbewassing_type: bedrijf ? "bedrijf" : alleenBinnen ? "binnen" : type,
+        glasbewassing_type: opgeslagenGlasbewassingType,
         frequentie,
         bereikbaar: tekst(details.bereikbaar, 30) || "ja",
         kozijnen,
