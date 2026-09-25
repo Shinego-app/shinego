@@ -21,12 +21,17 @@
 * { box-sizing: border-box; }
 
 html {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
   background: var(--background);
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
 }
 
 body {
+  width: 100%;
+  max-width: 100%;
   margin: 0;
   overflow-x: hidden;
   background: linear-gradient(180deg, #eef8ff 0%, #f9fcff 45%, #eef8ff 100%);
@@ -179,4 +184,42 @@ footer .mt-9 .flex.flex-wrap > span:nth-child(4)::after {
   button, a[class*="rounded"] { touch-action: manipulation; }
   main button[class*="px-10"], main a[class*="px-10"] { padding-left: 1.25rem; padding-right: 1.25rem; }
   main .text-6xl { font-size: 2.75rem; line-height: 1; }
+}
+
+
+/* Mobile overflow guard: prevent long Dutch labels, addresses and CTA text
+   from forcing cards or grids wider than the viewport. */
+@media (max-width: 639px) {
+  main,
+  main section,
+  main article,
+  main form,
+  main header,
+  main footer,
+  main nav {
+    max-width: 100%;
+  }
+
+  main .grid > *,
+  main .flex > * {
+    min-width: 0;
+  }
+
+  main h1,
+  main h2,
+  main h3,
+  main p,
+  main a,
+  main button,
+  main label,
+  main span,
+  main strong,
+  main dd {
+    overflow-wrap: anywhere;
+  }
+
+  main a,
+  main button {
+    max-width: 100%;
+  }
 }
