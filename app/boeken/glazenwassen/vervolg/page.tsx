@@ -37,6 +37,10 @@ function VervolgBetalingInhoud() {
         return;
       }
 
+      localStorage.setItem("shinegoLaatsteBoekingId", bookingId);
+      localStorage.removeItem("shinegoKlantGegevens");
+      localStorage.removeItem("shinegoGlazenwassen");
+      localStorage.removeItem("shinegoPrijs");
       window.location.href = data.url;
     } catch {
       setMelding("Betaling kon niet worden gestart. Probeer het opnieuw.");
