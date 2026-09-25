@@ -154,6 +154,9 @@ export async function POST(request: Request) {
           klantbedrag,
           platformCommissie,
           professionalBedrag,
+          grondslagLabel: isAnnuleringsvergoeding
+            ? "Annuleringskosten klant (incl. btw)"
+            : undefined,
           stripeTransferId: transfer.id,
         });
 
