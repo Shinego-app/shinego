@@ -54,7 +54,13 @@ export default function DetailsPage() {
     const opgeslagen = localStorage.getItem("shinegoGlazenwassen");
     const data: Gegevens | null = keuze || (opgeslagen ? JSON.parse(opgeslagen) : null);
     if (!data) { window.location.href = "/#diensten"; return; }
-    if (keuze) localStorage.setItem("shinegoGlazenwassen", JSON.stringify(keuze));
+    if (keuze) {
+      localStorage.setItem("shinegoGlazenwassen", JSON.stringify(keuze));
+      localStorage.removeItem("shinegoGlazenwassenDetails");
+      localStorage.removeItem("shinegoPrijs");
+      localStorage.removeItem("shinegoKlantGegevens");
+      localStorage.removeItem("shinegoLaatsteBoekingId");
+    }
     setGegevens(data);
     setWoningtype(data.woningtype || "");
     const heeftNieuweVerdeling = data.ramenVoorkant !== undefined || data.ramenAchterkant !== undefined || data.ramenZijkant !== undefined;
