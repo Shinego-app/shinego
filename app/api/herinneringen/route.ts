@@ -122,7 +122,7 @@ export async function GET(request: NextRequest) {
     )
     .eq("gewenste_datum", morgen)
     .eq("betaald", true)
-    .neq("status", "afgerond");
+    .in("status", ["nieuw", "toegewezen", "onderweg"]);
 
   if (boekingenError) {
     console.error("Herinneringen: boekingen ophalen mislukt", boekingenError);
