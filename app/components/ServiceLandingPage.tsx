@@ -32,34 +32,34 @@ export default function ServiceLandingPage({
       </header>
 
       <section className="px-4 py-10 sm:px-6 sm:py-16">
-        <div className="mx-auto grid max-w-[1180px] gap-8 rounded-[32px] border border-white bg-white p-7 shadow-[0_24px_70px_rgba(46,79,119,.14)] sm:p-10 lg:grid-cols-[1.2fr_.8fr] lg:items-center lg:p-14">
-          <div>
-            <div className="inline-flex rounded-full bg-[#e7f4ff] px-4 py-2 text-sm font-extrabold text-[#1678d4]">
+        <div className="mx-auto grid w-full min-w-0 max-w-[1180px] gap-8 rounded-[32px] border border-white bg-white p-5 shadow-[0_24px_70px_rgba(46,79,119,.14)] sm:p-10 lg:grid-cols-[1.2fr_.8fr] lg:items-center lg:p-14">
+          <div className="min-w-0">
+            <div className="inline-flex max-w-full whitespace-normal rounded-full bg-[#e7f4ff] px-4 py-2 text-sm font-extrabold text-[#1678d4]">
               {eyebrow}
             </div>
-            <h1 className="mt-5 text-[40px] font-extrabold leading-[1.02] tracking-[-.04em] text-[#112f58] sm:text-[58px]">
+            <h1 className="mt-5 max-w-full hyphens-auto text-[34px] font-extrabold leading-[1.05] tracking-[-.04em] text-[#112f58] [overflow-wrap:anywhere] sm:text-[58px] sm:leading-[1.02]">
               {title}
             </h1>
-            <p className="mt-6 max-w-2xl text-base leading-7 text-[#607b98] sm:text-lg sm:leading-8">
+            <p className="mt-6 min-w-0 max-w-2xl text-base leading-7 text-[#607b98] [overflow-wrap:anywhere] sm:text-lg sm:leading-8">
               {intro}
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-8 flex min-w-0 flex-col gap-3 sm:flex-row">
               <a
                 href={ctaHref}
-                className="rounded-xl bg-[#1683f8] px-8 py-4 text-center text-base font-extrabold text-white shadow-[0_10px_25px_rgba(22,131,248,.25)] transition hover:bg-[#0874df]"
+                className="w-full min-w-0 whitespace-normal rounded-xl bg-[#1683f8] px-4 py-4 text-center text-base font-extrabold text-white shadow-[0_10px_25px_rgba(22,131,248,.25)] transition hover:bg-[#0874df] sm:w-auto sm:px-8"
               >
                 {ctaLabel}
               </a>
               <a
                 href="/prijzen"
-                className="rounded-xl border border-[#78b9ee] bg-white px-8 py-4 text-center text-base font-extrabold text-[#1768b5]"
+                className="w-full min-w-0 whitespace-normal rounded-xl border border-[#78b9ee] bg-white px-4 py-4 text-center text-base font-extrabold text-[#1768b5] sm:w-auto sm:px-8"
               >
                 Bekijk prijzen
               </a>
             </div>
           </div>
 
-          <aside className="rounded-[28px] border border-[#d5e9f8] bg-gradient-to-br from-[#eef8ff] to-[#dcefff] p-6 sm:p-8">
+          <aside className="min-w-0 rounded-[28px] border border-[#d5e9f8] bg-gradient-to-br from-[#eef8ff] to-[#dcefff] p-6 sm:p-8">
             <p className="text-xs font-extrabold uppercase tracking-[.16em] text-[#1683f8]">
               Via ShineGo
             </p>
@@ -73,7 +73,7 @@ export default function ServiceLandingPage({
                   className="flex gap-3 rounded-2xl bg-white/90 px-4 py-3 text-sm font-bold text-[#315f88] shadow-sm"
                 >
                   <span className="text-[#1683f8]">✓</span>
-                  <span>{punt}</span>
+                  <span className="min-w-0 [overflow-wrap:anywhere]">{punt}</span>
                 </div>
               ))}
             </div>
