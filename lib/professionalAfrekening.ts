@@ -11,6 +11,7 @@ export type ProfessionalAfrekeningGegevens = {
   klantbedrag: number;
   platformCommissie: number;
   professionalBedrag: number;
+  grondslagLabel?: string | null;
   stripeTransferId?: string | null;
 };
 
@@ -154,7 +155,7 @@ export async function maakProfessionalAfrekeningPdf(
     font: vet,
   });
 
-  pagina.drawText("Opdrachtwaarde klant (incl. btw)", {
+  pagina.drawText(gegevens.grondslagLabel || "Opdrachtwaarde klant (incl. btw)", {
     x: 50,
     y: 480,
     size: 10,
@@ -248,7 +249,7 @@ export async function maakProfessionalAfrekeningPdf(
   );
 
   pagina.drawText(
-    "Deze wijziging verandert de klantprijs, Stripe-betaling of netto uitbetaling niet.",
+    "Deze afrekening verandert de oorspronkelijke Stripe-betaling niet en toont alleen de definitieve verdeling.",
     {
       x: 50,
       y: 228,
