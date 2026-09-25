@@ -84,6 +84,36 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Ongeldige Nederlandse postcode." }, { status: 400 });
     }
 
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(gewensteDatum)) {
+      return NextResponse.json({ error: "Ongeldige gewenste datum." }, { status: 400 });
+    }
+
+    const vandaag = new Intl.DateTimeFormat("en-CA", {
+      timeZone: "Europe/Amsterdam",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    }).format(new Date());
+
+    if (gewensteDatum < vandaag) {
+      return NextResponse.json({ error: "Kies een datum vanaf vandaag." }, { status: 400 });
+    }
+
+    const toegestaneTijdvakken = new Set([
+      "08:00-10:00",
+      "10:00-12:00",
+      "12:00-14:00",
+      "14:00-16:00",
+      "16:00-18:00",
+    ]);
+    if (!toegestaneTijdvakken.has(gewensteTijd)) {
+      return NextResponse.json({ error: "Kies een geldig tijdvak." }, { status: 400 });
+    }
+
+    if (!new Set(["ja", "nee"]).has(thuisNodig)) {
+      return NextResponse.json({ error: "Geef aan of je thuis moet zijn." }, { status: 400 });
+    }
+
     const postcode = `${postcodeRaw.slice(0, 4)} ${postcodeRaw.slice(4)}`;
     const woningtype = tekst(klus.woningtype, 80);
     const type = tekst(klus.type, 30).toLowerCase();
