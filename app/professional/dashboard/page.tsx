@@ -167,8 +167,6 @@ export default function ProfessionalDashboardPage() {
   }
 
   async function startStripeConnect() {
-    if (!professional?.email) return;
-
     const { data: sessionData } = await supabase.auth.getSession();
     const token = sessionData.session?.access_token;
     if (!token) {
@@ -192,6 +190,17 @@ export default function ProfessionalDashboardPage() {
 
     router.push("/professional/dashboard/uitbetalingen");
   }
+
+  const geplandeOpdrachten = [...opdrachten]
+    .filter((opdracht) =>
+      ["toegewezen", "onderweg"].includes(String(opdracht.status || "")) &&
+      Boolean(opdracht.gewenste_datum)
+    )
+    .sort((a, b) =>
+      `${a.gewenste_datum || ""} ${a.gewenste_tijd || ""}`.localeCompare(
+        `${b.gewenste_datum || ""} ${b.gewenste_tijd || ""}`
+      )
+    );
 
   if (laden) return <main style={{ padding: "24px" }}>Dashboard laden...</main>;
 
@@ -316,7 +325,27 @@ export default function ProfessionalDashboardPage() {
 
         <section className="mt-8 rounded-2xl bg-white p-5 shadow-sm sm:p-6">
           <h2 className="text-xl font-bold text-gray-900">Mijn planning</h2>
-          <p className="mt-2 text-gray-600">Nog geen afspraken gepland.</p>
+          {geplandeOpdrachten.length === 0 ? (
+            <p className="mt-2 text-gray-600">Nog geen afspraken gepland.</p>
+          ) : (
+            <div className="mt-4 grid gap-3">
+              {geplandeOpdrachten.map((opdracht) => (
+                <button
+                  key={opdracht.id}
+                  type="button"
+                  onClick={() => router.push(`/professional/dashboard/opdracht/${opdracht.id}`)}
+                  className="w-full rounded-xl border border-gray-200 bg-gray-50 p-4 text-left hover:border-blue-300"
+                >
+                  <strong className="block text-gray-900">
+                    {opdracht.gewenste_datum} · {opdracht.gewenste_tijd || "Tijd nog niet gepland"}
+                  </strong>
+                  <span className="mt-1 block text-sm text-gray-600">
+                    {opdracht.plaats || "Locatie"} · status {String(opdracht.status || "-").replaceAll("_", " ")}
+                  </span>
+                </button>
+              ))}
+            </div>
+          )}
         </section>
 
         <section className="mt-8 rounded-2xl bg-white p-5 shadow-sm sm:p-6">
