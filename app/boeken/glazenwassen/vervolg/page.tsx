@@ -1,9 +1,9 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 
-export default function VervolgBetalingPage() {
+function VervolgBetalingInhoud() {
   const params = useSearchParams();
   const bookingId = params.get("booking") || "";
   const checkoutToken = params.get("token") || "";
@@ -90,5 +90,22 @@ export default function VervolgBetalingPage() {
         </section>
       </div>
     </main>
+  );
+}
+
+
+export default function VervolgBetalingPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-gradient-to-b from-[#eaf6ff] to-[#f8fcff] px-4 py-10 text-[#123c70] sm:px-6">
+          <div className="mx-auto max-w-xl">
+            <p className="text-sm font-semibold text-[#607b98]">Betaalpagina laden...</p>
+          </div>
+        </main>
+      }
+    >
+      <VervolgBetalingInhoud />
+    </Suspense>
   );
 }
