@@ -259,6 +259,9 @@ export async function PATCH(request: Request) {
                     <p>Opdracht <strong>#${booking.id}</strong> is geannuleerd en staat niet meer in je planning.</p>
                     <p><strong>Datum:</strong> ${escapeHtml(booking.gewenste_datum || "-")}<br>
                     <strong>Tijd:</strong> ${escapeHtml(booking.gewenste_tijd || "-")}</p>
+                    ${klantAnnuleertMetKosten
+                      ? `<p>Voor deze late annulering is je vergoeding <strong>€${vergoedingVolgensVerdeling.toFixed(2).replace(".", ",")}</strong>. Dit is 85% van de annuleringskosten; ShineGo houdt 15% platformcommissie. De vergoeding wordt na verwerking van de klantterugbetaling meegenomen in de wekelijkse uitbetalingsronde.</p>`
+                      : ""}
                     <p>Controleer je dashboard voor je actuele opdrachten.</p>
                     <p><a href="${siteUrl}/professional/dashboard">Open dashboard</a></p>
                   `,
@@ -271,6 +274,38 @@ export async function PATCH(request: Request) {
           }
         }
 
+        if (
+          klant_niet_thuis === true &&
+          vergoedingZojuistGoedgekeurd &&
+          vorigeProfessionalId
+        ) {
+          const { data: professionalVoorVergoeding } = await supabaseAdmin
+            .from("professionals")
+            .select("email, voornaam, bedrijfsnaam")
+            .eq("id", vorigeProfessionalId)
+            .maybeSingle();
+
+          if (professionalVoorVergoeding?.email) {
+            meldingen.push(
+              resend.emails.send(
+                {
+                  from: "ShineGo <noreply@shinego.nl>",
+                  to: professionalVoorVergoeding.email,
+                  subject: `No-showvergoeding goedgekeurd - ShineGo #${booking.id}`,
+                  html: `
+                    <p>Beste ${escapeHtml(professionalVoorVergoeding.voornaam || professionalVoorVergoeding.bedrijfsnaam || "professional")},</p>
+                    <p>Het no-showbewijs voor opdracht <strong>#${booking.id}</strong> is goedgekeurd.</p>
+                    <p>Je vergoeding is <strong>€${vergoedingVolgensVerdeling.toFixed(2).replace(".", ",")}</strong>. Dit is 85% van de annuleringskosten; ShineGo houdt 15% platformcommissie.</p>
+                    <p>Na verwerking van de klantterugbetaling wordt dit bedrag meegenomen in de wekelijkse uitbetalingsronde.</p>
+                  `,
+                },
+                {
+                  idempotencyKey: `no-show-compensation-approved/${booking.id}/${vorigeProfessionalId}`,
+                }
+              )
+            );
+          }
+        }
         if (
           booking_status === "nieuw" &&
           geannuleerd_door === "professional" &&
