@@ -34,7 +34,9 @@ export async function maakProfessionalAfrekeningPdf(
     Number(gegevens.platformCommissie || 0)
   );
 
-  const platformFactuurnummer = `SG-COM-${new Date().getFullYear()}-${String(
+  const factuurJaarMatch = String(gegevens.factuurnummer || "").match(/^SG-(\d{4})-/);
+  const factuurJaar = factuurJaarMatch?.[1] || String(new Date().getFullYear());
+  const platformFactuurnummer = `SG-COM-${factuurJaar}-${String(
     gegevens.bookingId
   ).padStart(6, "0")}`;
 
