@@ -67,17 +67,17 @@ export default function GlazenwasserWordenPage() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#eaf6ff] to-[#f8fcff] text-[#123c70]">
       <header className="border-b border-[#d7eaf8] bg-white/95">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-8">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-4 sm:px-8">
           <a
             href="/"
-            className="text-[29px] font-extrabold tracking-tight text-[#0d3f79]"
+            className="shrink-0 text-[25px] font-extrabold tracking-tight text-[#0d3f79] sm:text-[29px]"
           >
             Shine<span className="text-[#1683f8]">Go</span>
             <span className="ml-1 text-[#1683f8]">✦</span>
           </a>
           <a
             href="/professional/login"
-            className="rounded-xl border border-[#cfe3f4] bg-white px-4 py-2.5 text-sm font-bold text-[#315f88]"
+            className="min-w-0 rounded-xl border border-[#cfe3f4] bg-white px-3 py-2.5 text-center text-xs font-bold leading-5 text-[#315f88] sm:px-4 sm:text-sm"
           >
             Inloggen professional
           </a>
@@ -85,38 +85,38 @@ export default function GlazenwasserWordenPage() {
       </header>
 
       <section className="px-4 py-10 sm:px-6 sm:py-16">
-        <div className="mx-auto grid max-w-[1180px] gap-8 overflow-hidden rounded-[32px] border border-white bg-white p-7 shadow-[0_24px_70px_rgba(46,79,119,.14)] sm:p-10 lg:grid-cols-[1.15fr_.85fr] lg:items-center lg:p-14">
-          <div>
-            <div className="inline-flex rounded-full bg-[#e7f4ff] px-4 py-2 text-sm font-extrabold text-[#1678d4]">
+        <div className="mx-auto grid w-full min-w-0 max-w-[1180px] gap-8 overflow-hidden rounded-[28px] border border-white bg-white p-5 shadow-[0_24px_70px_rgba(46,79,119,.14)] sm:rounded-[32px] sm:p-10 lg:grid-cols-[1.15fr_.85fr] lg:items-center lg:p-14">
+          <div className="min-w-0">
+            <div className="inline-flex max-w-full whitespace-normal rounded-full bg-[#e7f4ff] px-4 py-2 text-sm font-extrabold leading-5 text-[#1678d4]">
               Voor zzp'ers en zelfstandige glazenwassers
             </div>
-            <h1 className="mt-5 text-[40px] font-extrabold leading-[1.02] tracking-[-.04em] text-[#112f58] sm:text-[58px]">
+            <h1 className="mt-5 max-w-full text-[34px] font-extrabold leading-[1.04] tracking-[-.035em] text-[#112f58] [overflow-wrap:anywhere] sm:text-[58px] sm:leading-[1.02]">
               Meer glazenwasopdrachten.
               <br />
               <span className="text-[#1683f8]">Jij bepaalt wanneer.</span>
             </h1>
-            <p className="mt-6 max-w-2xl text-base leading-7 text-[#607b98] sm:text-lg sm:leading-8">
+            <p className="mt-6 min-w-0 max-w-2xl text-base leading-7 text-[#607b98] [overflow-wrap:anywhere] sm:text-lg sm:leading-8">
               ShineGo brengt klanten en zzp-glazenwassers bij elkaar. Ontvang
               glazenwasopdrachten in jouw regio, kies zelf wat bij je agenda past
               en bouw verder aan je bedrijf.
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-8 flex min-w-0 flex-col gap-3 sm:flex-row">
               <a
                 href="/professional"
-                className="rounded-xl bg-[#1683f8] px-8 py-4 text-center text-base font-extrabold text-white shadow-[0_10px_25px_rgba(22,131,248,.25)] transition hover:bg-[#0874df]"
+                className="w-full min-w-0 whitespace-normal rounded-xl bg-[#1683f8] px-4 py-4 text-center text-base font-extrabold text-white shadow-[0_10px_25px_rgba(22,131,248,.25)] transition hover:bg-[#0874df] sm:w-auto sm:px-8"
               >
                 Aanmelden als glazenwasser →
               </a>
               <a
                 href="/professional/veelgestelde-vragen"
-                className="rounded-xl border border-[#78b9ee] bg-white px-8 py-4 text-center text-base font-extrabold text-[#1768b5]"
+                className="w-full min-w-0 whitespace-normal rounded-xl border border-[#78b9ee] bg-white px-4 py-4 text-center text-base font-extrabold text-[#1768b5] sm:w-auto sm:px-8"
               >
                 Veelgestelde vragen
               </a>
             </div>
           </div>
 
-          <div className="rounded-[28px] border border-[#d5e9f8] bg-gradient-to-br from-[#eef8ff] to-[#dcefff] p-6 sm:p-8">
+          <div className="min-w-0 rounded-[24px] border border-[#d5e9f8] bg-gradient-to-br from-[#eef8ff] to-[#dcefff] p-5 sm:rounded-[28px] sm:p-8">
             <p className="text-xs font-extrabold uppercase tracking-[.16em] text-[#1683f8]">
               ShineGo voor professionals
             </p>
@@ -135,7 +135,7 @@ export default function GlazenwasserWordenPage() {
                   className="flex gap-3 rounded-2xl bg-white/90 px-4 py-3 text-sm font-bold text-[#315f88] shadow-sm"
                 >
                   <span className="text-[#1683f8]">✓</span>
-                  <span>{punt}</span>
+                  <span className="min-w-0 [overflow-wrap:anywhere]">{punt}</span>
                 </div>
               ))}
             </div>
