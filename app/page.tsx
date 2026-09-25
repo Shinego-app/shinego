@@ -57,7 +57,7 @@ export default function Home() {
       <header className="border-b border-[#d7eaf8] bg-white/90 backdrop-blur-xl">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-8">
           <a href="/" className="text-[29px] font-extrabold tracking-tight text-[#0d3f79]">Shine<span className="text-[#1683f8]">Go</span><span className="ml-1 text-[#1683f8]">✦</span></a>
-          <nav className="hidden items-center gap-7 md:flex"><a href="#diensten" className="text-sm font-semibold text-[#52779b]">Diensten</a><a href="#hoe" className="text-sm font-semibold text-[#52779b]">Hoe het werkt</a><a href="/prijzen" className="text-sm font-semibold text-[#52779b]">Prijzen</a><a href="/veelgestelde-vragen" className="text-sm font-semibold text-[#52779b]">Veelgestelde vragen</a></nav>
+          <nav className="hidden items-center gap-7 md:flex"><a href="#diensten" className="text-sm font-semibold text-[#52779b]">Diensten</a><a href="#hoe" className="text-sm font-semibold text-[#52779b]">Hoe het werkt</a><a href="/prijzen" className="text-sm font-semibold text-[#52779b]">Prijzen</a><a href="/over-ons" className="text-sm font-semibold text-[#52779b]">Over ons</a><a href="/veelgestelde-vragen" className="text-sm font-semibold text-[#52779b]">Veelgestelde vragen</a></nav>
           <a href="/professional/login" className="rounded-xl border border-[#cfe3f4] bg-white px-4 py-2.5 text-sm font-bold text-[#315f88]">Inloggen</a>
         </div>
       </header>
@@ -144,6 +144,7 @@ export default function Home() {
               <div className="mt-4 space-y-3 text-sm font-semibold text-white/90">
                 <a href="mailto:info@shinego.nl" className="block hover:text-[#7fc1ff]">✉ Klantenservice</a>
                 <a href="/contact" className="block hover:text-[#7fc1ff]">💬 Contactformulier</a>
+                <a href="/over-ons" className="block hover:text-[#7fc1ff]">Over ons</a>
                 <a href="/veelgestelde-vragen" className="block hover:text-[#7fc1ff]">? Veelgestelde vragen</a>
               </div>
             </div>
