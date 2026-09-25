@@ -332,7 +332,7 @@ export default function AdminPage() {
                             <div>
                               Verdiepingen: {boeking.verdiepingen?.length ? boeking.verdiepingen.join(", ") : "-"}
                             </div>
-                            <div>Bereikbaarheid: {boeking.bereikbaar || "-"}</div>
+                            
                             <div>Kozijnen schoonmaken: {boeking.kozijnen ? "ja" : "nee"}</div>
                             <div>Gewenste datum: {boeking.gewenste_datum || "-"}</div>
                             <div>Gewenste tijd: {boeking.gewenste_tijd || "-"}</div>
