@@ -19,10 +19,9 @@ export async function GET(request: NextRequest) {
   const { data: boekingen, error: boekingenError } = await supabaseAdmin
     .from("boekingen")
     .select("*")
-    .eq("status", "afgerond")
+    .in("status", ["afgerond", "geannuleerd"])
     .eq("betaald", true)
     .eq("uitbetaald", false)
-    .not("professional_id", "is", null)
     .order("gewenste_datum", { ascending: true })
     .limit(100);
 
@@ -37,7 +36,29 @@ export async function GET(request: NextRequest) {
 
   for (const booking of boekingen || []) {
     try {
-      if (!booking.professional_id || !booking.stripe_payment_id) {
+      const isAnnuleringsvergoeding = booking.status === "geannuleerd";
+      const professionalId = isAnnuleringsvergoeding
+        ? booking.geannuleerde_professional_id
+        : booking.professional_id;
+      const uitbetalingsbedrag = Number(
+        isAnnuleringsvergoeding
+          ? booking.professional_vergoeding || 0
+          : booking.professional_bedrag || 0
+      );
+
+      if (isAnnuleringsvergoeding) {
+        if (booking.vergoeding_goedgekeurd !== true || uitbetalingsbedrag <= 0) {
+          overgeslagen += 1;
+          continue;
+        }
+        if (booking.terugbetaald !== true) {
+          overgeslagen += 1;
+          fouten.push({ booking_id: booking.id, reden: "Annuleringsvergoeding wacht op klantterugbetaling." });
+          continue;
+        }
+      }
+
+      if (!professionalId || !booking.stripe_payment_id) {
         overgeslagen += 1;
         fouten.push({ booking_id: booking.id, reden: "Professional of Stripe-betaling ontbreekt." });
         continue;
@@ -46,7 +67,7 @@ export async function GET(request: NextRequest) {
       const { data: professional, error: professionalError } = await supabaseAdmin
         .from("professionals")
         .select("id, email, stripe_account_id, bedrijfsnaam, kvk_nummer, btw_nummer")
-        .eq("id", booking.professional_id)
+        .eq("id", professionalId)
         .single();
 
       if (professionalError || !professional?.stripe_account_id) {
@@ -71,7 +92,7 @@ export async function GET(request: NextRequest) {
         continue;
       }
 
-      const amount = Math.round(Number(booking.professional_bedrag || 0) * 100);
+      const amount = Math.round(uitbetalingsbedrag * 100);
       if (!amount || amount <= 0) {
         overgeslagen += 1;
         fouten.push({ booking_id: booking.id, reden: "Ongeldig professionalbedrag." });
@@ -110,7 +131,7 @@ export async function GET(request: NextRequest) {
         .from("boekingen")
         .update({
           uitbetaald: true,
-          uitbetaald_bedrag: Number(booking.professional_bedrag),
+          uitbetaald_bedrag: uitbetalingsbedrag,
           stripe_transfer_id: transfer.id,
           factuurnummer,
         })
@@ -129,12 +150,16 @@ export async function GET(request: NextRequest) {
 
       if (professional.email) {
         try {
-          const klantbedrag = Number(booking.totaalprijs ?? 0);
-          const professionalBedrag = Number(booking.professional_bedrag ?? 0);
-          const platformCommissie = Number(
-            booking.platform_commissie ??
-              Math.max(0, klantbedrag - professionalBedrag)
-          );
+          const klantbedrag = isAnnuleringsvergoeding
+            ? Number(booking.annuleringskosten ?? 0)
+            : Number(booking.totaalprijs ?? 0);
+          const professionalBedrag = uitbetalingsbedrag;
+          const platformCommissie = isAnnuleringsvergoeding
+            ? Math.max(0, klantbedrag - professionalBedrag)
+            : Number(
+                booking.platform_commissie ??
+                  Math.max(0, klantbedrag - professionalBedrag)
+              );
 
           const pdfBytes = await maakProfessionalAfrekeningPdf({
             factuurnummer,
@@ -153,10 +178,14 @@ export async function GET(request: NextRequest) {
             {
               from: "ShineGo <noreply@shinego.nl>",
               to: professional.email,
-              subject: `Uitbetalingsafrekening ${factuurnummer} - ShineGo`,
+              subject: isAnnuleringsvergoeding
+                ? `Annuleringsvergoeding ${factuurnummer} - ShineGo`
+                : `Uitbetalingsafrekening ${factuurnummer} - ShineGo`,
               html: `
                 <p>Beste ${professional.bedrijfsnaam || "professional"},</p>
-                <p>De wekelijkse uitbetaling voor opdracht ${booking.id} is uitgevoerd.</p>
+                <p>${isAnnuleringsvergoeding
+                  ? `De annuleringsvergoeding voor opdracht ${booking.id} is uitbetaald.`
+                  : `De wekelijkse uitbetaling voor opdracht ${booking.id} is uitgevoerd.`}</p>
                 <p>In de bijlage vind je de uitbetalingsafrekening.</p>
                 <p>Met vriendelijke groet,<br>ShineGo</p>
               `,
