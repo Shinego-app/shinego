@@ -4,6 +4,7 @@ import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { maakFactuurPdf, maakFactuurnummer } from "@/lib/factuur";
 import { magOpdrachtStarten } from "@/lib/opdrachtTijd";
 import { maakCheckoutToken } from "@/lib/checkoutToken";
+import { berekenKlantBtwRegels } from "@/lib/btw";
 
 const resend = new Resend(process.env.RESEND_API_KEY!);
 
@@ -169,7 +170,7 @@ export async function POST(req: NextRequest) {
 
     const { data: professional, error: professionalLookupError } = await supabaseAdmin
       .from("professionals")
-      .select("id, bedrijfsnaam, kvk_nummer, btw_nummer")
+      .select("id, bedrijfsnaam, kvk_nummer, btw_nummer, straat, huisnummer, toevoeging, postcode, woonplaats")
       .eq("user_id", user.id)
       .single();
 
@@ -263,8 +264,14 @@ export async function POST(req: NextRequest) {
       professionalBedrijfsnaam: professional.bedrijfsnaam,
       professionalKvK: professional.kvk_nummer,
       professionalBtwNummer: professional.btw_nummer,
+      professionalStraat: professional.straat,
+      professionalHuisnummer: professional.huisnummer,
+      professionalToevoeging: professional.toevoeging,
+      professionalPostcode: professional.postcode,
+      professionalPlaats: professional.woonplaats,
       omschrijving: "Glazenwassen via ShineGo",
       bedrag: Number(booking.totaalprijs),
+      btwRegels: berekenKlantBtwRegels(booking),
     });
 
     const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://shinego.nl").replace(/\/$/, "");
