@@ -48,10 +48,45 @@ export async function POST(request: NextRequest) {
   );
 
   if (!codeKlopt) {
-    return NextResponse.json(
+    const attempts = Number(challenge.attempts || 0) + 1;
+
+    if (attempts >= 5) {
+      const response = NextResponse.json(
+        { error: "Te veel onjuiste pogingen. Vraag een nieuwe code aan." },
+        { status: 429 }
+      );
+      response.cookies.set(ADMIN_CHALLENGE_COOKIE, "", {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        path: "/",
+        maxAge: 0,
+      });
+      response.headers.set("Cache-Control", "no-store");
+      return response;
+    }
+
+    const vernieuwdeChallenge = await maakAdminToken(
+      {
+        ...challenge,
+        attempts,
+      },
+      adminPassword
+    );
+
+    const response = NextResponse.json(
       { error: "De verificatiecode is onjuist." },
       { status: 401 }
     );
+    response.cookies.set(ADMIN_CHALLENGE_COOKIE, vernieuwdeChallenge, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      path: "/",
+      maxAge: Math.max(1, Math.floor((challenge.exp - Date.now()) / 1000)),
+    });
+    response.headers.set("Cache-Control", "no-store");
+    return response;
   }
 
   const sessieDuurMs = 12 * 60 * 60 * 1000;
