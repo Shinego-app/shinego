@@ -105,7 +105,7 @@ export default function AdminBetalingenPage() {
           <div>
             <div className="text-sm font-semibold text-blue-600">ShineGo beheer</div>
             <h1 className="mt-1 text-3xl font-bold text-gray-900">Betalingen</h1>
-            <p className="mt-2 text-sm text-gray-600">Handmatige Stripe-uitbetalingen en klantterugbetalingen.</p>
+            <p className="mt-2 text-sm text-gray-600">Uitbetalingen worden wekelijks automatisch verwerkt. Gebruik handmatig uitbetalen alleen als noodoptie; klantterugbetalingen blijven handmatig controleerbaar.</p>
           </div>
           <a href="/admin" className="rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm font-semibold text-gray-700">← Terug naar boekingen</a>
         </div>
@@ -146,7 +146,7 @@ export default function AdminBetalingenPage() {
                       <td className="px-5 py-4"><div className="font-medium">{boeking.status || "-"}</div>{boeking.terugbetaald && <div className="mt-1 text-xs font-semibold text-green-700">Terugbetaald {euro(boeking.terugbetaald_bedrag)}</div>}</td>
                       <td className="px-5 py-4">
                         <div className="flex min-w-48 flex-col gap-2">
-                          <button type="button" disabled={!kanUitbetalen || bezigId === boeking.id} onClick={() => uitbetalen(boeking.id)} className="rounded-lg bg-blue-600 px-3 py-2 font-semibold text-white disabled:bg-gray-300">Professional uitbetalen</button>
+                          <button type="button" disabled={!kanUitbetalen || bezigId === boeking.id} onClick={() => uitbetalen(boeking.id)} className="rounded-lg bg-blue-600 px-3 py-2 font-semibold text-white disabled:bg-gray-300">Nu uitbetalen (nood)</button>
                           <button type="button" disabled={!kanTerugbetalen || terugBedrag <= 0 || bezigId === boeking.id} onClick={() => terugbetalen(boeking)} className="rounded-lg bg-green-600 px-3 py-2 font-semibold text-white disabled:bg-gray-300">Klant terugbetalen</button>
                         </div>
                       </td>
