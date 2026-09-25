@@ -69,12 +69,72 @@ export async function GET(request: NextRequest) {
 
   let klantVerzonden = 0;
   let professionalVerzonden = 0;
+  let nietGekoppeld = 0;
   const fouten: string[] = [];
+  const beheerEmail = process.env.ADMIN_NOTIFICATION_EMAIL || "info@shinego.nl";
 
   for (const boeking of boekingen ?? []) {
     const adres = `${boeking.straat ?? ""} ${boeking.huisnummer ?? ""}${
       boeking.toevoeging ? ` ${boeking.toevoeging}` : ""
     }, ${boeking.postcode ?? ""} ${boeking.plaats ?? ""}`.trim();
+
+    if (!boeking.professional_id) {
+      nietGekoppeld += 1;
+
+      const meldingen = [
+        resend.emails.send(
+          {
+            from: "ShineGo <noreply@shinego.nl>",
+            to: beheerEmail,
+            subject: `Actie nodig: boeking ${boeking.id} voor morgen nog niet gekoppeld`,
+            html: `
+              <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111827">
+                <h2 style="color:#b45309">Betaalde boeking zonder professional</h2>
+                <p>Boeking <strong>#${boeking.id}</strong> staat gepland voor morgen, maar er is nog geen professional gekoppeld.</p>
+                <p><strong>Datum:</strong> ${formatDatum(boeking.gewenste_datum)}<br>
+                <strong>Tijd:</strong> ${escapeHtml(boeking.gewenste_tijd || "-")}<br>
+                <strong>Regio:</strong> ${escapeHtml(boeking.postcode || "")} ${escapeHtml(boeking.plaats || "")}</p>
+                <p>Controleer deze boeking direct in de ShineGo-admin en neem zo nodig contact op met de klant.</p>
+                <p><a href="https://www.shinego.nl/admin" style="display:inline-block;background:#2563eb;color:#fff;text-decoration:none;padding:12px 18px;border-radius:10px;font-weight:700">Open admin</a></p>
+              </div>
+            `,
+          },
+          {
+            idempotencyKey: `unassigned-admin/${boeking.id}/${morgen}`,
+          }
+        ),
+      ];
+
+      if (boeking.email) {
+        meldingen.push(
+          resend.emails.send(
+            {
+              from: "ShineGo <noreply@shinego.nl>",
+              to: boeking.email,
+              subject: `Update over je ShineGo-boeking ${boeking.id}`,
+              html: `
+                <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111827">
+                  <h2 style="color:#2563eb">Update over je afspraak</h2>
+                  <p>Beste ${escapeHtml(boeking.voornaam ?? "klant")},</p>
+                  <p>Je boeking staat voor morgen gepland, maar er is op dit moment nog geen professional definitief gekoppeld.</p>
+                  <p>ShineGo controleert dit en neemt contact met je op als er iets aan de afspraak moet wijzigen. Je hoeft op dit moment niets te doen.</p>
+                  <p>Met vriendelijke groet,<br><strong>ShineGo</strong></p>
+                </div>
+              `,
+            },
+            {
+              idempotencyKey: `unassigned-customer/${boeking.id}/${morgen}`,
+            }
+          )
+        );
+      }
+
+      const resultaten = await Promise.allSettled(meldingen);
+      if (resultaten.some((resultaat) => resultaat.status === "rejected")) {
+        fouten.push(`niet-gekoppeld:${boeking.id}`);
+      }
+      continue;
+    }
 
     if (!boeking.herinnering_klant_verzonden && boeking.email) {
       const { error: klantMailError } = await resend.emails.send({
@@ -192,6 +252,7 @@ export async function GET(request: NextRequest) {
     boekingen: boekingen?.length ?? 0,
     klant_verzonden: klantVerzonden,
     professional_verzonden: professionalVerzonden,
+    niet_gekoppeld: nietGekoppeld,
     fouten,
   });
 }
