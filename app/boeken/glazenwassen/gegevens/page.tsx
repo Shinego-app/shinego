@@ -29,7 +29,7 @@ function toonDatum(waarde: string) {
 export default function GegevensPage() {
   const [prijs, setPrijs] = useState<Prijs | null>(null);
   const [voornaam, setVoornaam] = useState(""); const [achternaam, setAchternaam] = useState(""); const [email, setEmail] = useState(""); const [telefoon, setTelefoon] = useState("");
-  const [postcode, setPostcode] = useState(""); const [huisnummer, setHuisnummer] = useState(""); const [straat, setStraat] = useState(""); const [plaats, setPlaats] = useState("");
+  const [postcode, setPostcode] = useState(""); const [huisnummer, setHuisnummer] = useState(""); const [toevoeging, setToevoeging] = useState(""); const [straat, setStraat] = useState(""); const [plaats, setPlaats] = useState("");
   const [gewensteDatum, setGewenensteDatum] = useState(""); const [gewensteTijd, setGewensteTijd] = useState(""); const [thuisNodig, setThuisNodig] = useState("");
   const [kalenderOpen, setKalenderOpen] = useState(false);
   const [zichtbareMaand, setZichtbareMaand] = useState(() => { const nu = new Date(); return new Date(nu.getFullYear(), nu.getMonth(), 1); });
@@ -38,7 +38,23 @@ export default function GegevensPage() {
     try {
       const opgeslagenPrijs = localStorage.getItem("shinegoPrijs");
       if (opgeslagenPrijs) setPrijs(JSON.parse(opgeslagenPrijs));
-      localStorage.removeItem("shinegoKlantGegevens");
+
+      const opgeslagenKlant = localStorage.getItem("shinegoKlantGegevens");
+      if (opgeslagenKlant) {
+        const klant = JSON.parse(opgeslagenKlant);
+        setVoornaam(klant.voornaam || "");
+        setAchternaam(klant.achternaam || "");
+        setEmail(klant.email || "");
+        setTelefoon(klant.telefoon || "");
+        setPostcode(klant.postcode || "");
+        setHuisnummer(klant.huisnummer || "");
+        setToevoeging(klant.toevoeging || "");
+        setStraat(klant.straat || "");
+        setPlaats(klant.plaats || "");
+        setGewenensteDatum(klant.gewensteDatum || "");
+        setGewensteTijd(klant.gewensteTijd || "");
+        setThuisNodig(klant.thuisNodig || "");
+      }
     } catch (error) {
       console.error("Boekingsgegevens laden mislukt:", error);
     }
@@ -63,7 +79,7 @@ export default function GegevensPage() {
   }, [zichtbareMaand]);
 
   const kanVerder = voornaam.trim() !== "" && achternaam.trim() !== "" && email.trim() !== "" && telefoon.trim() !== "" && postcode.trim() !== "" && huisnummer.trim() !== "" && straat.trim() !== "" && plaats.trim() !== "" && gewensteDatum !== "" && gewensteTijd !== "" && thuisNodig !== "";
-  function gaVerder() { if (!kanVerder) return; localStorage.setItem("shinegoKlantGegevens", JSON.stringify({ voornaam, achternaam, email, telefoon, postcode, huisnummer, straat, plaats, gewensteDatum, gewensteTijd, thuisNodig })); window.location.href = "/boeken/glazenwassen/bevestigen"; }
+  function gaVerder() { if (!kanVerder) return; localStorage.setItem("shinegoKlantGegevens", JSON.stringify({ voornaam, achternaam, email, telefoon, postcode, huisnummer, toevoeging, straat, plaats, gewensteDatum, gewensteTijd, thuisNodig })); window.location.href = "/boeken/glazenwassen/bevestigen"; }
   const inputClass = "w-full rounded-xl border border-[#cfe3f4] bg-white px-3 py-2.5 text-sm font-semibold text-[#123c70] outline-none placeholder:text-[#9ab0c4] focus:border-[#1683f8]";
   const stappen = ["Keuze", "Details", "Prijs", "Gegevens", "Bevestigen"];
 
@@ -84,6 +100,7 @@ export default function GegevensPage() {
               <label className="text-xs font-bold text-[#4f708f] sm:col-span-2">Telefoonnummer<input type="tel" value={telefoon} onChange={(e)=>setTelefoon(e.target.value)} className={`${inputClass} mt-1`} placeholder="06 12345678" /></label>
               <label className="text-xs font-bold text-[#4f708f]">Postcode<input value={postcode} onChange={(e)=>setPostcode(e.target.value)} className={`${inputClass} mt-1 uppercase`} placeholder="1234 AB" /></label>
               <label className="text-xs font-bold text-[#4f708f]">Huisnummer<input value={huisnummer} onChange={(e)=>setHuisnummer(e.target.value)} className={`${inputClass} mt-1`} placeholder="12" /></label>
+              <label className="text-xs font-bold text-[#4f708f]">Toevoeging <span className="font-medium text-[#8aa0b5]">(optioneel)</span><input value={toevoeging} onChange={(e)=>setToevoeging(e.target.value)} className={`${inputClass} mt-1`} placeholder="A" /></label>
               <label className="text-xs font-bold text-[#4f708f]">Straat<input value={straat} onChange={(e)=>setStraat(e.target.value)} className={`${inputClass} mt-1`} placeholder="Straatnaam" /></label>
               <label className="text-xs font-bold text-[#4f708f]">Plaats<input value={plaats} onChange={(e)=>setPlaats(e.target.value)} className={`${inputClass} mt-1`} placeholder="Amsterdam" /></label>
             </div>
