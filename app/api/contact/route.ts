@@ -1,10 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import { checkRateLimit, clientIp } from "@/lib/rateLimit";
 
 const resend = new Resend(process.env.RESEND_API_KEY!);
 const CONTACT_EMAIL = process.env.CONTACT_EMAIL || "info@shinego.nl";
 
 export async function POST(req: NextRequest) {
+  const rate = checkRateLimit(`contact:${clientIp(req)}`, 5, 10 * 60 * 1000);
+  if (!rate.toegestaan) {
+    return NextResponse.json(
+      { error: "Te veel berichten in korte tijd. Probeer het later opnieuw." },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rate.retryAfterSeconds) },
+      }
+    );
+  }
+
   try {
     const { naam, email, onderwerp, bericht, website } = await req.json();
 
