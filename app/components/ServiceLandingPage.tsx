@@ -20,8 +20,8 @@ export default function ServiceLandingPage({
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#eaf6ff] to-[#f8fcff] text-[#123c70]">
       <header className="border-b border-[#d7eaf8] bg-white/95">
-        <div className="mx-auto flex max-w-6xl items-center justify-between px-5 py-4 sm:px-8">
-          <a href="/" className="text-[29px] font-extrabold tracking-tight text-[#0d3f79]">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-3 px-4 py-4 sm:px-8">
+          <a href="/" className="shrink-0 text-[25px] font-extrabold tracking-tight text-[#0d3f79] sm:text-[29px]">
             Shine<span className="text-[#1683f8]">Go</span>
             <span className="ml-1 text-[#1683f8]">✦</span>
           </a>
