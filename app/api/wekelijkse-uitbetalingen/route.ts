@@ -171,6 +171,9 @@ export async function GET(request: NextRequest) {
             klantbedrag,
             platformCommissie,
             professionalBedrag,
+            grondslagLabel: isAnnuleringsvergoeding
+              ? "Annuleringskosten klant (incl. btw)"
+              : undefined,
             stripeTransferId: transfer.id,
           });
 
