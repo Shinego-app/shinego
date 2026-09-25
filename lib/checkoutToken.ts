@@ -12,12 +12,16 @@ function sign(payload: string) {
   return createHmac("sha256", signingSecret()).update(payload).digest("base64url");
 }
 
-export function maakCheckoutToken(bookingId: string | number, bedrag: number) {
+export function maakCheckoutToken(
+  bookingId: string | number,
+  bedrag: number,
+  geldigheidMs = 30 * 60 * 1000
+) {
   const payload = Buffer.from(
     JSON.stringify({
       bookingId: String(bookingId),
       amountCents: Math.round(Number(bedrag) * 100),
-      expiresAt: Date.now() + 30 * 60 * 1000,
+      expiresAt: Date.now() + geldigheidMs,
     }),
     "utf8"
   ).toString("base64url");
