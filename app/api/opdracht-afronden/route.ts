@@ -266,9 +266,13 @@ export async function POST(req: NextRequest) {
       console.error("Vervolgboeking aanmaken mislukt:", vervolgError);
     }
 
+    const factuurDatum = booking.gewenste_datum
+      ? new Date(`${booking.gewenste_datum}T12:00:00`).toLocaleDateString("nl-NL")
+      : new Date().toLocaleDateString("nl-NL");
+
     const pdfBytes = await maakFactuurPdf({
       factuurnummer,
-      datum: new Date().toLocaleDateString("nl-NL"),
+      datum: factuurDatum,
       klantNaam: `${booking.voornaam} ${booking.achternaam}`,
       klantEmail: booking.email,
       klantStraat: booking.straat,
