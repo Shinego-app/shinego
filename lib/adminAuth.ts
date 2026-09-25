@@ -6,6 +6,8 @@ export type AdminTokenPayload = {
   exp: number;
   email?: string;
   code_hash?: string;
+  iat?: number;
+  attempts?: number;
 };
 
 function base64UrlEncode(bytes: Uint8Array) {
