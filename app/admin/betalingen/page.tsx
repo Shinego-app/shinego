@@ -20,6 +20,8 @@ type Boeking = {
   stripe_refund_id?: string | null;
   terugbetaald?: boolean;
   terugbetaald_bedrag?: number;
+  klant_niet_thuis?: boolean;
+  vergoeding_goedgekeurd?: boolean;
 };
 
 function euro(value: unknown) {
@@ -133,7 +135,14 @@ export default function AdminBetalingenPage() {
                   <tr><td colSpan={7} className="px-5 py-8 text-center text-gray-500">Geen betaalde boekingen gevonden.</td></tr>
                 ) : boekingen.map((boeking) => {
                   const kanUitbetalen = boeking.status === "afgerond" && !!boeking.professional_id && !boeking.uitbetaald;
-                  const kanTerugbetalen = boeking.status === "geannuleerd" && !boeking.terugbetaald && !!boeking.stripe_payment_id;
+                  const noShowWachtOpBewijs =
+                    boeking.klant_niet_thuis === true &&
+                    boeking.vergoeding_goedgekeurd !== true;
+                  const kanTerugbetalen =
+                    boeking.status === "geannuleerd" &&
+                    !boeking.terugbetaald &&
+                    !!boeking.stripe_payment_id &&
+                    !noShowWachtOpBewijs;
                   const terugBedrag = Math.max(0, Number(boeking.totaalprijs || 0) - Number(boeking.annuleringskosten || 0));
 
                   return (
@@ -148,6 +157,11 @@ export default function AdminBetalingenPage() {
                         <div className="flex min-w-48 flex-col gap-2">
                           <button type="button" disabled={!kanUitbetalen || bezigId === boeking.id} onClick={() => uitbetalen(boeking.id)} className="rounded-lg bg-blue-600 px-3 py-2 font-semibold text-white disabled:bg-gray-300">Nu uitbetalen (nood)</button>
                           <button type="button" disabled={!kanTerugbetalen || terugBedrag <= 0 || bezigId === boeking.id} onClick={() => terugbetalen(boeking)} className="rounded-lg bg-green-600 px-3 py-2 font-semibold text-white disabled:bg-gray-300">Klant terugbetalen</button>
+                          {noShowWachtOpBewijs && (
+                            <span className="text-xs font-medium text-amber-700">
+                              Keur eerst het no-showbewijs goed in Boekingen.
+                            </span>
+                          )}
                         </div>
                       </td>
                     </tr>
