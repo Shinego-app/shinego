@@ -113,6 +113,22 @@ export async function PATCH(request: Request) {
             ? Math.min(effectieveAnnuleringskosten, 25)
             : Number(professional_vergoeding || 0);
 
+      const { data: huidigeBoeking, error: huidigeBoekingError } = await supabaseAdmin
+        .from("boekingen")
+        .select("id, professional_id")
+        .eq("id", booking_id)
+        .single();
+
+      if (huidigeBoekingError || !huidigeBoeking) {
+        return NextResponse.json(
+          { error: "Boeking kon niet worden gevonden." },
+          { status: 404 }
+        );
+      }
+
+      const vorigeProfessionalId =
+        geannuleerde_professional_id || huidigeBoeking.professional_id || null;
+
       const { data: booking, error: bookingError } = await supabaseAdmin
         .from("boekingen")
         .update({
@@ -124,8 +140,9 @@ export async function PATCH(request: Request) {
           geannuleerd_door,
           klant_niet_thuis,
           niet_thuis_bewijs,
-          geannuleerde_professional_id,
-          ...(booking_status === "nieuw" && ["professional", "shinego"].includes(geannuleerd_door)
+          geannuleerde_professional_id: vorigeProfessionalId,
+          ...(booking_status === "geannuleerd" ||
+          (booking_status === "nieuw" && ["professional", "shinego"].includes(geannuleerd_door))
             ? { professional_id: null }
             : {}),
         })
