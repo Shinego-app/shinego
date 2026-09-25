@@ -193,7 +193,7 @@ export async function POST(request: Request) {
             await supabaseAdmin
               .from("boekingen")
               .select(
-                "id, voornaam, achternaam, email, straat, huisnummer, toevoeging, postcode, plaats, gewenste_datum, gewenste_tijd, totaalprijs, betaald, stripe_payment_id"
+                "id, voornaam, achternaam, email, straat, huisnummer, toevoeging, postcode, plaats, woningtype, glasbewassing_type, telescoop, gewenste_datum, gewenste_tijd, totaalprijs, professional_bedrag, betaald, stripe_payment_id"
               )
               .eq("id", bookingId)
               .eq("betaald", true)
