@@ -85,11 +85,35 @@ async function geocode(postcode?: string | null, huisnummer?: string | null) {
   return geocodeCache.get(cacheKey)!;
 }
 
+function vereisteDiensten(boeking: BoekingVoorMatching) {
+  const type = String(boeking.glasbewassing_type || "").toLowerCase();
+  const woningtype = String(boeking.woningtype || "").toLowerCase();
+  const bedrijf = type.includes("bedrijf") || woningtype.includes("bedrijf");
+  const binnen = type === "binnen" || type.includes("binnen-") || type.endsWith("-binnen");
+  const buiten = type.includes("buiten") || (!binnen && !bedrijf);
+  const telescoop = boeking.telescoop === true || type === "telewash";
+
+  const vereist = new Set<string>();
+
+  if (bedrijf) vereist.add("bedrijf");
+  if (binnen) vereist.add("binnen");
+  if (telescoop) vereist.add("telewash");
+
+  if (!bedrijf && buiten && !telescoop) {
+    vereist.add("glazenwasser");
+  }
+
+  if (vereist.size === 0) vereist.add("glazenwasser");
+  return Array.from(vereist);
+}
+
 export function vereisteDienst(boeking: BoekingVoorMatching) {
   const type = String(boeking.glasbewassing_type || "").toLowerCase();
+  const woningtype = String(boeking.woningtype || "").toLowerCase();
+
+  if (type.includes("bedrijf") || woningtype.includes("bedrijf")) return "bedrijf";
   if (boeking.telescoop || type === "telewash") return "telewash";
-  if (type === "bedrijf" || String(boeking.woningtype || "").toLowerCase().includes("bedrijf")) return "bedrijf";
-  if (type === "binnen") return "binnen";
+  if (type.includes("binnen")) return "binnen";
   return "glazenwasser";
 }
 
@@ -97,8 +121,7 @@ export function heeftBenodigdeDienst(professional: ProfessionalVoorMatching, boe
   const diensten = Array.isArray(professional.diensten)
     ? professional.diensten.map(normaliseerDienst)
     : [];
-  const vereist = vereisteDienst(boeking);
-  return diensten.includes(vereist);
+  return vereisteDiensten(boeking).every((vereist) => diensten.includes(vereist));
 }
 
 export async function berekenAfstandTotBoeking(
