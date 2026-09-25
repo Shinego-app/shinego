@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { maakFactuurPdf, maakFactuurnummer } from "@/lib/factuur";
+import { berekenKlantBtwRegels } from "@/lib/btw";
 
 function isAdminAuthorized(request: NextRequest) {
   const adminPassword = process.env.ADMIN_PASSWORD;
@@ -97,8 +98,14 @@ export async function GET(request: NextRequest) {
     professionalBedrijfsnaam: professional.bedrijfsnaam,
     professionalKvK: professional.kvk_nummer,
     professionalBtwNummer: professional.btw_nummer,
+    professionalStraat: professional.straat,
+    professionalHuisnummer: professional.huisnummer,
+    professionalToevoeging: professional.toevoeging,
+    professionalPostcode: professional.postcode,
+    professionalPlaats: professional.woonplaats,
     omschrijving: booking.dienst_naam || booking.dienst || "Glazenwassen",
     bedrag: Number(booking.totaalprijs),
+    btwRegels: berekenKlantBtwRegels(booking),
   });
 
   return new NextResponse(Buffer.from(pdfBytes), {
