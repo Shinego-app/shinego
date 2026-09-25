@@ -86,13 +86,11 @@ export async function PATCH(request: Request) {
       booking_status,
       annuleringsreden,
       annuleringskosten,
-      professional_vergoeding,
       vergoeding_goedgekeurd,
       geannuleerd_door,
       klant_niet_thuis,
       niet_thuis_bewijs,
       geannuleerde_professional_id,
-      uitbetaald,
     } = body;
 
     if (booking_id && booking_status) {
@@ -103,19 +101,9 @@ export async function PATCH(request: Request) {
         );
       }
 
-      const effectieveAnnuleringskosten =
-        geannuleerd_door === "shinego" ? 0 : Math.max(0, Number(annuleringskosten || 0));
-
-      const goedgekeurdeVergoeding =
-        geannuleerd_door === "shinego"
-          ? 0
-          : vergoeding_goedgekeurd === true && klant_niet_thuis
-            ? Math.min(effectieveAnnuleringskosten, 25)
-            : Number(professional_vergoeding || 0);
-
       const { data: huidigeBoeking, error: huidigeBoekingError } = await supabaseAdmin
         .from("boekingen")
-        .select("id, professional_id")
+        .select("id, professional_id, geannuleerde_professional_id, totaalprijs, vergoeding_goedgekeurd")
         .eq("id", booking_id)
         .single();
 
@@ -127,7 +115,53 @@ export async function PATCH(request: Request) {
       }
 
       const vorigeProfessionalId =
-        geannuleerde_professional_id || huidigeBoeking.professional_id || null;
+        geannuleerde_professional_id ||
+        huidigeBoeking.professional_id ||
+        huidigeBoeking.geannuleerde_professional_id ||
+        null;
+
+      const totaalprijs = Math.max(0, Number(huidigeBoeking.totaalprijs || 0));
+      const maxAnnuleringskosten =
+        Math.round(totaalprijs * 0.3 * 100) / 100;
+      const aangevraagdeAnnuleringskosten = Math.max(
+        0,
+        Number(annuleringskosten || 0)
+      );
+      const effectieveAnnuleringskosten =
+        geannuleerd_door === "shinego" || booking_status === "nieuw"
+          ? 0
+          : Math.min(aangevraagdeAnnuleringskosten, maxAnnuleringskosten);
+
+      const vergoedingVolgensVerdeling =
+        vorigeProfessionalId && effectieveAnnuleringskosten > 0
+          ? Math.round(effectieveAnnuleringskosten * 0.85 * 100) / 100
+          : 0;
+      const platformCommissieAnnulering =
+        Math.round(
+          Math.max(
+            0,
+            effectieveAnnuleringskosten - vergoedingVolgensVerdeling
+          ) * 100
+        ) / 100;
+
+      const klantAnnuleertMetKosten =
+        booking_status === "geannuleerd" &&
+        geannuleerd_door === "klant" &&
+        vergoedingVolgensVerdeling > 0;
+      const noShowGoedgekeurd =
+        booking_status === "geannuleerd" &&
+        klant_niet_thuis === true &&
+        vergoeding_goedgekeurd === true &&
+        vergoedingVolgensVerdeling > 0;
+
+      const definitiefGoedgekeurd =
+        klantAnnuleertMetKosten || noShowGoedgekeurd;
+      const definitieveProfessionalVergoeding = definitiefGoedgekeurd
+        ? vergoedingVolgensVerdeling
+        : 0;
+      const vergoedingZojuistGoedgekeurd =
+        definitiefGoedgekeurd &&
+        huidigeBoeking.vergoeding_goedgekeurd !== true;
 
       const { data: booking, error: bookingError } = await supabaseAdmin
         .from("boekingen")
@@ -135,12 +169,18 @@ export async function PATCH(request: Request) {
           status: booking_status,
           annuleringsreden,
           annuleringskosten: effectieveAnnuleringskosten,
-          professional_vergoeding: goedgekeurdeVergoeding,
-          vergoeding_goedgekeurd,
+          professional_vergoeding: definitieveProfessionalVergoeding,
+          vergoeding_goedgekeurd: definitiefGoedgekeurd,
           geannuleerd_door,
           klant_niet_thuis,
           niet_thuis_bewijs,
           geannuleerde_professional_id: vorigeProfessionalId,
+          ...(booking_status === "geannuleerd"
+            ? {
+                professional_bedrag: vergoedingVolgensVerdeling,
+                platform_commissie: platformCommissieAnnulering,
+              }
+            : {}),
           ...(booking_status === "geannuleerd" ||
           (booking_status === "nieuw" && ["professional", "shinego"].includes(geannuleerd_door))
             ? { professional_id: null }
