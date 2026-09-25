@@ -16,7 +16,7 @@ export async function POST(request: Request) {
 
     const { data: booking, error: bookingError } = await supabaseAdmin
       .from("boekingen")
-      .select("id, email, totaalprijs, betaald")
+      .select("id, email, totaalprijs, betaald, gewenste_datum")
       .eq("id", bookingId)
       .single();
 
@@ -44,6 +44,25 @@ export async function POST(request: Request) {
         { error: "Deze boeking is al betaald.", stage: "booking" },
         { status: 400 }
       );
+    }
+
+    if (booking.gewenste_datum) {
+      const vandaag = new Intl.DateTimeFormat("en-CA", {
+        timeZone: "Europe/Amsterdam",
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+      }).format(new Date());
+
+      if (String(booking.gewenste_datum).slice(0, 10) < vandaag) {
+        return NextResponse.json(
+          {
+            error: "De geplande datum van deze afspraak is verstreken. Neem contact op met ShineGo voor een nieuwe datum.",
+            stage: "booking",
+          },
+          { status: 409 }
+        );
+      }
     }
 
     const totaalprijs = Number(booking.totaalprijs);
