@@ -20,7 +20,7 @@ export default function CookieNotice() {
   if (!visible) return null;
 
   return (
-    <div className="fixed inset-x-4 bottom-4 z-50 mx-auto max-w-3xl rounded-2xl border border-slate-200 bg-white p-5 shadow-2xl sm:p-6">
+    <div className="fixed inset-x-3 bottom-[calc(.75rem+env(safe-area-inset-bottom))] z-50 mx-auto max-h-[calc(100dvh-1.5rem-env(safe-area-inset-bottom))] max-w-3xl overflow-y-auto rounded-2xl border border-slate-200 bg-white p-4 shadow-2xl sm:inset-x-4 sm:bottom-4 sm:p-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="max-w-2xl">
           <p className="font-bold text-slate-950">Cookies bij ShineGo</p>
@@ -41,7 +41,7 @@ export default function CookieNotice() {
         <button
           type="button"
           onClick={sluiten}
-          className="shrink-0 rounded-xl bg-blue-600 px-5 py-3 font-bold text-white transition hover:bg-blue-700"
+          className="w-full shrink-0 rounded-xl bg-blue-600 px-5 py-3 font-bold text-white transition hover:bg-blue-700 sm:w-auto"
         >
           Begrepen
         </button>
