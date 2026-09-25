@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { supabase } from "@/lib/supabase";
 
 type Boeking = {
   id: string | number;
@@ -438,64 +437,21 @@ export default function AdminPage() {
                               </button>
 
                               {boeking.status === "toegewezen" && (
-                                <button
-                                  type="button"
-                                  onClick={() =>
-                                    bookingStatusBijwerken(boeking.id, "afgerond")
-                                  }
-                                  className="rounded-lg bg-green-600 px-3 py-2 text-sm font-semibold text-white"
-                                >
-                                  Afronden
-                                </button>
+                                <div className="rounded-lg bg-gray-100 px-3 py-2 text-xs font-semibold text-gray-600">
+                                  Afronden gebeurt door de professional na uitvoering.
+                                </div>
                               )}
 
                               {boeking.betaald === true &&
                                 boeking.uitbetaald !== true &&
                                 boeking.professional_id &&
                                 boeking.status === "afgerond" && (
-                                  <button
-                                    type="button"
-                                    onClick={async () => {
-                                      try {
-                                        const { data: sessionData } = await supabase.auth.getSession();
-                                        const token = sessionData.session?.access_token;
-                                        if (!token) {
-                                          throw new Error("Niet ingelogd als professional.");
-                                        }
-
-                                        const response = await fetch(
-                                          "/api/stripe-payout",
-                                          {
-                                            method: "POST",
-                                            headers: {
-                                              "Content-Type": "application/json",
-                                              Authorization: `Bearer ${token}`,
-                                            },
-                                            body: JSON.stringify({
-                                              booking_id: boeking.id,
-                                            }),
-                                          }
-                                        );
-
-                                        const data = await response.json();
-                                        if (!response.ok) {
-                                          throw new Error(
-                                            data.error || "Uitbetaling mislukt."
-                                          );
-                                        }
-                                        await gegevensLaden();
-                                      } catch (error) {
-                                        setFout(
-                                          error instanceof Error
-                                            ? error.message
-                                            : "Uitbetaling mislukt."
-                                        );
-                                      }
-                                    }}
-                                    className="rounded-lg bg-blue-600 px-3 py-2 text-sm font-semibold text-white"
+                                  <a
+                                    href="/admin/betalingen"
+                                    className="rounded-lg bg-blue-600 px-3 py-2 text-center text-sm font-semibold text-white"
                                   >
-                                    Uitbetalen
-                                  </button>
+                                    Naar betalingen
+                                  </a>
                                 )}
 
                               {boeking.klant_niet_thuis &&
@@ -544,6 +500,7 @@ export default function AdminPage() {
                                 .filter(
                                   (professional) =>
                                     professional.actief === true &&
+                                    professional.geverifieerd === true &&
                                     professional.id !==
                                       boeking.geannuleerde_professional_id
                                 )
