@@ -3,6 +3,7 @@ import { Resend } from "resend";
 import {
   ADMIN_CHALLENGE_COOKIE,
   hashAdminCode,
+  leesAdminToken,
   maakAdminToken,
 } from "@/lib/adminAuth";
 
@@ -29,13 +30,32 @@ export async function POST(request: NextRequest) {
   const adminEmail = (process.env.ADMIN_LOGIN_EMAIL || "info@shinego.nl")
     .trim()
     .toLowerCase();
+
+  const bestaandeChallenge = await leesAdminToken(
+    request.cookies.get(ADMIN_CHALLENGE_COOKIE)?.value,
+    adminPassword
+  );
+  if (
+    bestaandeChallenge?.type === "challenge" &&
+    bestaandeChallenge.iat &&
+    Date.now() - bestaandeChallenge.iat < 60 * 1000
+  ) {
+    return NextResponse.json(
+      { error: "Wacht 1 minuut voordat je een nieuwe code aanvraagt." },
+      { status: 429 }
+    );
+  }
+
   const code = maakCode();
-  const exp = Date.now() + 10 * 60 * 1000;
+  const nu = Date.now();
+  const exp = nu + 10 * 60 * 1000;
   const codeHash = await hashAdminCode(code, adminPassword);
   const challenge = await maakAdminToken(
     {
       type: "challenge",
       exp,
+      iat: nu,
+      attempts: 0,
       email: adminEmail,
       code_hash: codeHash,
     },
