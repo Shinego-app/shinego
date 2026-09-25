@@ -147,13 +147,118 @@ export async function PATCH(request: Request) {
             : {}),
         })
         .eq("id", booking_id)
-        .select("*");
+        .select("*")
+        .maybeSingle();
 
       if (bookingError) {
         return NextResponse.json(
           { error: "Boekingstatus kon niet worden bijgewerkt.", details: bookingError.message },
           { status: 500 }
         );
+      }
+
+      if (!booking) {
+        return NextResponse.json(
+          { error: "Boeking kon niet worden bijgewerkt." },
+          { status: 409 }
+        );
+      }
+
+      try {
+        const meldingen: Promise<unknown>[] = [];
+        const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.shinego.nl").replace(/\/$/, "");
+
+        if (
+          booking_status === "geannuleerd" &&
+          klant_niet_thuis !== true &&
+          booking.email
+        ) {
+          const terugTeBetalen = Math.max(
+            0,
+            Number(booking.totaalprijs || 0) - effectieveAnnuleringskosten
+          );
+
+          meldingen.push(
+            resend.emails.send(
+              {
+                from: "ShineGo <noreply@shinego.nl>",
+                to: booking.email,
+                subject: `ShineGo-boeking #${booking.id} geannuleerd`,
+                html: `
+                  <p>Beste ${escapeHtml(booking.voornaam || "klant")},</p>
+                  <p>Je ShineGo-boeking is geannuleerd.</p>
+                  <p><strong>Annuleringskosten:</strong> €${effectieveAnnuleringskosten.toFixed(2).replace(".", ",")}<br>
+                  <strong>Terug te betalen:</strong> €${terugTeBetalen.toFixed(2).replace(".", ",")}</p>
+                  <p>Een eventuele terugbetaling wordt via ShineGo verwerkt.</p>
+                  <p>Met vriendelijke groet,<br>ShineGo</p>
+                `,
+              },
+              {
+                idempotencyKey: `booking-cancelled-customer/${booking.id}/${geannuleerd_door || "admin"}`,
+              }
+            )
+          );
+        }
+
+        if (vorigeProfessionalId && booking_status === "geannuleerd") {
+          const { data: vorigeProfessional } = await supabaseAdmin
+            .from("professionals")
+            .select("email, voornaam, bedrijfsnaam")
+            .eq("id", vorigeProfessionalId)
+            .maybeSingle();
+
+          if (vorigeProfessional?.email) {
+            meldingen.push(
+              resend.emails.send(
+                {
+                  from: "ShineGo <noreply@shinego.nl>",
+                  to: vorigeProfessional.email,
+                  subject: `ShineGo-opdracht #${booking.id} geannuleerd`,
+                  html: `
+                    <p>Beste ${escapeHtml(vorigeProfessional.voornaam || vorigeProfessional.bedrijfsnaam || "professional")},</p>
+                    <p>Opdracht <strong>#${booking.id}</strong> is geannuleerd en staat niet meer in je planning.</p>
+                    <p><strong>Datum:</strong> ${escapeHtml(booking.gewenste_datum || "-")}<br>
+                    <strong>Tijd:</strong> ${escapeHtml(booking.gewenste_tijd || "-")}</p>
+                    <p>Controleer je dashboard voor je actuele opdrachten.</p>
+                    <p><a href="${siteUrl}/professional/dashboard">Open dashboard</a></p>
+                  `,
+                },
+                {
+                  idempotencyKey: `booking-cancelled-professional/${booking.id}/${vorigeProfessionalId}`,
+                }
+              )
+            );
+          }
+        }
+
+        if (
+          booking_status === "nieuw" &&
+          geannuleerd_door === "professional" &&
+          booking.email
+        ) {
+          meldingen.push(
+            resend.emails.send(
+              {
+                from: "ShineGo <noreply@shinego.nl>",
+                to: booking.email,
+                subject: `Update over je ShineGo-boeking #${booking.id}`,
+                html: `
+                  <p>Beste ${escapeHtml(booking.voornaam || "klant")},</p>
+                  <p>De eerder gekoppelde professional kan je afspraak niet uitvoeren.</p>
+                  <p>Je betaalde boeking blijft actief en ShineGo stelt de opdracht opnieuw beschikbaar. Je hoeft niets opnieuw te betalen.</p>
+                  <p>We houden je op de hoogte zodra een nieuwe professional is gekoppeld.</p>
+                `,
+              },
+              {
+                idempotencyKey: `admin-professional-cancel-customer/${booking.id}/${vorigeProfessionalId || "unknown"}`,
+              }
+            )
+          );
+        }
+
+        await Promise.allSettled(meldingen);
+      } catch (meldingError) {
+        console.error("Meldingen na admin-statuswijziging mislukt:", meldingError);
       }
 
       return NextResponse.json({ booking });
