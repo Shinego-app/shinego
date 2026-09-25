@@ -294,7 +294,9 @@ export async function POST(req: NextRequest) {
     });
 
     const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://shinego.nl").replace(/\/$/, "");
-    const reviewUrl = `${siteUrl}/review/${booking.review_token}`;
+    const reviewUrl = booking.review_token
+      ? `${siteUrl}/review/${booking.review_token}`
+      : null;
 
     const { error: klantEmailError } = await resend.emails.send(
       {
@@ -304,8 +306,10 @@ export async function POST(req: NextRequest) {
       html: `
         <p>Beste ${escapeHtml(booking.voornaam)},</p>
         <p>Je opdracht is afgerond. In de bijlage vind je jouw factuur.</p>
-        <p>Hoe was je ervaring met ${escapeHtml(professional.bedrijfsnaam)}? Je helpt andere klanten en de professional met een korte beoordeling.</p>
-        <p><a href="${reviewUrl}" style="display:inline-block;background:#2563eb;color:#ffffff;text-decoration:none;padding:12px 18px;border-radius:10px;font-weight:600;">Geef een beoordeling</a></p>
+        ${reviewUrl ? `
+          <p>Hoe was je ervaring met ${escapeHtml(professional.bedrijfsnaam)}? Je helpt andere klanten en de professional met een korte beoordeling.</p>
+          <p><a href="${reviewUrl}" style="display:inline-block;background:#2563eb;color:#ffffff;text-decoration:none;padding:12px 18px;border-radius:10px;font-weight:600;">Geef een beoordeling</a></p>
+        ` : ""}
         ${vervolgInfo ? `
           <hr style="border:0;border-top:1px solid #e5e7eb;margin:28px 0;">
           <h3 style="color:#0b3d75;">Je volgende glasbewassing staat klaar</h3>
