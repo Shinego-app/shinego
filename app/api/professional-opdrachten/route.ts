@@ -5,6 +5,15 @@ import { Resend } from "resend";
 
 const resend = new Resend(process.env.RESEND_API_KEY!);
 
+function escapeHtml(value: unknown) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
+}
+
 function vandaagNederland() {
   return new Intl.DateTimeFormat("en-CA", {
     timeZone: "Europe/Amsterdam",
@@ -217,8 +226,8 @@ export async function POST(request: Request) {
             html: `
               <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111827">
                 <h2 style="color:#2563eb">Er is een glazenwasser aan je opdracht gekoppeld</h2>
-                <p>Beste ${String(aangenomen.voornaam || "klant")},</p>
-                <p><strong>${String(professionalNaam)}</strong> heeft je ShineGo-opdracht aangenomen.</p>
+                <p>Beste ${escapeHtml(aangenomen.voornaam || "klant")},</p>
+                <p><strong>${escapeHtml(professionalNaam)}</strong> heeft je ShineGo-opdracht aangenomen.</p>
                 <div style="margin:20px 0;padding:16px;background:#f9fafb;border-radius:12px">
                   <p style="margin:0 0 6px"><strong>Boekingsnummer:</strong> ${aangenomen.id}</p>
                   <p style="margin:0 0 6px"><strong>Datum:</strong> ${aangenomen.gewenste_datum || "-"}</p>
