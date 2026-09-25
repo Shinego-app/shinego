@@ -1,18 +1,6 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
-function normaliseerDiensten(value: unknown) {
-  const invoer = Array.isArray(value) ? value : [];
-  const toegestaan = new Set(["glazenwasser", "telewash", "bedrijf", "binnen"]);
-  const diensten = invoer
-    .map((dienst) => String(dienst || "").toLowerCase())
-    .map((dienst) => (dienst === "glazenwassen" ? "glazenwasser" : dienst))
-    .filter((dienst) => toegestaan.has(dienst));
-
-  if (!diensten.includes("glazenwasser")) diensten.unshift("glazenwasser");
-  return Array.from(new Set(diensten));
-}
-
 export async function POST(request: Request) {
   try {
     const authHeader = request.headers.get("authorization") || "";
