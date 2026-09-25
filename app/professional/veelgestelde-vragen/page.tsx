@@ -51,7 +51,7 @@ const vragen = [
   {
     vraag: "Wat als de klant niet thuis is of ik geen toegang krijg?",
     antwoord:
-      "Controleer eerst of aanwezigheid volgens de opdracht nodig is. Als de opdracht niet kan worden uitgevoerd door ontbrekende toegang of afwezigheid van de klant, leg dit vast en meld het via ShineGo. De no-show- en annuleringsregels worden daarna toegepast.",
+      "Controleer eerst of aanwezigheid volgens de opdracht nodig is. Als de opdracht niet kan worden uitgevoerd door ontbrekende toegang of afwezigheid van de klant, leg dit vast en meld het via ShineGo. Na goedkeuring van het bewijs geldt bij 30% annuleringskosten de standaardverdeling: 85% van die annuleringskosten is voor de professional en 15% is platformcommissie voor ShineGo. Uitbetaling volgt nadat de klantterugbetaling is verwerkt.",
   },
   {
     vraag: "Kan ik zelf een opdracht annuleren?",
