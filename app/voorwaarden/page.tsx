@@ -7,7 +7,7 @@ export default function VoorwaardenPage() {
         <div className="rounded-3xl border border-slate-200 bg-white p-7 shadow-sm sm:p-10">
           <p className="text-sm font-bold uppercase tracking-wider text-blue-600">ShineGo</p>
           <h1 className="mt-2 text-3xl font-extrabold tracking-tight sm:text-4xl">Algemene voorwaarden voor klanten</h1>
-          <p className="mt-3 text-sm text-slate-500">Laatst bijgewerkt: 14 september 2026</p>
+          <p className="mt-3 text-sm text-slate-500">Laatst bijgewerkt: 25 september 2026</p>
 
           <div className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-5 text-sm leading-6 text-slate-700">
             <p><strong>Handelsnaam:</strong> ShineGo</p>
@@ -84,7 +84,9 @@ export default function VoorwaardenPage() {
             <section>
               <h2 className="text-xl font-bold text-slate-900">11. Periodieke boekingen</h2>
               <p className="mt-2">Wanneer de klant kiest voor een terugkerende frequentie, bijvoorbeeld iedere 4, 8 of 12 weken, worden de frequentie, prijs of korting en overige relevante afspraken vóór het afronden van de boeking getoond.</p>
-              <p className="mt-2">De klant kan toekomstige periodieke opdrachten beëindigen volgens de voorwaarden die bij het aangaan van de periodieke boeking zijn meegedeeld. Dwingendrechtelijke regels over opzegging, verlenging en consumentenbescherming blijven altijd van toepassing.</p>
+              <p className="mt-2">Na een afgeronde periodieke opdracht kan ShineGo de volgende beurt op basis van de gekozen frequentie klaarzetten. Hiervoor wordt niet automatisch opnieuw afgeschreven. De klant ontvangt voor iedere volgende beurt een afzonderlijk betaalverzoek en de volgende afspraak wordt pas definitief nadat die betaling is afgerond.</p>
+              <p className="mt-2">Als de klant een volgende beurt niet wil bevestigen, hoeft het betaalverzoek niet te worden voldaan. ShineGo kan waar mogelijk rekening houden met dezelfde professional, maar een zelfstandige professional blijft vrij om een nieuwe opdracht wel of niet aan te nemen.</p>
+              <p className="mt-2">Dwingendrechtelijke regels over opzegging, verlenging en consumentenbescherming blijven altijd van toepassing.</p>
             </section>
 
             <section>
