@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
+import BookingNavigation from "@/app/components/BookingNavigation";
 
 export const metadata: Metadata = {
   robots: {
@@ -9,5 +10,10 @@ export const metadata: Metadata = {
 };
 
 export default function BoekenLayout({ children }: { children: ReactNode }) {
-  return children;
+  return (
+    <>
+      <BookingNavigation />
+      {children}
+    </>
+  );
 }
