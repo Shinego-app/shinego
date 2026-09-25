@@ -43,7 +43,6 @@ export async function POST(request: Request) {
     const avbPolisnummer = String(body.avb_polisnummer || "").trim();
     const avbBevestigd = body.avb_bevestigd === true;
     const werkgebiedKm = Number(body.werkgebied_km);
-    const diensten = normaliseerDiensten(body.diensten);
 
     if (
       !bedrijfsnaam || !voornaam || !achternaam || !telefoon ||
@@ -93,7 +92,6 @@ export async function POST(request: Request) {
         avb_polisnummer: avbPolisnummer || null,
         avb_bevestigd: avbBevestigd,
         werkgebied_km: werkgebiedKm,
-        diensten,
       })
       .eq("user_id", userData.user.id)
       .select("*")
@@ -107,7 +105,6 @@ export async function POST(request: Request) {
     const { error: metadataError } = await supabaseAdmin.auth.admin.updateUserById(userData.user.id, {
       user_metadata: {
         ...bestaandeMetadata,
-        diensten,
         werkgebied_km: werkgebiedKm,
         avb_verzekeraar: avbVerzekeraar || null,
         avb_polisnummer: avbPolisnummer || null,
