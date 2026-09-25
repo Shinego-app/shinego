@@ -28,17 +28,31 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Boeking niet gevonden." }, { status: 404 });
     }
 
-    if (!booking.professional_id) {
-      return NextResponse.json({ error: "Geen professional aan deze boeking gekoppeld." }, { status: 400 });
+    const isAnnuleringsvergoeding = booking.status === "geannuleerd";
+    const professionalId = isAnnuleringsvergoeding
+      ? booking.geannuleerde_professional_id
+      : booking.professional_id;
+
+    if (!professionalId) {
+      return NextResponse.json({ error: "Geen professional voor deze uitbetaling gevonden." }, { status: 400 });
     }
 
-    const tijdControle = magOpdrachtStarten(booking.gewenste_datum, booking.gewenste_tijd);
-    if (!tijdControle.toegestaan) {
-      return NextResponse.json({ error: `Uitbetaling geblokkeerd. ${tijdControle.reden}` }, { status: 400 });
-    }
+    if (isAnnuleringsvergoeding) {
+      if (booking.vergoeding_goedgekeurd !== true || Number(booking.professional_vergoeding || 0) <= 0) {
+        return NextResponse.json({ error: "De annuleringsvergoeding is nog niet goedgekeurd." }, { status: 400 });
+      }
+      if (booking.terugbetaald !== true) {
+        return NextResponse.json({ error: "Verwerk eerst de klantterugbetaling." }, { status: 409 });
+      }
+    } else {
+      const tijdControle = magOpdrachtStarten(booking.gewenste_datum, booking.gewenste_tijd);
+      if (!tijdControle.toegestaan) {
+        return NextResponse.json({ error: `Uitbetaling geblokkeerd. ${tijdControle.reden}` }, { status: 400 });
+      }
 
-    if (booking.status !== "afgerond") {
-      return NextResponse.json({ error: "Boeking is nog niet afgerond." }, { status: 400 });
+      if (booking.status !== "afgerond") {
+        return NextResponse.json({ error: "Boeking is nog niet afgerond." }, { status: 400 });
+      }
     }
 
     if (booking.uitbetaald === true) {
@@ -48,7 +62,7 @@ export async function POST(request: Request) {
     const { data: professional, error: professionalError } = await supabaseAdmin
       .from("professionals")
       .select("id, email, stripe_account_id, uitbetalingen_actief, bedrijfsnaam, kvk_nummer, btw_nummer")
-      .eq("id", booking.professional_id)
+      .eq("id", professionalId)
       .single();
 
     if (professionalError || !professional) {
@@ -76,7 +90,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: `Uitbetalingen zijn in Stripe niet actief (${status}).` }, { status: 400 });
     }
 
-    const amount = Math.round(Number(booking.professional_bedrag || 0) * 100);
+    const uitbetalingsbedrag = Number(isAnnuleringsvergoeding ? booking.professional_vergoeding || 0 : booking.professional_bedrag || 0);
+    const amount = Math.round(uitbetalingsbedrag * 100);
     if (!amount || amount <= 0) {
       return NextResponse.json({ error: "Ongeldig uitbetalingsbedrag." }, { status: 400 });
     }
@@ -109,7 +124,7 @@ export async function POST(request: Request) {
       .from("boekingen")
       .update({
         uitbetaald: true,
-        uitbetaald_bedrag: Number(booking.professional_bedrag),
+        uitbetaald_bedrag: uitbetalingsbedrag,
         stripe_transfer_id: transfer.id,
         factuurnummer,
       })
@@ -121,9 +136,13 @@ export async function POST(request: Request) {
     let afrekeningVerzonden = false;
     if (professional.email) {
       try {
-        const klantbedrag = Number(booking.totaalprijs ?? 0);
-        const professionalBedrag = Number(booking.professional_bedrag ?? 0);
-        const platformCommissie = Number(booking.platform_commissie ?? Math.max(0, klantbedrag - professionalBedrag));
+        const klantbedrag = isAnnuleringsvergoeding
+          ? Number(booking.annuleringskosten ?? 0)
+          : Number(booking.totaalprijs ?? 0);
+        const professionalBedrag = uitbetalingsbedrag;
+        const platformCommissie = isAnnuleringsvergoeding
+          ? Math.max(0, klantbedrag - professionalBedrag)
+          : Number(booking.platform_commissie ?? Math.max(0, klantbedrag - professionalBedrag));
 
         const pdfBytes = await maakProfessionalAfrekeningPdf({
           factuurnummer,
@@ -141,8 +160,8 @@ export async function POST(request: Request) {
         const { error: emailError } = await resend.emails.send({
           from: "ShineGo <noreply@shinego.nl>",
           to: professional.email,
-          subject: `Uitbetalingsafrekening ${factuurnummer} - ShineGo`,
-          html: `<p>Beste ${professional.bedrijfsnaam || "professional"},</p><p>De uitbetaling voor opdracht ${booking.id} is uitgevoerd.</p><p>In de bijlage vind je de uitbetalingsafrekening.</p><p>Met vriendelijke groet,<br />ShineGo</p>`,
+          subject: isAnnuleringsvergoeding ? `Annuleringsvergoeding ${factuurnummer} - ShineGo` : `Uitbetalingsafrekening ${factuurnummer} - ShineGo`,
+          html: `<p>Beste ${professional.bedrijfsnaam || "professional"},</p><p>${isAnnuleringsvergoeding ? `De annuleringsvergoeding voor opdracht ${booking.id} is uitgevoerd.` : `De uitbetaling voor opdracht ${booking.id} is uitgevoerd.`}</p><p>In de bijlage vind je de uitbetalingsafrekening.</p><p>Met vriendelijke groet,<br />ShineGo</p>`,
           attachments: [{ filename: `afrekening-${factuurnummer}.pdf`, content: Buffer.from(pdfBytes) }],
         });
 
