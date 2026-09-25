@@ -50,7 +50,10 @@ async function stuurNieuweOpdrachtMeldingen(boeking: {
   gewenste_datum?: string | null;
   gewenste_tijd?: string | null;
   professional_bedrag?: number | string | null;
+  opmerking?: string | null;
 }) {
+  const voorkeurMatch = String(boeking.opmerking || "").match(/\[\[shinego-voorkeur-professional:([^\]]+)\]\]/);
+  const voorkeurProfessionalId = voorkeurMatch?.[1] || null;
   const { data: professionals, error } = await supabaseAdmin
     .from("professionals")
     .select("id, email, bedrijfsnaam, voornaam, postcode, huisnummer, werkgebied_km, diensten, actief, geverifieerd")
@@ -85,12 +88,14 @@ async function stuurNieuweOpdrachtMeldingen(boeking: {
         {
           from: "ShineGo <noreply@shinego.nl>",
           to: professional.email!,
-          subject: `Nieuwe ShineGo-opdracht in jouw werkgebied (#${boeking.id})`,
+          subject: String(professional.id) === voorkeurProfessionalId
+            ? `Terugkerende ShineGo-klant: opdracht #${boeking.id}`
+            : `Nieuwe ShineGo-opdracht in jouw werkgebied (#${boeking.id})`,
           html: `
             <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111827">
               <h2 style="color:#2563eb">Nieuwe opdracht beschikbaar</h2>
               <p>Beste ${escapeHtml(professional.voornaam || professional.bedrijfsnaam || "professional")},</p>
-              <p>Er staat een nieuwe betaalde opdracht klaar die past bij jouw diensten en werkgebied.</p>
+              <p>${String(professional.id) === voorkeurProfessionalId ? "Een klant die je eerder via ShineGo hebt geholpen heeft een nieuwe beurt betaald. Waar mogelijk geven we de klant graag dezelfde glazenwasser; je blijft vrij om de opdracht wel of niet aan te nemen." : "Er staat een nieuwe betaalde opdracht klaar die past bij jouw diensten en werkgebied."}</p>
               <div style="margin:20px 0;padding:16px;background:#f9fafb;border-radius:12px">
                 <p style="margin:0 0 6px"><strong>Regio:</strong> ${escapeHtml(boeking.postcode || "")} ${escapeHtml(boeking.plaats || "")}</p>
                 <p style="margin:0 0 6px"><strong>Datum:</strong> ${escapeHtml(formatDatum(boeking.gewenste_datum))}</p>
@@ -169,7 +174,7 @@ export async function POST(request: Request) {
             .eq("id", bookingId)
             .eq("betaald", false)
             .select(
-              "id, voornaam, achternaam, email, straat, huisnummer, toevoeging, postcode, plaats, woningtype, glasbewassing_type, telescoop, gewenste_datum, gewenste_tijd, totaalprijs, professional_bedrag"
+              "id, voornaam, achternaam, email, straat, huisnummer, toevoeging, postcode, plaats, woningtype, glasbewassing_type, telescoop, gewenste_datum, gewenste_tijd, totaalprijs, professional_bedrag, opmerking"
             )
             .maybeSingle();
 
@@ -193,7 +198,7 @@ export async function POST(request: Request) {
             await supabaseAdmin
               .from("boekingen")
               .select(
-                "id, voornaam, achternaam, email, straat, huisnummer, toevoeging, postcode, plaats, woningtype, glasbewassing_type, telescoop, gewenste_datum, gewenste_tijd, totaalprijs, professional_bedrag, betaald, stripe_payment_id"
+                "id, voornaam, achternaam, email, straat, huisnummer, toevoeging, postcode, plaats, woningtype, glasbewassing_type, telescoop, gewenste_datum, gewenste_tijd, totaalprijs, professional_bedrag, opmerking, betaald, stripe_payment_id"
               )
               .eq("id", bookingId)
               .eq("betaald", true)
