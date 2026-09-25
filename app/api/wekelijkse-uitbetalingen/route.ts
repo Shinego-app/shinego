@@ -16,19 +16,47 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Niet toegestaan" }, { status: 401 });
   }
 
-  const { data: boekingen, error: boekingenError } = await supabaseAdmin
-    .from("boekingen")
-    .select("*")
-    .in("status", ["afgerond", "geannuleerd"])
-    .eq("betaald", true)
-    .eq("uitbetaald", false)
-    .order("gewenste_datum", { ascending: true })
-    .limit(100);
+  const [afgerondeResultaat, annuleringenResultaat] = await Promise.all([
+    supabaseAdmin
+      .from("boekingen")
+      .select("*")
+      .eq("status", "afgerond")
+      .eq("betaald", true)
+      .eq("uitbetaald", false)
+      .not("professional_id", "is", null)
+      .order("gewenste_datum", { ascending: true })
+      .limit(100),
+    supabaseAdmin
+      .from("boekingen")
+      .select("*")
+      .eq("status", "geannuleerd")
+      .eq("betaald", true)
+      .eq("uitbetaald", false)
+      .eq("vergoeding_goedgekeurd", true)
+      .gt("professional_vergoeding", 0)
+      .not("geannuleerde_professional_id", "is", null)
+      .order("gewenste_datum", { ascending: true })
+      .limit(100),
+  ]);
+
+  const boekingenError =
+    afgerondeResultaat.error || annuleringenResultaat.error;
 
   if (boekingenError) {
     console.error("Wekelijkse uitbetalingen: boekingen ophalen mislukt", boekingenError);
     return NextResponse.json({ error: "Boekingen ophalen mislukt" }, { status: 500 });
   }
+
+  const boekingen = [
+    ...(afgerondeResultaat.data || []),
+    ...(annuleringenResultaat.data || []),
+  ]
+    .sort((a, b) =>
+      String(a.gewenste_datum || "").localeCompare(
+        String(b.gewenste_datum || "")
+      )
+    )
+    .slice(0, 100);
 
   let uitgevoerd = 0;
   let overgeslagen = 0;
