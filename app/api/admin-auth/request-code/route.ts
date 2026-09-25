@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Resend } from "resend";
+import { checkRateLimit, clientIp } from "@/lib/rateLimit";
 import {
   ADMIN_CHALLENGE_COOKIE,
   hashAdminCode,
@@ -16,6 +17,21 @@ function maakCode() {
 }
 
 export async function POST(request: NextRequest) {
+  const rate = checkRateLimit(
+    `admin-code:${clientIp(request)}`,
+    5,
+    10 * 60 * 1000
+  );
+  if (!rate.toegestaan) {
+    return NextResponse.json(
+      { error: "Te veel code-aanvragen. Probeer het later opnieuw." },
+      {
+        status: 429,
+        headers: { "Retry-After": String(rate.retryAfterSeconds) },
+      }
+    );
+  }
+
   const adminPassword = process.env.ADMIN_PASSWORD;
   if (!adminPassword) {
     return NextResponse.json(
