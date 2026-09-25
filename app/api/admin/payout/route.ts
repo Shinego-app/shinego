@@ -100,7 +100,7 @@ export async function POST(request: Request) {
         source_transaction: chargeId,
         metadata: { booking_id: String(booking.id) },
       },
-      { idempotencyKey: `shinego-admin-payout-booking-${booking.id}` }
+      { idempotencyKey: `shinego-payout-booking-${booking.id}` }
     );
 
     const factuurnummer = booking.factuurnummer ?? maakFactuurnummer(Number(booking.id));
