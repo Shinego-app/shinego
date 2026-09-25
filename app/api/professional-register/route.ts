@@ -63,9 +63,17 @@ export async function POST(request: Request) {
     }
 
     const bedrijfsnaam = String(metadata.bedrijfsnaam || "").trim();
+    const voornaam = String(metadata.voornaam || "").trim();
+    const achternaam = String(metadata.achternaam || "").trim();
     const telefoon = String(metadata.telefoon || "").trim();
-    const postcode = String(metadata.postcode || "").trim();
+    const schoonTelefoon = telefoon.replace(/[\s().-]/g, "");
+    const postcodeRaw = String(metadata.postcode || "").replace(/\s/g, "").toUpperCase();
+    const postcode = /^[1-9][0-9]{3}[A-Z]{2}$/.test(postcodeRaw)
+      ? `${postcodeRaw.slice(0, 4)} ${postcodeRaw.slice(4)}`
+      : "";
     const woonplaats = String(metadata.woonplaats || "").trim();
+    const straat = String(metadata.straat || "").trim();
+    const huisnummer = String(metadata.huisnummer || "").trim();
     const kvkNummer = String(metadata.kvk_nummer || "").replace(/\D/g, "");
     const btwNummer = String(metadata.btw_nummer || "").replace(/[\s.\-]/g, "").toUpperCase();
     const avbVerzekeraar = String(metadata.avb_verzekeraar || "").trim();
@@ -73,9 +81,14 @@ export async function POST(request: Request) {
 
     if (
       !bedrijfsnaam ||
+      !voornaam ||
+      !achternaam ||
       !telefoon ||
+      !/^(?:\+31|0031|0)[1-9][0-9]{8}$/.test(schoonTelefoon) ||
       !postcode ||
       !woonplaats ||
+      !straat ||
+      !huisnummer ||
       !/^\d{8}$/.test(kvkNummer) ||
       !/^NL\d{9}B\d{2}$/.test(btwNummer)
     ) {
@@ -96,13 +109,13 @@ export async function POST(request: Request) {
         user_id: user.id,
         email: user.email || null,
         bedrijfsnaam,
-        voornaam: String(metadata.voornaam || "").trim() || null,
-        achternaam: String(metadata.achternaam || "").trim() || null,
+        voornaam,
+        achternaam,
         telefoon,
         postcode,
         woonplaats,
-        straat: String(metadata.straat || "").trim() || null,
-        huisnummer: String(metadata.huisnummer || "").trim() || null,
+        straat,
+        huisnummer,
         toevoeging: String(metadata.toevoeging || "").trim() || null,
         kvk_nummer: kvkNummer,
         btw_nummer: btwNummer,
