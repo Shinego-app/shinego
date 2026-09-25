@@ -145,8 +145,19 @@ export async function POST(request: Request) {
   }
 
   try {
-    if (event.type === "checkout.session.completed") {
+    if (
+      event.type === "checkout.session.completed" ||
+      event.type === "checkout.session.async_payment_succeeded"
+    ) {
       const session = event.data.object as Stripe.Checkout.Session;
+
+      if (session.payment_status !== "paid") {
+        return NextResponse.json({
+          received: true,
+          pending_payment: true,
+        });
+      }
+
       const bookingId = session.metadata?.bookingId;
 
       if (bookingId && session.payment_intent) {
