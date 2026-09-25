@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { heeftBenodigdeDienst, ligtBinnenWerkgebied, vereisteDienst } from "@/lib/opdrachtMatching";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY!);
 
 function vandaagNederland() {
   return new Intl.DateTimeFormat("en-CA", {
@@ -33,7 +36,7 @@ async function haalProfessional(request: Request) {
 
   const { data: professional, error: professionalError } = await supabaseAdmin
     .from("professionals")
-    .select("id, postcode, huisnummer, woonplaats, werkgebied_km, diensten, actief, geverifieerd")
+    .select("id, email, bedrijfsnaam, voornaam, postcode, huisnummer, woonplaats, werkgebied_km, diensten, actief, geverifieerd")
     .eq("user_id", user.id)
     .single();
 
@@ -199,6 +202,44 @@ export async function POST(request: Request) {
 
     if (!aangenomen) {
       return NextResponse.json({ error: "Deze opdracht is niet meer beschikbaar." }, { status: 409 });
+    }
+
+    if (aangenomen.email) {
+      try {
+        const professionalNaam =
+          professional.bedrijfsnaam || professional.voornaam || "de professional";
+
+        const { error: mailError } = await resend.emails.send(
+          {
+            from: "ShineGo <noreply@shinego.nl>",
+            to: aangenomen.email,
+            subject: `Professional gekoppeld - ShineGo boeking ${aangenomen.id}`,
+            html: `
+              <div style="font-family:Arial,sans-serif;line-height:1.6;color:#111827">
+                <h2 style="color:#2563eb">Er is een glazenwasser aan je opdracht gekoppeld</h2>
+                <p>Beste ${String(aangenomen.voornaam || "klant")},</p>
+                <p><strong>${String(professionalNaam)}</strong> heeft je ShineGo-opdracht aangenomen.</p>
+                <div style="margin:20px 0;padding:16px;background:#f9fafb;border-radius:12px">
+                  <p style="margin:0 0 6px"><strong>Boekingsnummer:</strong> ${aangenomen.id}</p>
+                  <p style="margin:0 0 6px"><strong>Datum:</strong> ${aangenomen.gewenste_datum || "-"}</p>
+                  <p style="margin:0"><strong>Tijd:</strong> ${aangenomen.gewenste_tijd || "-"}</p>
+                </div>
+                <p>De boeking en betaling blijven via ShineGo beheerd.</p>
+                <p>Met vriendelijke groet,<br><strong>ShineGo</strong></p>
+              </div>
+            `,
+          },
+          {
+            idempotencyKey: `job-accepted/${aangenomen.id}/${professional.id}`,
+          }
+        );
+
+        if (mailError) {
+          console.error("Klantmelding na aannemen opdracht mislukt:", mailError);
+        }
+      } catch (mailError) {
+        console.error("Klantmelding na aannemen opdracht fout:", mailError);
+      }
     }
 
     return NextResponse.json({ booking: aangenomen });
