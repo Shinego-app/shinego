@@ -10,6 +10,15 @@ function bedrag(value: unknown) {
 }
 
 function dienstLabel(opdracht: any) {
+  const type = String(opdracht.glasbewassing_type || "").toLowerCase();
+
+  if (type === "bedrijf-binnen") return "Bedrijfspand · binnenramen";
+  if (type === "bedrijf-binnen-buiten") return "Bedrijfspand · binnen + buiten";
+  if (type === "binnen-buiten") {
+    return opdracht.telescoop
+      ? "Binnen + buiten · telescoopsteel"
+      : "Binnen + buiten ramen";
+  }
   if (opdracht.vereiste_dienst === "telewash") return "Telewash / telescoopsteel";
   if (opdracht.vereiste_dienst === "bedrijf") return "Winkel / bedrijfspand";
   if (opdracht.vereiste_dienst === "binnen") return "Binnenramen";
