@@ -193,7 +193,7 @@ export default function ProfessionalDashboardPage() {
   return (
     <main className="min-h-screen bg-gray-50 px-4 py-8 sm:px-6">
       <div className="mx-auto w-full max-w-5xl">
-        <h1 className="text-2xl font-bold text-gray-900 sm:text-3xl">
+        <h1 className="min-w-0 text-2xl font-bold text-gray-900 [overflow-wrap:anywhere] sm:text-3xl">
           {professional?.bedrijfsnaam ? `Welkom, ${professional.bedrijfsnaam}` : "Mijn ShineGo"}
         </h1>
         <p className="mt-2 text-gray-600">Beheer hier je opdrachten, planning en verdiensten.</p>
@@ -299,7 +299,7 @@ export default function ProfessionalDashboardPage() {
         <section className="mt-8 rounded-2xl bg-white p-5 shadow-sm sm:p-6">
           <h2>Mijn opdrachten</h2>
           {opdrachten.length === 0 ? <p>Je hebt momenteel geen opdrachten.</p> : opdrachten.map((opdracht) => (
-            <div key={opdracht.id} onClick={() => router.push(`/professional/dashboard/opdracht/${opdracht.id}`)} className="mt-4 cursor-pointer rounded-xl border border-gray-200 bg-white p-4 transition hover:border-blue-300 hover:shadow-sm">
+            <div key={opdracht.id} onClick={() => router.push(`/professional/dashboard/opdracht/${opdracht.id}`)} className="mt-4 min-w-0 cursor-pointer rounded-xl border border-gray-200 bg-white p-4 transition hover:border-blue-300 hover:shadow-sm">
               <strong>{opdracht.voornaam} {opdracht.achternaam}</strong>
               <p>Datum: {opdracht.gewenste_datum || "Nog niet gepland"}</p>
               <p>Tijd: {opdracht.gewenste_tijd || "Nog niet gepland"}</p>
