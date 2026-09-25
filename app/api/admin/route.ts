@@ -96,6 +96,13 @@ export async function PATCH(request: Request) {
     } = body;
 
     if (booking_id && booking_status) {
+      if (!["nieuw", "geannuleerd"].includes(String(booking_status))) {
+        return NextResponse.json(
+          { error: "Deze statuswijziging is niet toegestaan via de beheeractie." },
+          { status: 400 }
+        );
+      }
+
       const effectieveAnnuleringskosten =
         geannuleerd_door === "shinego" ? 0 : Math.max(0, Number(annuleringskosten || 0));
 
@@ -105,20 +112,6 @@ export async function PATCH(request: Request) {
           : vergoeding_goedgekeurd === true && klant_niet_thuis
             ? Math.min(effectieveAnnuleringskosten, 25)
             : Number(professional_vergoeding || 0);
-
-      const { data: huidigeBoeking } = await supabaseAdmin
-        .from("boekingen")
-        .select("betaald, uitbetaald, professional_bedrag")
-        .eq("id", booking_id)
-        .single();
-
-      const uitbetaaldBedrag = klant_niet_thuis === true
-        ? goedgekeurdeVergoeding
-        : Number(huidigeBoeking?.professional_bedrag || 0);
-
-      if (uitbetaald === true && (!huidigeBoeking?.betaald || huidigeBoeking?.uitbetaald)) {
-        return NextResponse.json({ error: "Deze boeking kan niet worden uitbetaald." }, { status: 400 });
-      }
 
       const { data: booking, error: bookingError } = await supabaseAdmin
         .from("boekingen")
@@ -135,12 +128,6 @@ export async function PATCH(request: Request) {
           ...(booking_status === "nieuw" && ["professional", "shinego"].includes(geannuleerd_door)
             ? { professional_id: null }
             : {}),
-          uitbetaald_bedrag:
-            uitbetaald === true && (!klant_niet_thuis || vergoeding_goedgekeurd === true)
-              ? uitbetaaldBedrag
-              : 0,
-          uitbetaald:
-            uitbetaald === true && (!klant_niet_thuis || vergoeding_goedgekeurd === true),
         })
         .eq("id", booking_id)
         .select("*");
