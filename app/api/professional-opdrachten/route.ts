@@ -14,13 +14,49 @@ function escapeHtml(value: unknown) {
     .replaceAll("'", "&#039;");
 }
 
-function vandaagNederland() {
-  return new Intl.DateTimeFormat("en-CA", {
+function nuNederland() {
+  const delen = new Intl.DateTimeFormat("nl-NL", {
     timeZone: "Europe/Amsterdam",
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
-  }).format(new Date());
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).formatToParts(new Date());
+
+  const waarde = (type: string) =>
+    delen.find((deel) => deel.type === type)?.value || "";
+
+  return {
+    datum: `${waarde("year")}-${waarde("month")}-${waarde("day")}`,
+    tijd: `${waarde("hour")}:${waarde("minute")}`,
+  };
+}
+
+function vandaagNederland() {
+  return nuNederland().datum;
+}
+
+function tijdvakVerlopen(
+  gewensteDatum?: string | null,
+  gewensteTijd?: string | null
+) {
+  if (!gewensteDatum) return true;
+
+  const nu = nuNederland();
+  const datum = String(gewensteDatum).slice(0, 10);
+
+  if (datum < nu.datum) return true;
+  if (datum > nu.datum) return false;
+
+  const tijden = String(gewensteTijd || "").match(/(\d{1,2}:\d{2})/g) || [];
+  const einde = tijden[1] || tijden[0];
+  if (!einde) return false;
+
+  const [uur, minuut] = einde.split(":");
+  const eindTijd = `${uur.padStart(2, "0")}:${minuut}`;
+  return nu.tijd >= eindTijd;
 }
 
 function normaliseerDiensten(value: unknown) {
@@ -121,7 +157,14 @@ export async function GET(request: Request) {
     );
 
     const opdrachten = gematchteOpdrachten
-      .filter((item) => item.binnen_werkgebied)
+      .filter(
+        (item) =>
+          item.binnen_werkgebied &&
+          !tijdvakVerlopen(
+            item.opdracht.gewenste_datum,
+            item.opdracht.gewenste_tijd
+          )
+      )
       .map((item) => item.opdracht);
 
     return NextResponse.json({
@@ -156,7 +199,7 @@ export async function POST(request: Request) {
 
     const { data: boeking, error: boekingError } = await supabaseAdmin
       .from("boekingen")
-      .select("id, postcode, huisnummer, plaats, woningtype, glasbewassing_type, telescoop, gewenste_datum, status, betaald, professional_id")
+      .select("id, postcode, huisnummer, plaats, woningtype, glasbewassing_type, telescoop, gewenste_datum, gewenste_tijd, status, betaald, professional_id")
       .eq("id", bookingId)
       .single();
 
@@ -168,8 +211,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Deze opdracht is niet meer beschikbaar." }, { status: 409 });
     }
 
-    if (!boeking.gewenste_datum || boeking.gewenste_datum < vandaagNederland()) {
-      return NextResponse.json({ error: "De datum van deze opdracht is inmiddels verstreken." }, { status: 409 });
+    if (
+      !boeking.gewenste_datum ||
+      boeking.gewenste_datum < vandaagNederland() ||
+      tijdvakVerlopen(boeking.gewenste_datum, (boeking as any).gewenste_tijd)
+    ) {
+      return NextResponse.json({ error: "Het geplande tijdvak van deze opdracht is inmiddels verstreken." }, { status: 409 });
     }
 
     if (!heeftBenodigdeDienst(professional, boeking)) {
