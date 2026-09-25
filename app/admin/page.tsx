@@ -110,6 +110,18 @@ export default function AdminPage() {
     return naam || "-";
   }
 
+  function urenTotAfspraak(gewensteDatum?: string, gewensteTijd?: string) {
+    const tijdMatch = String(gewensteTijd || "").match(/^(\d{2}):(\d{2})/);
+    if (!gewensteDatum || !tijdMatch) return Number.POSITIVE_INFINITY;
+
+    const afspraakMoment = new Date(
+      `${gewensteDatum}T${tijdMatch[1]}:${tijdMatch[2]}:00`
+    );
+    if (Number.isNaN(afspraakMoment.getTime())) return Number.POSITIVE_INFINITY;
+
+    return (afspraakMoment.getTime() - Date.now()) / (1000 * 60 * 60);
+  }
+
   async function professionalKoppelen(
     booking_id: string | number,
     professional_id: string | number
@@ -359,27 +371,45 @@ export default function AdminPage() {
                                 type="button"
                                 disabled={boeking.status === "geannuleerd"}
                                 onClick={() => {
-                                  const afspraakMoment = new Date(
-                                    `${boeking.gewenste_datum}T${boeking.gewenste_tijd}`
-                                  );
-                                  const reden = window.prompt("Reden van annulering:");
+                                  const reden = window.prompt("Reden annulering door klant:");
                                   if (reden === null) return;
-                                  const urenTotAfspraak =
-                                    (afspraakMoment.getTime() - Date.now()) /
-                                    (1000 * 60 * 60);
+                                  const binnen24Uur =
+                                    urenTotAfspraak(
+                                      boeking.gewenste_datum,
+                                      boeking.gewenste_tijd
+                                    ) <= 24;
                                   bookingStatusBijwerken(
                                     boeking.id,
                                     "geannuleerd",
                                     reden,
-                                    urenTotAfspraak <= 24
+                                    binnen24Uur
                                       ? Number(boeking.totaalprijs || 0) * 0.3
                                       : 0,
-                                    "shinego"
+                                    "klant"
                                   );
                                 }}
                                 className="rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50"
                               >
-                                Annuleren
+                                Klant annuleert
+                              </button>
+
+                              <button
+                                type="button"
+                                disabled={boeking.status === "geannuleerd"}
+                                onClick={() => {
+                                  const reden = window.prompt("Reden annulering door ShineGo:");
+                                  if (reden === null) return;
+                                  bookingStatusBijwerken(
+                                    boeking.id,
+                                    "geannuleerd",
+                                    reden,
+                                    0,
+                                    "shinego"
+                                  );
+                                }}
+                                className="rounded-lg bg-slate-700 px-3 py-2 text-sm font-semibold text-white disabled:opacity-50"
+                              >
+                                ShineGo annuleert
                               </button>
 
                               <button
