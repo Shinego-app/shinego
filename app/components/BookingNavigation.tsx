@@ -53,7 +53,7 @@ export default function BookingNavigation() {
           {open ? "×" : "≡"}
         </button>
         {open && (
-          <div className="mt-2 w-64 overflow-hidden rounded-2xl border border-[#d5e9f8] bg-white p-2 shadow-xl">
+          <div className="absolute right-0 top-full mt-2 w-64 max-w-[calc(100vw-2.5rem)] overflow-hidden rounded-2xl border border-[#d5e9f8] bg-white p-2 shadow-xl">
             {links.map((link) => (
               <a key={link.href} href={link.href} onClick={() => setOpen(false)} className="block rounded-xl px-4 py-3 text-sm font-semibold text-[#52779b] hover:bg-[#eef8ff] hover:text-[#1683f8]">
                 {link.label}
