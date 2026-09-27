@@ -44,77 +44,9 @@ export function berekenKlantBtwRegels(booking: Record<string, unknown>): BtwRege
   const totaal = geld(nummer(booking.totaalprijs));
   if (totaal <= 0) return [];
 
-  const type = String(booking.glasbewassing_type || "").toLowerCase();
-  const woningtype = String(booking.woningtype || "").toLowerCase();
-  const bedrijf =
-    type === "bedrijf" ||
-    woningtype.includes("bedrijf") ||
-    woningtype.includes("winkel");
-
-  if (bedrijf) {
-    return [
-      {
-        omschrijving: "Zakelijke glasbewassing",
-        tarief: 21,
-        bedragIncl: totaal,
-      },
-    ];
-  }
-
-  if (type === "binnen") {
-    return [
-      {
-        omschrijving: "Glasbewassing binnen in woning",
-        tarief: 9,
-        bedragIncl: totaal,
-      },
-    ];
-  }
-
-  // Bij een gecombineerde woningopdracht wordt het binnenwerk in de huidige
-  // boeking niet als apart bedrag opgeslagen. We leiden dit veilig af uit de
-  // bestaande prijscomponenten, zonder de betaal- of uitbetalingsflow te wijzigen.
-  const kortingBedrag = nummer(booking.korting_bedrag);
-  const voorKorting = geld(totaal + kortingBedrag);
-
-  const bekendeBuitenComponenten = geld(
-    nummer(booking.basisprijs) +
-      nummer(booking.ramen_prijs) +
-      nummer(booking.verdieping_toeslag) +
-      nummer(booking.bereik_toeslag) +
-      nummer(booking.kozijnen_toeslag)
-  );
-
-  const afgeleidBinnenVoorKorting = geld(
-    Math.max(0, voorKorting - bekendeBuitenComponenten)
-  );
-
-  if (afgeleidBinnenVoorKorting > 0.01 && voorKorting > 0) {
-    const factor = totaal / voorKorting;
-    const binnenIncl = geld(
-      Math.min(totaal, afgeleidBinnenVoorKorting * factor)
-    );
-    const buitenIncl = geld(Math.max(0, totaal - binnenIncl));
-
-    if (binnenIncl > 0 && buitenIncl > 0) {
-      return [
-        {
-          omschrijving: "Glasbewassing binnen in woning",
-          tarief: 9,
-          bedragIncl: binnenIncl,
-        },
-        {
-          omschrijving: "Glasbewassing buiten / overige werkzaamheden",
-          tarief: 21,
-          bedragIncl: buitenIncl,
-        },
-      ];
-    }
-  }
-
   return [
     {
-      omschrijving: "Glasbewassing buiten",
+      omschrijving: "Glasbewassing",
       tarief: 21,
       bedragIncl: totaal,
     },
