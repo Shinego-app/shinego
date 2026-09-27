@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-type GlazenwassenGegevens = { woningtype: string; verdiepingen: string[]; ramen: number; glasOppervlak?: string; binnenGlasOppervlak?: string; telescoop: boolean; type: string; frequentie: string; binnenkant?: boolean; alleenBinnen?: boolean; };
+type GlazenwassenGegevens = { woningtype: string; verdiepingen: string[]; ramen: number; ramenVoorkant?: number; ramenAchterkant?: number; ramenZijkant?: number; achterkant?: boolean; glasOppervlak?: string; binnenGlasOppervlak?: string; telescoop: boolean; type: string; frequentie: string; binnenkant?: boolean; alleenBinnen?: boolean; };
 type GlazenwassenDetails = { bereikbaar: string; extraVuil?: boolean; kozijnen: boolean; opmerking: string; };
 type Prijs = { basisprijs: number; ramenPrijs: number; verdiepingToeslag: number; bereikToeslag: number; kozijnenToeslag: number; kortingPercentage: number; kortingBedrag: number; totaal: number; };
 type KlantGegevens = { voornaam: string; achternaam: string; email: string; telefoon: string; postcode: string; huisnummer: string; toevoeging?: string; straat: string; plaats: string; gewensteDatum: string; gewensteTijd: string; thuisNodig: string; };
@@ -85,6 +85,12 @@ export default function BevestigenPage() {
   const reiniging = alleenBinnen ? "Alleen binnen" : binnenkant ? "Binnen + buiten" : "Alleen buiten";
   const frequentie = klus?.frequentie === "4weken" ? "Elke 4 weken" : klus?.frequentie === "8weken" ? "Elke 8 weken" : klus?.frequentie === "12weken" ? "Elke 12 weken" : "Eenmalig";
   const verdiepingenTekst = klus?.verdiepingen?.length ? klus.verdiepingen.map(v => verdiepingNaam[v] || v).join(", ") : "Niet opgegeven";
+  const heeftNieuweRamenVerdeling = Boolean(klus && (klus.ramenVoorkant !== undefined || klus.ramenAchterkant !== undefined || klus.ramenZijkant !== undefined));
+  const totaalRamen = klus
+    ? heeftNieuweRamenVerdeling
+      ? (klus.ramenVoorkant || 0) + (klus.ramenAchterkant || 0) + (klus.ramenZijkant || 0)
+      : (klus.ramen || 0) + (klus.achterkant ? (klus.ramen || 0) : 0)
+    : 0;
   const stappen = ["Keuze", "Details", "Prijs", "Gegevens", "Bevestigen"];
 
   return <main className="min-h-screen bg-gradient-to-b from-[#eaf6ff] to-[#f8fcff] text-[#123c70]">
@@ -104,7 +110,7 @@ export default function BevestigenPage() {
               {(binnenkant||alleenBinnen)&&<div className="flex justify-between gap-3"><dt>Glas binnen</dt><dd className="text-right font-semibold text-[#123c70]">{klus.binnenGlasOppervlak || "Niet opgegeven"}</dd></div>}
               {!alleenBinnen&&<div className="flex justify-between gap-3"><dt>Telescoopsteel</dt><dd className="text-right font-semibold text-[#123c70]">{klus.telescoop ? "Ja" : "Nee"}</dd></div>}
             </> : <>
-              <div className="flex justify-between gap-3"><dt>Aantal ramen</dt><dd className="text-right font-semibold text-[#123c70]">{klus.ramen || "Niet opgegeven"}</dd></div>
+              <div className="flex justify-between gap-3"><dt>Aantal ramen</dt><dd className="text-right font-semibold text-[#123c70]">{totaalRamen || "Niet opgegeven"}</dd></div>
               <div className="flex justify-between gap-3"><dt>Verdiepingen</dt><dd className="text-right font-semibold text-[#123c70]">{verdiepingenTekst}</dd></div>
               <div className="flex justify-between gap-3"><dt>Telescoopsteel</dt><dd className="text-right font-semibold text-[#123c70]">{klus.telescoop ? "Ja" : "Nee"}</dd></div>
             </>}<div className="flex justify-between gap-3"><dt>Kozijnen</dt><dd className="text-right font-semibold text-[#123c70]">{details.kozijnen ? "Ja" : "Nee"}</dd></div><div className="flex justify-between gap-3"><dt>Frequentie</dt><dd className="text-right font-semibold text-[#123c70]">{frequentie}</dd></div><div className="flex justify-between gap-3"><dt>Datum</dt><dd className="text-right font-semibold text-[#123c70]">{klant.gewensteDatum}</dd></div><div className="flex justify-between gap-3"><dt>Tijd</dt><dd className="text-right font-semibold text-[#123c70]">{klant.gewensteTijd}</dd></div><div className="flex justify-between gap-3"><dt>Thuis nodig</dt><dd className="text-right font-semibold text-[#123c70]">{klant.thuisNodig || "Niet opgegeven"}</dd></div>{details.opmerking && <div className="flex justify-between gap-3"><dt>Opmerking</dt><dd className="max-w-[65%] text-right font-semibold text-[#123c70]">{details.opmerking}</dd></div>}</dl></div>
