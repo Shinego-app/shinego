@@ -261,7 +261,23 @@ export async function POST(request: Request) {
           ? `Zakelijke reiniging: binnen + buiten. Buiten: ${glasOppervlak} m². Binnen: ${binnenGlasOppervlak} m².`
           : `Zakelijke reiniging: alleen buiten. Buiten: ${glasOppervlak} m².`
       : "";
-    const opgeslagenOpmerking = [zakelijkeOmschrijving, klantOpmerking].filter(Boolean).join("\n");
+    const ramenVerdelingOmschrijving =
+      !bedrijf && heeftNieuweVerdeling
+        ? [
+            voorkant > 0 ? `voorkant ${voorkant}` : "",
+            achterkant > 0 ? `achterkant ${achterkant}` : "",
+            zijkant > 0 ? `zijkant ${zijkant}` : "",
+          ]
+            .filter(Boolean)
+            .join(", ")
+        : "";
+    const opgeslagenOpmerking = [
+      zakelijkeOmschrijving,
+      ramenVerdelingOmschrijving ? `Ramenverdeling: ${ramenVerdelingOmschrijving}.` : "",
+      klantOpmerking,
+    ]
+      .filter(Boolean)
+      .join("\n");
 
     const verwachteTotaalprijs = Number(body.verwachteTotaalprijs);
     if (
