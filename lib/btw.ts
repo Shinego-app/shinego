@@ -1,6 +1,6 @@
 export type BtwRegel = {
   omschrijving: string;
-  tarief: 9 | 21;
+  tarief: 21;
   bedragIncl: number;
 };
 
@@ -8,7 +8,7 @@ export type BtwUitsplitsing = {
   bedragIncl: number;
   bedragExcl: number;
   btwBedrag: number;
-  tarief: 9 | 21;
+  tarief: 21;
 };
 
 function geld(value: number) {
@@ -22,7 +22,7 @@ function nummer(value: unknown) {
 
 export function splitsBtwUitInclusief(
   bedragIncl: number,
-  tarief: 9 | 21
+  tarief: 21
 ): BtwUitsplitsing {
   const incl = geld(bedragIncl);
   const excl = geld(incl / (1 + tarief / 100));
