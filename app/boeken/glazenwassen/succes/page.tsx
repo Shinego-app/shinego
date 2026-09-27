@@ -26,7 +26,7 @@ export default function SuccesPage() {
 
   return <main className="min-h-screen bg-gradient-to-b from-[#eaf6ff] to-[#f8fcff] text-[#123c70]">
     <div className="mx-auto max-w-5xl px-5 py-5 sm:px-8 sm:py-7">
-      <header className="flex items-center justify-between"><a href="/" className="text-[29px] font-extrabold tracking-tight text-[#0d3f79]">Shine<span className="text-[#1683f8]">Go</span><span className="ml-1 text-[#1683f8]">✦</span></a><a href="/" aria-label="Menu" className="flex h-9 w-9 items-center justify-center text-2xl font-bold text-[#1683f8]">≡</a></header>
+      <header className="flex items-center justify-between"><a href="/" className="text-[29px] font-extrabold tracking-tight text-[#0d3f79]">Shine<span className="text-[#1683f8]">Go</span><span className="ml-1 text-[#1683f8]">✦</span></a></header>
       <div className="mx-auto mt-3 grid max-w-3xl grid-cols-5 gap-1">{stappen.map((stap,index)=><div key={stap} className="text-center"><div className="flex items-center"><span className={`h-px flex-1 ${index===0?"bg-transparent":"bg-[#7db9eb]"}`} /><span className={`flex h-7 w-7 items-center justify-center rounded-full border text-xs font-extrabold ${index===4?"border-[#1683f8] bg-[#1683f8] text-white":"border-[#9ccbf0] bg-[#eaf6ff] text-[#1683f8]"}`}>{index+1}</span><span className={`h-px flex-1 ${index===4?"bg-transparent":"bg-[#7db9eb]"}`} /></div><div className={`mt-1 text-[10px] sm:text-xs ${index===4?"font-bold text-[#1683f8]":"text-[#52779b]"}`}>{stap}</div></div>)}</div>
 
       <section className="mx-auto mt-5 max-w-3xl rounded-[28px] border border-[#d5e9f8] bg-white/90 px-5 py-7 shadow-[0_18px_55px_rgba(40,93,140,.12)] sm:px-7 sm:py-8">
