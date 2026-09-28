@@ -25,6 +25,65 @@ function normaliseerDiensten(value: unknown) {
   return Array.from(new Set(diensten));
 }
 
+async function verstuurAdminMelding(professional: any) {
+  const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.shinego.nl").replace(/\/$/, "");
+  // Gebruik hetzelfde beheeradres als de admin-inlogcodes. Dit voorkomt dat
+  // registratiemeldingen per ongeluk naar een afwijkend notificatie-adres gaan.
+  const beheerEmail = (process.env.ADMIN_LOGIN_EMAIL || "info@shinego.nl")
+    .trim()
+    .toLowerCase();
+  const volledigeNaam =
+    [professional.voornaam, professional.achternaam].filter(Boolean).join(" ") || "-";
+
+  const { data: emailData, error: emailError } = await resend.emails.send({
+    from: "ShineGo <noreply@shinego.nl>",
+    to: beheerEmail,
+    subject: `Nieuwe professional aangemeld - ${professional.bedrijfsnaam}`,
+    html: `
+      <h2>Nieuwe ShineGo-professional aangemeld</h2>
+      <p>Er staat een nieuwe aanmelding klaar om te controleren.</p>
+      <p><strong>Bedrijfsnaam:</strong> ${escapeHtml(professional.bedrijfsnaam)}</p>
+      <p><strong>Naam:</strong> ${escapeHtml(volledigeNaam)}</p>
+      <p><strong>E-mail:</strong> ${escapeHtml(professional.email || "-")}</p>
+      <p><strong>Telefoon:</strong> ${escapeHtml(professional.telefoon || "-")}</p>
+      <p><strong>Woonplaats:</strong> ${escapeHtml(professional.woonplaats || "-")}</p>
+      <p><strong>KVK:</strong> ${escapeHtml(professional.kvk_nummer || "-")}</p>
+      <p><strong>BTW:</strong> ${escapeHtml(professional.btw_nummer || "-")}</p>
+      <p><a href="${siteUrl}/admin/professionals" style="display:inline-block;background:#2563eb;color:#ffffff;text-decoration:none;padding:12px 18px;border-radius:10px;font-weight:600;">Aanmelding controleren</a></p>
+    `,
+  });
+
+  if (emailError) {
+    console.error("Adminmelding nieuwe professional mislukt:", emailError);
+    return false;
+  }
+
+  console.info("Adminmelding nieuwe professional verstuurd:", {
+    professional_id: professional.id,
+    resend_email_id: emailData?.id || null,
+  });
+  return true;
+}
+
+async function markeerAdminMeldingVerstuurd(
+  userId: string,
+  appMetadata: Record<string, unknown> | null | undefined
+) {
+  const { error } = await supabaseAdmin.auth.admin.updateUserById(userId, {
+    app_metadata: {
+      ...(appMetadata || {}),
+      professional_admin_notification_sent_at: new Date().toISOString(),
+    },
+  });
+
+  if (error) {
+    console.error("Adminmelding-markering opslaan mislukt:", error);
+    return false;
+  }
+
+  return true;
+}
+
 export async function POST(request: Request) {
   try {
     const authorization = request.headers.get("authorization") || "";
@@ -44,6 +103,7 @@ export async function POST(request: Request) {
     }
 
     const metadata = user.user_metadata || {};
+    const appMetadata = user.app_metadata || {};
     if (metadata.account_type && metadata.account_type !== "professional") {
       return NextResponse.json({ error: "Dit account is geen professional-account." }, { status: 403 });
     }
@@ -59,6 +119,20 @@ export async function POST(request: Request) {
     }
 
     if (bestaand) {
+      // Als een eerdere verzendpoging mislukte, proberen we bij de eerstvolgende
+      // geldige login opnieuw. De server-only app_metadata-markering voorkomt
+      // dubbele mails bij latere logins.
+      if (!appMetadata.professional_admin_notification_sent_at) {
+        try {
+          const meldingVerstuurd = await verstuurAdminMelding(bestaand);
+          if (meldingVerstuurd) {
+            await markeerAdminMeldingVerstuurd(user.id, appMetadata);
+          }
+        } catch (emailError) {
+          console.error("Adminmelding bestaande professional fout:", emailError);
+        }
+      }
+
       return NextResponse.json({ professional: bestaand, already_exists: true });
     }
 
@@ -139,37 +213,20 @@ export async function POST(request: Request) {
       );
     }
 
+    let notificationSent = false;
     try {
-      const siteUrl = (process.env.NEXT_PUBLIC_SITE_URL || "https://www.shinego.nl").replace(/\/$/, "");
-      const beheerEmail = process.env.ADMIN_NOTIFICATION_EMAIL || "info@shinego.nl";
-      const volledigeNaam = [data.voornaam, data.achternaam].filter(Boolean).join(" ") || "-";
-
-      const { error: emailError } = await resend.emails.send({
-        from: "ShineGo <noreply@shinego.nl>",
-        to: beheerEmail,
-        subject: `Nieuwe professional aangemeld - ${data.bedrijfsnaam}`,
-        html: `
-          <h2>Nieuwe ShineGo-professional aangemeld</h2>
-          <p>Er staat een nieuwe aanmelding klaar om te controleren.</p>
-          <p><strong>Bedrijfsnaam:</strong> ${escapeHtml(data.bedrijfsnaam)}</p>
-          <p><strong>Naam:</strong> ${escapeHtml(volledigeNaam)}</p>
-          <p><strong>E-mail:</strong> ${escapeHtml(data.email || "-")}</p>
-          <p><strong>Telefoon:</strong> ${escapeHtml(data.telefoon || "-")}</p>
-          <p><strong>Woonplaats:</strong> ${escapeHtml(data.woonplaats || "-")}</p>
-          <p><strong>KVK:</strong> ${escapeHtml(data.kvk_nummer || "-")}</p>
-          <p><strong>BTW:</strong> ${escapeHtml(data.btw_nummer || "-")}</p>
-          <p><a href="${siteUrl}/admin/professionals" style="display:inline-block;background:#2563eb;color:#ffffff;text-decoration:none;padding:12px 18px;border-radius:10px;font-weight:600;">Aanmelding controleren</a></p>
-        `,
-      });
-
-      if (emailError) {
-        console.error("Adminmelding nieuwe professional mislukt:", emailError);
+      notificationSent = await verstuurAdminMelding(data);
+      if (notificationSent) {
+        await markeerAdminMeldingVerstuurd(user.id, appMetadata);
       }
     } catch (emailError) {
       console.error("Adminmelding nieuwe professional fout:", emailError);
     }
 
-    return NextResponse.json({ professional: data });
+    return NextResponse.json({
+      professional: data,
+      notification_sent: notificationSent,
+    });
   } catch (error) {
     console.error("Professional registratie API fout:", error);
     return NextResponse.json(
