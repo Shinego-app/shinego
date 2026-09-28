@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Over ons | ShineGo",
   description:
-    "Lees meer over ShineGo, het Nederlandse bemiddelingsplatform dat klanten en zelfstandige glazenwassers samenbrengt voor duidelijke en eenvoudig geregelde glasbewassing.",
+    "Ontdek hoe ShineGo klanten en zelfstandige glazenwassers samenbrengt met minder administratie, slimmer plannen, regionale opdrachten en meer ruimte om te ondernemen.",
   alternates: {
     canonical: "/over-ons",
   },
@@ -49,8 +49,9 @@ export default function OverOns() {
             </h1>
             <p className="mt-6 text-base leading-7 text-[#607b98] sm:text-lg sm:leading-8">
               ShineGo is een Nederlands online bemiddelingsplatform dat klanten en zelfstandige
-              glazenwassers samenbrengt. Ons doel is eenvoudig: het boeken, plannen en afhandelen
-              van glasbewassing duidelijker en makkelijker maken voor beide kanten.
+              glazenwassers samenbrengt. We willen het werk rondom glasbewassing slimmer organiseren:
+              van boeken en plannen tot betalen, factureren en financiële overzichten. Zo ontstaat
+              minder administratieve rompslomp en meer tijd voor het vak.
             </p>
           </div>
         </div>
@@ -72,9 +73,10 @@ export default function OverOns() {
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#eaf6ff] text-2xl">🧽</div>
             <h2 className="mt-5 text-2xl font-extrabold text-[#0b3d75]">Voor glazenwassers</h2>
             <p className="mt-3 text-sm leading-7 text-[#6685a1] sm:text-base">
-              Zelfstandige glazenwassers kunnen via ShineGo opdrachten in hun werkgebied ontvangen
-              en zelf bepalen welke opdrachten bij hun planning passen. Zo blijft de professional
-              zelfstandig en is de administratie rond opdrachten overzichtelijk geregeld.
+              Zelfstandige glazenwassers kunnen via ShineGo opdrachten in hun eigen werkgebied
+              ontvangen en zelf bepalen welke opdrachten bij hun planning passen. Door opdrachten
+              dichter bij bestaande routes te bundelen, kan er minder tijd verloren gaan aan rijden
+              en blijft er meer tijd over voor klanten en het vak.
             </p>
           </article>
         </div>
@@ -92,16 +94,18 @@ export default function OverOns() {
               </h2>
               <p className="mt-4 max-w-2xl text-sm leading-7 text-[#6685a1] sm:text-base">
                 Een glazenwasser vinden en een opdracht goed afspreken hoeft niet ingewikkeld te
-                zijn. ShineGo brengt prijs, planning, betaling en communicatie zoveel mogelijk samen
-                in één duidelijke online omgeving.
+                zijn. ShineGo brengt prijs, planning, betaling, facturen en financiële overzichten
+                zoveel mogelijk samen in één duidelijke online omgeving. Veel stappen verlopen
+                geautomatiseerd, zodat klanten én professionals minder losse administratie hebben.
               </p>
             </div>
 
             <div className="grid gap-3">
               {[
                 ["Duidelijk", "Vooraf weten wat je afspreekt en wat het kost."],
-                ["Eenvoudig", "Boeken en opdrachten beheren zonder onnodige stappen."],
-                ["Zelfstandig", "De glazenwasser voert de opdracht uit als zelfstandig professional."],
+                ["Geautomatiseerd", "Boekingen, betalingen, facturen en financiële overzichten zoveel mogelijk in één systeem."],
+                ["Zelfstandig", "De glazenwasser kiest zelf welke opdrachten bij zijn planning passen."],
+                ["Regionaal", "Opdrachten dichter bij elkaar kunnen reistijd, kilometers en uitstoot verminderen."],
               ].map(([title, text]) => (
                 <div key={title} className="rounded-2xl bg-white/90 p-5 shadow-sm">
                   <strong className="text-[#123c70]">{title}</strong>
@@ -110,6 +114,60 @@ export default function OverOns() {
               ))}
             </div>
           </div>
+        </div>
+      </section>
+
+      <section className="px-4 py-6 sm:px-6 sm:py-10">
+        <div className="mx-auto max-w-[1180px] rounded-[30px] border border-[#d5e9f8] bg-white p-7 shadow-[0_14px_36px_rgba(46,79,119,.08)] sm:p-10">
+          <p className="text-xs font-extrabold uppercase tracking-[.18em] text-[#1683f8]">
+            Voor professionals
+          </p>
+          <h2 className="mt-2 text-3xl font-extrabold tracking-tight text-[#0b3d75]">
+            Meer tijd voor je vak, minder tijd op de weg
+          </h2>
+
+          <div className="mt-6 grid gap-4 md:grid-cols-2">
+            <div className="rounded-2xl bg-[#f4faff] p-5">
+              <h3 className="font-extrabold text-[#123c70]">Geen vast abonnement</h3>
+              <p className="mt-2 text-sm leading-6 text-[#6685a1]">
+                ShineGo werkt met 15% commissie over uitgevoerde opdrachten. We gebruiken die
+                inkomsten om het platform te onderhouden en verder te ontwikkelen én om te investeren
+                in consumentenmarketing, zodat er meer vraag en nieuwe opdrachten via ShineGo kunnen ontstaan.
+              </p>
+            </div>
+
+            <div className="rounded-2xl bg-[#f4faff] p-5">
+              <h3 className="font-extrabold text-[#123c70]">Minder administratieve rompslomp</h3>
+              <p className="mt-2 text-sm leading-6 text-[#6685a1]">
+                Boekingen, betalingen, facturen en financiële overzichten worden zoveel mogelijk
+                geautomatiseerd en op één plek geregeld. Zo hoeft de professional minder tijd kwijt
+                te zijn aan losse administratie en achter betalingen aan te gaan.
+              </p>
+            </div>
+
+            <div className="rounded-2xl bg-[#f4faff] p-5">
+              <h3 className="font-extrabold text-[#123c70]">Compactere routes</h3>
+              <p className="mt-2 text-sm leading-6 text-[#6685a1]">
+                We willen opdrachten zoveel mogelijk koppelen aan professionals die in de buurt werken.
+                Meer klanten in dezelfde omgeving kan zorgen voor minder reistijd, minder kilometers,
+                lagere reiskosten en minder uitstoot.
+              </p>
+            </div>
+
+            <div className="rounded-2xl bg-[#f4faff] p-5">
+              <h3 className="font-extrabold text-[#123c70]">De drempel verlagen</h3>
+              <p className="mt-2 text-sm leading-6 text-[#6685a1]">
+                ShineGo wil het makkelijker maken om als glazenwasser zelfstandig aan de slag te gaan.
+                Op termijn willen we dit verder uitbreiden met begeleiding en mogelijkheden voor opleiding
+                en praktijkervaring voor nieuwe glazenwassers.
+              </p>
+            </div>
+          </div>
+
+          <p className="mt-6 rounded-2xl bg-[#eaf6ff] px-5 py-4 text-sm font-bold leading-6 text-[#315f88] sm:text-base">
+            Onze ambitie: meer opdrachten dichtbij huis, minder administratie en meer ruimte voor de
+            glazenwasser om zelfstandig te werken en te groeien.
+          </p>
         </div>
       </section>
 
