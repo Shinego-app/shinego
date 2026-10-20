@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Resend } from "resend";
+import { resend } from "@/lib/resend";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { maakFactuurPdf, maakFactuurnummer } from "@/lib/factuur";
 import { magOpdrachtStarten } from "@/lib/opdrachtTijd";
 import { maakCheckoutToken } from "@/lib/checkoutToken";
 import { berekenKlantBtwRegels } from "@/lib/btw";
-
-const resend = new Resend(process.env.RESEND_API_KEY!);
 
 function escapeHtml(value: unknown) {
   return String(value ?? "")
@@ -146,7 +144,6 @@ async function maakVervolgBoeking(
     betaalUrl,
   };
 }
-
 
 export async function POST(req: NextRequest) {
   try {

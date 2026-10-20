@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Resend } from "resend";
+import { resend } from "@/lib/resend";
 import { checkRateLimit, clientIp } from "@/lib/rateLimit";
 import {
   ADMIN_CHALLENGE_COOKIE,
@@ -7,8 +7,6 @@ import {
   leesAdminToken,
   maakAdminToken,
 } from "@/lib/adminAuth";
-
-const resend = new Resend(process.env.RESEND_API_KEY!);
 
 function maakCode() {
   const waarden = new Uint32Array(1);

@@ -2,10 +2,9 @@ import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { maakFactuurnummer } from "@/lib/factuur";
-import { Resend } from "resend";
+import { resend } from "@/lib/resend";
 import { heeftBenodigdeDienst, ligtBinnenWerkgebied } from "@/lib/opdrachtMatching";
 
-const resend = new Resend(process.env.RESEND_API_KEY!);
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 function escapeHtml(value: string | number | null | undefined) {
@@ -37,7 +36,6 @@ function formatDatum(value: string | null | undefined) {
     year: "numeric",
   });
 }
-
 
 async function stuurNieuweOpdrachtMeldingen(boeking: {
   id: string | number;
