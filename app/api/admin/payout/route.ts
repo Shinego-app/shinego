@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
-import Stripe from "stripe";
+import { getStripe } from "@/lib/stripe";
 import { resend } from "@/lib/resend";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { maakFactuurnummer } from "@/lib/factuur";
 import { maakProfessionalAfrekeningPdf } from "@/lib/professionalAfrekening";
 import { magOpdrachtStarten } from "@/lib/opdrachtTijd";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(request: Request) {
   try {
@@ -72,7 +70,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Professional heeft geen Stripe Connect-account." }, { status: 400 });
     }
 
-    const stripeAccount = await stripe.accounts.retrieve(professional.stripe_account_id);
+    const stripeAccount = await getStripe().accounts.retrieve(professional.stripe_account_id);
     const transfersActive = stripeAccount.capabilities?.transfers === "active";
     const payoutsEnabled = stripeAccount.payouts_enabled === true;
     const uitbetalingenActief = transfersActive && payoutsEnabled;
@@ -99,14 +97,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Stripe betaling ontbreekt bij deze boeking." }, { status: 400 });
     }
 
-    const paymentIntent = await stripe.paymentIntents.retrieve(booking.stripe_payment_id);
+    const paymentIntent = await getStripe().paymentIntents.retrieve(booking.stripe_payment_id);
     const chargeId = typeof paymentIntent.latest_charge === "string" ? paymentIntent.latest_charge : paymentIntent.latest_charge?.id;
 
     if (!chargeId) {
       return NextResponse.json({ error: "Geen Stripe charge gevonden voor deze betaling." }, { status: 400 });
     }
 
-    const transfer = await stripe.transfers.create(
+    const transfer = await getStripe().transfers.create(
       {
         amount,
         currency: "eur",

@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
-import Stripe from "stripe";
+import { getStripe } from "@/lib/stripe";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(request: Request) {
   try {
@@ -28,7 +26,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Stripe Connect-account niet gevonden." }, { status: 404 });
     }
 
-    const account = await stripe.accounts.retrieve(professional.stripe_account_id);
+    const account = await getStripe().accounts.retrieve(professional.stripe_account_id);
     const transfersActive = account.capabilities?.transfers === "active";
     const payoutsActive = account.payouts_enabled === true;
     const uitbetalingenActief = transfersActive && payoutsActive;

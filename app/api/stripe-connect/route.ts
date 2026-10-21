@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
-import Stripe from "stripe";
+import { getStripe } from "@/lib/stripe";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(request: Request) {
   try {
@@ -42,7 +40,7 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "E-mailadres ontbreekt." }, { status: 400 });
       }
 
-      const account = await stripe.accounts.create({
+      const account = await getStripe().accounts.create({
         type: "express",
         country: "NL",
         email,
@@ -77,7 +75,7 @@ export async function POST(request: Request) {
     } else {
       // Voor bestaande Connect-accounts mag ShineGo het Stripe-e-mailadres niet wijzigen.
       // Alleen velden bijwerken waarvoor het platform wel toestemming heeft.
-      await stripe.accounts.update(accountId, {
+      await getStripe().accounts.update(accountId, {
         business_profile: {
           name: professional.bedrijfsnaam || undefined,
           product_description: "Glazenwasservice via ShineGo",

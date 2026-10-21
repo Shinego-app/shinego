@@ -19,3 +19,14 @@ Het lockbestand is gesynchroniseerd met de al bestaande package.json-versies Nex
 
 ## Voor publicatie
 PR nog niet mergen of naar productie publiceren zonder expliciete toestemming. Werkelijke previewconfiguratie en runtime met bestaande geldige Resend-sleutel nog te verifiëren via geautoriseerde Vercel-teamtoegang. Geen productiecredentials naar previews kopiëren als onderdeel van deze wijziging. Foutafhandeling blijft expliciet: geen sleutel betekent geen verzonden e-mail en geen succesvol adminloginproces.
+
+## Vervolg 21 oktober 2026
+De scope is uitgebreid met de volgende buildblokkades: Stripe in acht routes en de Supabase-serverclient worden pas bij gebruik geïnitialiseerd. De openbare Supabase-browserconfiguratie blijft vereist. Er zijn geen providerinstellingen of betaalparameters gewijzigd.
+
+Verificatie:
+- `node --test tests/*.test.mjs`: 3 tests geslaagd (Resend mock-succes/-fout, ontbrekende keys, Stripe-signaturecontrole, Supabase-query met gemockte fetch en methodebinding).
+- Schone `npm run build`: geslaagd inclusief TypeScript en 73 statische pagina's, met uitsluitend openbare lokale dummywaarden `http://127.0.0.1:1` / `offline-test`, zonder Stripe-, Resend- of Supabase-serverkey. Eerste poging had een beschadigde lokale Turbopack-cache; opnieuw opgebouwd na verwijderen van alleen gegenereerde `.next`-bestanden.
+- Lokale server op 127.0.0.1: homepage 200; lege boeking 400; registratie zonder sessie 401; lege checkout 400; webhook zonder signature 400; review zonder token 400; uitbetaling/admin-professionals zonder sessie 401; admincode zonder mailkey 500 zonder cookie. Negen controles geslaagd. Geen echte diensten aangeroepen.
+- Gerichte ESLint voor nieuwe helpers/test: geslaagd. Volledige lint: 63 fouten / 15 waarschuwingen, dezelfde totalen als de eerdere baseline. Bestaande lintschuld niet opgelost.
+- Deze tests bewijzen alleen buildbaarheid en de genoemde lokale veiligheids- en contractgevallen, geen succesvolle live end-to-end betaling of registratie.
+- GitHub/Vercel-previewstatus opnieuw controleren na branchupdate. Vercel-API weigert deploymentleestoegang met 403; volledige runtimeverificatie blijft open.
