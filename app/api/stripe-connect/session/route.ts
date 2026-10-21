@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
-import Stripe from "stripe";
+import { getStripe } from "@/lib/stripe";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(request: Request) {
   try {
@@ -39,7 +37,7 @@ export async function POST(request: Request) {
       );
     }
 
-    const accountSession = await stripe.accountSessions.create({
+    const accountSession = await getStripe().accountSessions.create({
       account: professional.stripe_account_id,
       components: {
         account_onboarding: {

@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
-import Stripe from "stripe";
+import { getStripe } from "@/lib/stripe";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 export async function POST(request: Request) {
   const body = await request.text();
@@ -27,7 +25,7 @@ export async function POST(request: Request) {
   let event;
 
   try {
-    event = stripe.parseEventNotification(body, signature, webhookSecret);
+    event = getStripe().parseEventNotification(body, signature, webhookSecret);
   } catch {
     return NextResponse.json(
       { error: "Webhook fout" },

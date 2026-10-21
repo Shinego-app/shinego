@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
-import Stripe from "stripe";
-import { Resend } from "resend";
+import { getStripe } from "@/lib/stripe";
+import { resend } from "@/lib/resend";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-const resend = new Resend(process.env.RESEND_API_KEY!);
 
 export async function POST(request: Request) {
   try {
@@ -61,7 +58,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Er is geen bedrag om terug te betalen." }, { status: 400 });
     }
 
-    const refund = await stripe.refunds.create(
+    const refund = await getStripe().refunds.create(
       {
         payment_intent: booking.stripe_payment_id,
         amount,

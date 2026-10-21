@@ -1,12 +1,10 @@
 import { NextResponse } from "next/server";
-import Stripe from "stripe";
+import { getStripe } from "@/lib/stripe";
+import type Stripe from "stripe";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { maakFactuurnummer } from "@/lib/factuur";
-import { Resend } from "resend";
+import { resend } from "@/lib/resend";
 import { heeftBenodigdeDienst, ligtBinnenWerkgebied } from "@/lib/opdrachtMatching";
-
-const resend = new Resend(process.env.RESEND_API_KEY!);
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
 
 function escapeHtml(value: string | number | null | undefined) {
   return String(value ?? "")
@@ -37,7 +35,6 @@ function formatDatum(value: string | null | undefined) {
     year: "numeric",
   });
 }
-
 
 async function stuurNieuweOpdrachtMeldingen(boeking: {
   id: string | number;
@@ -130,7 +127,7 @@ export async function POST(request: Request) {
   let event: Stripe.Event;
 
   try {
-    event = stripe.webhooks.constructEvent(
+    event = getStripe().webhooks.constructEvent(
       body,
       signature,
       process.env.STRIPE_WEBHOOK_SECRET!

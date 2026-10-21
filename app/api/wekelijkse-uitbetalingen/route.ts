@@ -1,12 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import Stripe from "stripe";
-import { Resend } from "resend";
+import { getStripe } from "@/lib/stripe";
+import { resend } from "@/lib/resend";
 import { supabaseAdmin } from "@/lib/supabaseAdmin";
 import { maakFactuurnummer } from "@/lib/factuur";
 import { maakProfessionalAfrekeningPdf } from "@/lib/professionalAfrekening";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-const resend = new Resend(process.env.RESEND_API_KEY!);
 
 export async function GET(request: NextRequest) {
   const cronSecret = process.env.CRON_SECRET;
@@ -104,7 +101,7 @@ export async function GET(request: NextRequest) {
         continue;
       }
 
-      const account = await stripe.accounts.retrieve(professional.stripe_account_id);
+      const account = await getStripe().accounts.retrieve(professional.stripe_account_id);
       const transfersActive = account.capabilities?.transfers === "active";
       const payoutsEnabled = account.payouts_enabled === true;
       const uitbetalingenActief = transfersActive && payoutsEnabled;
@@ -127,7 +124,7 @@ export async function GET(request: NextRequest) {
         continue;
       }
 
-      const paymentIntent = await stripe.paymentIntents.retrieve(booking.stripe_payment_id);
+      const paymentIntent = await getStripe().paymentIntents.retrieve(booking.stripe_payment_id);
       const chargeId =
         typeof paymentIntent.latest_charge === "string"
           ? paymentIntent.latest_charge
@@ -139,7 +136,7 @@ export async function GET(request: NextRequest) {
         continue;
       }
 
-      const transfer = await stripe.transfers.create(
+      const transfer = await getStripe().transfers.create(
         {
           amount,
           currency: "eur",

@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
-import { Resend } from "resend";
+import { resend } from "@/lib/resend";
 import { checkRateLimit, clientIp } from "@/lib/rateLimit";
 
-const resend = new Resend(process.env.RESEND_API_KEY!);
 const CONTACT_EMAIL = process.env.CONTACT_EMAIL || "info@shinego.nl";
 
 export async function POST(req: NextRequest) {
