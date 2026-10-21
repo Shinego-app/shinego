@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Over ons | ShineGo",
+  title: "Over ons",
   description:
     "Ontdek hoe ShineGo klanten en zelfstandige glazenwassers samenbrengt met minder administratie, slimmer plannen, regionale opdrachten en meer ruimte om te ondernemen.",
   alternates: {
